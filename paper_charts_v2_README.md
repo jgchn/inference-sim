@@ -8,58 +8,43 @@ We organize the evaluation around six operator decisions. Each maps to a concret
 
 | Chart | Operator Question | What We Measure |
 |-------|-------------------|-----------------|
-| 1 | "What's the cheapest config that meets my SLOs?" | Size and dominance of explored Pareto front; cost of top recommendations |
-| 2 | "Will these configs actually work when I deploy?" | Prediction-to-reality gap; SLO compliance on real llm-d |
-| 3 | "Is the time-to-answer reasonable for what I get?" | Runtime and resource cost of the planning phase itself |
-| 4 | "Can I serve more traffic without hurting premium users?" | Throughput gain from SLO tiering while maintaining premium P99 TTFT |
-| 5 | "When do I need to add capacity?" | Recommended GPUs vs. validated ground truth across a load range |
-| 6 | "Can I serve a better model on existing hardware?" | Whether the tool correctly identifies larger models as viable |
+| 1 | "What's the cheapest config that meets my SLOs — and will it actually work?" | Pareto front quality, cost of recommendations, and sim2real drift on llm-d |
+| 2 | "Is the time-to-answer reasonable for what I get?" | Runtime and resource cost of the planning phase itself |
+| 3 | "Can I serve more traffic without hurting premium users?" | Throughput gain from SLO tiering while maintaining premium P99 TTFT |
+| 4 | "When do I need to add capacity?" | Recommended GPUs vs. validated ground truth across a load range |
+| 5 | "Can I serve a better model on existing hardware?" | Whether the tool correctly identifies larger models as viable |
 
 The views build progressively:
 
-**Charts 1-2: Does the tool lead to a deployment that works?** Chart 1 shows that BLIS explores a dominant Pareto front and recommends cheaper configs — single-GPU deployments where other tools require two or four. Chart 2 validates these recommendations on real llm-d: BLIS's configs meet SLO as predicted, while over-optimistic tools cause SLO violations and conservative tools waste capacity. Together, these charts establish that BLIS's recommendations are both cheaper and correct — the operator deploys a right-sized config on the first try.
+**Chart 1: Does the tool lead to a deployment that works?** Chart 1 shows the full picture in a single view: each tool's estimated Pareto front, the top-3 cheapest recommendations, and what actually happened when those configs were deployed on real llm-d. Drift arrows from estimated to actual position reveal each tool's prediction accuracy. Configs that crossed the SLO threshold in production are flagged — these are the dangerous false positives that lead to SLO violations on deploy day. BLIS's arrows are short (accurate) and stay in the green zone. Over-optimistic tools' arrows are long and cross into SLO violation territory.
 
-**Chart 3: Is the cost of getting these answers reasonable?** BLIS delivers its superior recommendations without requiring significantly more time or tying up GPU hardware. The operator pays minutes on a CPU, not hours on a GPU. For profiling-based tools that take hours, the wait is only worthwhile if their predictions hold — and Chart 2 shows they often don't.
+**Chart 2: Is the cost of getting these answers reasonable?** BLIS delivers its superior recommendations without requiring significantly more time or tying up GPU hardware. The operator pays minutes on a CPU, not hours on a GPU. For profiling-based tools that take hours, the wait is only worthwhile if their predictions hold — and Chart 1 shows they often don't.
 
-**Charts 4-6: What deployment improvements become possible with accurate platform-level simulation?** These charts demonstrate optimizations that other tools cannot even evaluate because they don't model the relevant system behavior. Chart 4 shows that SLO tiering unlocks 30% more throughput while fully protecting premium users — a scheduling optimization invisible to tools that assume uniform traffic. Chart 5 shows that accurate single-GPU capacity estimates delay scale-out decisions, avoiding premature cost doubling. Chart 6 shows that BLIS correctly identifies a larger model (Qwen3-32B) as viable on existing hardware, enabling better user-facing quality without additional GPUs. In each case, the deployment improvement requires a tool that models platform-level behavior — routing, admission, tiered scheduling, batching dynamics — not just single-request latency.
+**Charts 3-5: What deployment improvements become possible with accurate platform-level simulation?** These charts demonstrate optimizations that other tools cannot even evaluate because they don't model the relevant system behavior. Chart 3 shows that SLO tiering unlocks 30% more throughput while fully protecting premium users — a scheduling optimization invisible to tools that assume uniform traffic. Chart 4 shows that accurate single-GPU capacity estimates delay scale-out decisions, avoiding premature cost doubling. Chart 5 shows that BLIS correctly identifies a larger model (Qwen3-32B) as viable on existing hardware, enabling better user-facing quality without additional GPUs. In each case, the deployment improvement requires a tool that models platform-level behavior — routing, admission, tiered scheduling, batching dynamics — not just single-request latency.
 
 ---
 
-## Chart 1 — Fixed SLO, Minimum Cost
+## Chart 1 — Config Search + Sim2Real Validation
 
 ![Chart 1](chart_v2_1_pareto_fronts.png)
 
-**Operator question:** I have a workload and latency targets. What's the cheapest deployment that meets them?
+**Operator question:** What's the cheapest config that meets my SLOs — and will it actually work when I deploy it?
 
-**Setup.** Workload: chatbot (Qwen3-14B). SLO: P50 TTFT < 300ms. Each tool explores the same 432-config space (TP={1,2,4} x GPU={L40,A100,H100} x batch_size={32,48,64,96,128} x chunk_size={256,512,1024}) and produces an estimated Pareto front. From each tool's frontier, we select the top-3 cheapest configurations that the tool believes will meet SLO — these become the tool's deployment recommendations.
+**Setup.** Workload: chatbot (Qwen3-14B). SLO: mean TTFT < 300ms. Each tool explores the same 432-config space (TP={1,2,4} x GPU={L40,A100,H100} x batch_size={32,48,64,96,128} x chunk_size={256,512,1024}) and produces an estimated Pareto front. From each tool's frontier, we select the top-3 cheapest configurations that the tool believes will meet SLO. We then deploy every selected config on real llm-d and measure actual performance.
 
-**Presentation.** Scatter-line plot. Each tool's Pareto front shown with hollow markers (shape encodes tool, line style provides secondary distinction). Top-3 cheapest SLO-meeting configs shown as filled markers — these are what the tool would actually recommend deploying. SLO threshold region in light green.
+**Presentation.** Scatter-line plot combining the config search and sim2real validation in a single view. Each tool's estimated Pareto front is shown as a line with hollow markers (shape encodes tool, line style provides secondary distinction). For each selected config, a drift arrow connects the estimated position (hollow marker on the Pareto front) to the actual measured position (filled marker). The SLO threshold divides the space — configs whose actual position lands right of the threshold violated SLO in production and are flagged in red.
 
-**Claim.** BLIS recommends configurations that use fewer GPUs and cost less per hour while still meeting SLO under real load. BLIS finds single-GPU configs that meet SLO: 1xL40 ($1.50/hr), 1xA100 ($2.80/hr), 1xH100 ($3.20/hr). Other tools' cheapest SLO-meeting configs require 2-4 GPUs ($5.60–$6.40/hr) because their frontiers are lower — they don't believe single-GPU configs can meet the target. Tools that over-provision (2 GPUs when 1 suffices) waste cost.
+**Claim.** BLIS recommends single-GPU configs (1xL40 $1.50/hr, 1xA100 $2.80/hr, 1xH100 $3.20/hr) whose drift arrows are short and stay in the SLO-compliant region — predictions match reality, and every recommended config works as advertised. Other tools' cheapest SLO-meeting configs require 2-4 GPUs ($5.60–$6.40/hr) because their frontiers are lower.
 
-**Validation.** Deploy each tool's recommended config on real llm-d. Run the full chatbot workload via `blis observe`. A recommendation that violates SLO under real load is a false recommendation regardless of the tool's confidence. Results in Chart 2.
+Critically, some configs from other tools cross the SLO threshold when deployed on real hardware. These are dangerous false positives: the tool told the operator the config was safe, but it violates SLO in production. The operator who trusted these recommendations has a production incident. AIconfigurator's arrows are the longest and most likely to cross the SLO line — its over-optimistic predictions lead to the most dangerous recommendations.
 
----
+Tools whose recommendations violate SLO on real hardware made a false recommendation regardless of the tool's confidence. Tools that over-provision (2 GPUs when 1 suffices) waste cost. BLIS avoids both failure modes.
 
-## Chart 2 — Sim2Real: Predicted vs. Deployed Performance
-
-![Chart 2](chart_v2_2_sim2real.png)
-
-**Operator question:** Will these configs actually work when I deploy them?
-
-**Setup.** Take each tool's top-3 cheapest recommendations from Chart 1. Deploy each config on real llm-d infrastructure. Run the full chatbot workload via `blis observe`. Measure actual mean TTFT and throughput.
-
-**Presentation.** Two-panel grouped bar chart. (a) Mean TTFT: estimated (hatched) vs. actual (solid). (b) Throughput: same. SLO violations flagged. Configs labeled 1st/2nd/3rd cheapest.
-
-**Claim.** BLIS's predictions match reality within 3-5%. Configs work as advertised — no SLO violations, no wasted capacity. The deployment is right-sized on day one.
-
-Tools whose recommendations violate SLO on real hardware made a false recommendation — the operator who trusted them has a production incident. Tools whose configs meet SLO but deliver less throughput than predicted are wasting capacity the operator is paying for.
-
-**Why all measurements are real hardware.** Some tools predict only mean latency; others predict P99. Comparing predicted latencies across tools with different output semantics is not meaningful. Instead, we treat each tool as a black box that outputs a config recommendation, then evaluate all recommendations on equal footing: deploy and measure.
+**Validation.** Deploy each tool's recommended config on real llm-d. Run the full chatbot workload via `blis observe`. Measure actual mean TTFT and throughput. We treat each tool as a black box that outputs a config recommendation, then evaluate all recommendations on equal footing: deploy and measure.
 
 ---
 
-## Chart 3 — Runtime and Resource Cost
+## Chart 2 — Runtime and Resource Cost
 
 ![Chart 3](chart_v2_3_runtime.png)
 
@@ -83,7 +68,7 @@ BLIS doesn't need GPUs to evaluate GPU configs. The operator can plan an H100 de
 
 ---
 
-## Chart 4 — SLO Tiering: Premium Protection + Throughput Gain
+## Chart 3 — SLO Tiering: Premium Protection + Throughput Gain
 
 ![Chart 4](chart_v2_4_slo_tiering.png)
 
@@ -101,7 +86,7 @@ BLIS doesn't need GPUs to evaluate GPU configs. The operator can plan an H100 de
 
 ---
 
-## Chart 5 — Scaling Curve: When to Add Capacity
+## Chart 4 — Scaling Curve: When to Add Capacity
 
 ![Chart 5](chart_v2_5_scalability.png)
 
@@ -119,7 +104,7 @@ Tools that recommend more instances than needed over-provision (wasted cost). To
 
 ---
 
-## Chart 6 — Model Selection: Serving a Better Model on Existing Hardware
+## Chart 5 — Model Selection: Serving a Better Model on Existing Hardware
 
 ![Chart 6](chart_v2_6_model_selection.png)
 
