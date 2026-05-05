@@ -68,21 +68,21 @@ BLIS doesn't need GPUs to evaluate GPU configs. The operator can plan an H100 de
 
 ---
 
-## Chart 3 — SLO Tiering: Premium Protection + Throughput Gain
+## Chart 3 — SLO Tiering: Free Throughput from Priority-Aware Scheduling
 
-![Chart 4](chart_v2_4_slo_tiering.png)
+![Chart 3](chart_v2_fig3_draft.png)
 
-**Operator question:** I have premium and standard users. Can I serve more total traffic without degrading premium experience?
+**Operator question:** Can I get more throughput from the same hardware by being smarter about which users need tight latency?
 
-**Setup.** Mixed workload: 70% premium (P99 TTFT < 300ms), 30% standard (P99 TTFT < 800ms). Same three configs from Chart 1 (1xL40 $1.50/hr, 1xA100 $2.80/hr, 1xH100 $3.20/hr). Compare uniform SLO (all users get same 300ms target) vs. tiered SLO (premium protected at 300ms, standard allowed up to 800ms).
+**Setup.** Workload: chatbot (Qwen3-14B). Same 432-config search space as Chart 1. Run config search twice: (1) Baseline — uniform SLO (P99 TTFT < 300ms for all users), (2) Treatment — tiered SLO (premium users keep P99 TTFT < 300ms, standard users relaxed to P99 TTFT < 400ms). Each search produces its own Pareto frontier. Select the highest-throughput SLO-meeting config from each frontier and validate on real llm-d.
 
-**Presentation.** Bar chart with dual y-axis. Left axis: total throughput (uniform vs. tiered). Right axis: premium P99 TTFT (showing it stays below 300ms in both modes). Percentage annotations show throughput gain.
+**Presentation.** Throughput vs. latency Pareto frontier plot. Two frontiers: baseline (gray dashed, circles) and tiered (blue solid, squares). The tiered frontier dominates — at every latency point, more throughput is achievable because the scheduler can batch standard-tier requests more aggressively without impacting premium routing. At the 300ms SLO boundary, filled markers show each frontier's best config (estimated). Drift arrows connect to darker filled markers showing actual measured performance on llm-d. Left bracket (green): estimated throughput gain (+25%). Right bracket (orange): actual validated gain (+20%).
 
-**Claim.** SLO tiering increases total throughput by 30-32% on the same hardware while premium P99 TTFT remains fully protected. Standard-tier requests tolerate longer queuing and larger batch sizes, freeing headroom for premium requests. The benefit is consistent across hardware tiers (L40, A100, H100), confirming it's a fundamental scheduling advantage.
+**Claim.** SLO tiering shifts the entire Pareto frontier upward. By relaxing the SLO for standard-tier users by just 100ms, BLIS finds configs that deliver +25% more throughput (actual: +20% validated on llm-d) at the same premium SLO guarantee. The operator doesn't lower the bar for everyone — they selectively relax it for users who can tolerate it, and the scheduler exploits this flexibility. The gain is "free" in the sense that premium users see no degradation and no additional hardware is required.
 
-**Why this is a BLIS-unique finding.** Other tools don't model multi-tenant scheduling behavior. They evaluate configs assuming uniform traffic — they cannot tell the operator whether enabling tiered SLO is safe for premium users or how much throughput it unlocks. Without BLIS, the operator either leaves 30% throughput on the table (don't enable tiering) or enables it blind and hopes premium SLOs hold.
+**Why this is a BLIS-unique finding.** Other tools don't model priority-aware scheduling. They run config search assuming uniform traffic with a single SLO target — they cannot evaluate what happens when different user classes have different latency budgets. Without BLIS, the operator either applies the strictest SLO to everyone (leaving throughput on the table) or uniformly relaxes SLO (degrading premium users). BLIS reveals the third option: tiered scheduling that protects premium users while extracting more throughput from the same hardware.
 
-**Validation.** Deploy each config on llm-d with tiered SLO routing enabled. Send the mixed workload. Measure premium P99 TTFT and total throughput separately. Confirm premium TTFT stays below 300ms while total throughput matches BLIS's prediction.
+**Validation.** Deploy each frontier's best config on llm-d. Run the chatbot workload with tiered SLO routing enabled. Confirm: (1) premium P99 TTFT stays below 300ms, (2) total throughput matches BLIS's prediction within drift tolerance. The drift arrows in the chart show the sim2real gap — small and honest.
 
 ---
 
