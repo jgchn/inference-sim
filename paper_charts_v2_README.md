@@ -8,9 +8,9 @@ BLIS models the full serving stack: not just "how fast does one batch run" but "
 
 ## Section Flow
 
-**BLIS finds better deployments than existing tools.** We treat each tool as a black box that outputs a config recommendation, deploy every recommendation on real llm-d, and measure outcomes. BLIS recommends cheaper configs that actually meet SLO (Charts 1–2).
+**Part 1 — Comparative: BLIS vs. other tools on the same task (Charts 1–2).** All tools search the same config space for the same workload. We deploy every tool's recommendation on real llm-d and compare outcomes. BLIS finds cheaper configs that actually meet SLO; other tools over-provision or produce false positives.
 
-**BLIS models what operators actually do in production.** Real traffic has priority classes, bursty arrivals, and SLO tiers — mechanisms that engine-only tools are blind to. Because BLIS models these, it discovers optimizations that other tools cannot even search for: tiered scheduling that unlocks free throughput (Chart 3), accurate single-GPU capacity that delays costly scale-out (Chart 4), and cross-model viability on fixed hardware (Chart 5). All validated on real llm-d.
+**Part 2 — BLIS-only what-if analysis (Charts 3–5).** These explore deployment optimizations that only BLIS can evaluate because other tools don't model the relevant mechanisms. No head-to-head comparison — instead we show what becomes possible when the simulator understands production-level behavior: tiered scheduling unlocks free throughput (Chart 3), accurate capacity modeling delays costly scale-out (Chart 4), and cross-model evaluation identifies viable upgrades (Chart 5). All validated on real llm-d.
 
 ---
 
