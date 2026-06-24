@@ -1,0 +1,295 @@
+metadata:
+  iteration: 8
+  bundle_ref: "runs/iter-8/bundle.yaml"
+  description: >
+    Model-size generalization and formula limits. Tests lean bracket on qwen3-32b,
+    RP-27 bandwidth formula accuracy across 18 regimes, micro-eval horizon, and L40S robustness.
+
+setup:
+  - cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && go build -o blis main.go"
+    description: "Build BLIS binary"
+  - cmd: "cp /Users/jchen/go/src/inference-sim/inference-sim/search_blis_iter7.py /Users/jchen/go/src/inference-sim/inference-sim/search_blis_iter8.py"
+    description: "Create iter8 script with GLOBAL_BEST_TABLE updates and formula-predict strategy"
+
+arms:
+  - arm_id: "h-main"
+    conditions:
+      - name: "h100-rate100"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy adaptive-hierarchical --phase1-k 1
+          --phase1-profiles bracket --tp-candidates lean --skip-phase2
+          --hardware H100 --budget 2 --seeds 42,43,44,45,46
+          --rate 100 --num-requests 1000 --model qwen/qwen3-32b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-main/h100-rate100.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-main/h100-rate100.json"
+
+      - name: "h100-rate300"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy adaptive-hierarchical --phase1-k 1
+          --phase1-profiles bracket --tp-candidates lean --skip-phase2
+          --hardware H100 --budget 2 --seeds 42,43,44,45,46
+          --rate 300 --num-requests 1000 --model qwen/qwen3-32b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-main/h100-rate300.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-main/h100-rate300.json"
+
+      - name: "h100-rate500"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy adaptive-hierarchical --phase1-k 1
+          --phase1-profiles bracket --tp-candidates lean --skip-phase2
+          --hardware H100 --budget 2 --seeds 42,43,44,45,46
+          --rate 500 --num-requests 1000 --model qwen/qwen3-32b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-main/h100-rate500.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-main/h100-rate500.json"
+
+      - name: "a100-rate100"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy adaptive-hierarchical --phase1-k 1
+          --phase1-profiles bracket --tp-candidates lean --skip-phase2
+          --hardware A100-SXM --budget 2 --seeds 42,43,44,45,46
+          --rate 100 --num-requests 1000 --model qwen/qwen3-32b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-main/a100-rate100.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-main/a100-rate100.json"
+
+      - name: "a100-rate500"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy adaptive-hierarchical --phase1-k 1
+          --phase1-profiles bracket --tp-candidates lean --skip-phase2
+          --hardware A100-SXM --budget 2 --seeds 42,43,44,45,46
+          --rate 500 --num-requests 1000 --model qwen/qwen3-32b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-main/a100-rate500.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-main/a100-rate500.json"
+
+  - arm_id: "h-control-negative"
+    conditions:
+      - name: "h100-qwen14b-rate100"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy formula-predict
+          --hardware H100 --rate 100 --num-requests 1000 --model qwen/qwen3-14b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/h100-qwen14b-rate100.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/h100-qwen14b-rate100.json"
+
+      - name: "h100-qwen14b-rate500"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy formula-predict
+          --hardware H100 --rate 500 --num-requests 1000 --model qwen/qwen3-14b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/h100-qwen14b-rate500.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/h100-qwen14b-rate500.json"
+
+      - name: "h100-llama8b-rate100"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy formula-predict
+          --hardware H100 --rate 100 --num-requests 1000 --model meta-llama/llama-3.1-8b-instruct
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/h100-llama8b-rate100.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/h100-llama8b-rate100.json"
+
+      - name: "h100-llama8b-rate500"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy formula-predict
+          --hardware H100 --rate 500 --num-requests 1000 --model meta-llama/llama-3.1-8b-instruct
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/h100-llama8b-rate500.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/h100-llama8b-rate500.json"
+
+      - name: "h100-qwen32b-rate100"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy formula-predict
+          --hardware H100 --rate 100 --num-requests 1000 --model qwen/qwen3-32b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/h100-qwen32b-rate100.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/h100-qwen32b-rate100.json"
+
+      - name: "h100-qwen32b-rate500"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy formula-predict
+          --hardware H100 --rate 500 --num-requests 1000 --model qwen/qwen3-32b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/h100-qwen32b-rate500.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/h100-qwen32b-rate500.json"
+
+      - name: "a100-qwen14b-rate100"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy formula-predict
+          --hardware A100-SXM --rate 100 --num-requests 1000 --model qwen/qwen3-14b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/a100-qwen14b-rate100.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/a100-qwen14b-rate100.json"
+
+      - name: "a100-qwen14b-rate500"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy formula-predict
+          --hardware A100-SXM --rate 500 --num-requests 1000 --model qwen/qwen3-14b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/a100-qwen14b-rate500.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/a100-qwen14b-rate500.json"
+
+      - name: "a100-llama8b-rate100"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy formula-predict
+          --hardware A100-SXM --rate 100 --num-requests 1000 --model meta-llama/llama-3.1-8b-instruct
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/a100-llama8b-rate100.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/a100-llama8b-rate100.json"
+
+      - name: "a100-llama8b-rate500"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy formula-predict
+          --hardware A100-SXM --rate 500 --num-requests 1000 --model meta-llama/llama-3.1-8b-instruct
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/a100-llama8b-rate500.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/a100-llama8b-rate500.json"
+
+      - name: "a100-qwen32b-rate100"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy formula-predict
+          --hardware A100-SXM --rate 100 --num-requests 1000 --model qwen/qwen3-32b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/a100-qwen32b-rate100.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/a100-qwen32b-rate100.json"
+
+      - name: "a100-qwen32b-rate500"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy formula-predict
+          --hardware A100-SXM --rate 500 --num-requests 1000 --model qwen/qwen3-32b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/a100-qwen32b-rate500.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/a100-qwen32b-rate500.json"
+
+      - name: "l40s-qwen14b-rate100"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy formula-predict
+          --hardware L40S --rate 100 --num-requests 1000 --model qwen/qwen3-14b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/l40s-qwen14b-rate100.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/l40s-qwen14b-rate100.json"
+
+      - name: "l40s-qwen14b-rate500"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy formula-predict
+          --hardware L40S --rate 500 --num-requests 1000 --model qwen/qwen3-14b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/l40s-qwen14b-rate500.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/l40s-qwen14b-rate500.json"
+
+      - name: "l40s-llama8b-rate100"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy formula-predict
+          --hardware L40S --rate 100 --num-requests 1000 --model meta-llama/llama-3.1-8b-instruct
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/l40s-llama8b-rate100.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/l40s-llama8b-rate100.json"
+
+      - name: "l40s-llama8b-rate500"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy formula-predict
+          --hardware L40S --rate 500 --num-requests 1000 --model meta-llama/llama-3.1-8b-instruct
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/l40s-llama8b-rate500.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/l40s-llama8b-rate500.json"
+
+      - name: "l40s-qwen32b-rate100"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy formula-predict
+          --hardware L40S --rate 100 --num-requests 1000 --model qwen/qwen3-32b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/l40s-qwen32b-rate100.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/l40s-qwen32b-rate100.json"
+
+      - name: "l40s-qwen32b-rate500"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy formula-predict
+          --hardware L40S --rate 500 --num-requests 1000 --model qwen/qwen3-32b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/l40s-qwen32b-rate500.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-control-negative/l40s-qwen32b-rate500.json"
+
+  - arm_id: "h-ablation"
+    conditions:
+      - name: "h100-qwen14b-100req"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy adaptive-hierarchical --phase1-k 1
+          --phase1-profiles bracket --tp-candidates lean --skip-phase2
+          --hardware H100 --budget 2 --seeds 42
+          --rate 500 --num-requests 100 --model qwen/qwen3-14b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-ablation/h100-qwen14b-100req.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-ablation/h100-qwen14b-100req.json"
+
+      - name: "a100-qwen14b-100req"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy adaptive-hierarchical --phase1-k 1
+          --phase1-profiles bracket --tp-candidates lean --skip-phase2
+          --hardware A100-SXM --budget 2 --seeds 42
+          --rate 500 --num-requests 100 --model qwen/qwen3-14b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-ablation/a100-qwen14b-100req.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-ablation/a100-qwen14b-100req.json"
+
+      - name: "h100-llama8b-100req"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy adaptive-hierarchical --phase1-k 1
+          --phase1-profiles bracket --tp-candidates lean --skip-phase2
+          --hardware H100 --budget 2 --seeds 42
+          --rate 500 --num-requests 100 --model meta-llama/llama-3.1-8b-instruct
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-ablation/h100-llama8b-100req.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-ablation/h100-llama8b-100req.json"
+
+      - name: "h100-qwen32b-100req"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy adaptive-hierarchical --phase1-k 1
+          --phase1-profiles bracket --tp-candidates lean --skip-phase2
+          --hardware H100 --budget 2 --seeds 42
+          --rate 500 --num-requests 100 --model qwen/qwen3-32b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-ablation/h100-qwen32b-100req.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-ablation/h100-qwen32b-100req.json"
+
+  - arm_id: "h-robustness"
+    conditions:
+      - name: "l40s-qwen14b-rate100"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy adaptive-hierarchical --phase1-k 1
+          --phase1-profiles bracket --tp-candidates lean --skip-phase2
+          --hardware L40S --budget 2 --seeds 42,43,44,45,46
+          --rate 100 --num-requests 1000 --model qwen/qwen3-14b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-robustness/l40s-qwen14b-rate100.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-robustness/l40s-qwen14b-rate100.json"
+
+      - name: "l40s-qwen14b-rate500"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy adaptive-hierarchical --phase1-k 1
+          --phase1-profiles bracket --tp-candidates lean --skip-phase2
+          --hardware L40S --budget 2 --seeds 42,43,44,45,46
+          --rate 500 --num-requests 1000 --model qwen/qwen3-14b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-robustness/l40s-qwen14b-rate500.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-robustness/l40s-qwen14b-rate500.json"
+
+      - name: "l40s-llama8b-rate100"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy adaptive-hierarchical --phase1-k 1
+          --phase1-profiles bracket --tp-candidates lean --skip-phase2
+          --hardware L40S --budget 2 --seeds 42,43,44,45,46
+          --rate 100 --num-requests 1000 --model meta-llama/llama-3.1-8b-instruct
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-robustness/l40s-llama8b-rate100.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-robustness/l40s-llama8b-rate100.json"
+
+      - name: "l40s-llama8b-rate500"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter8.py --strategy adaptive-hierarchical --phase1-k 1
+          --phase1-profiles bracket --tp-candidates lean --skip-phase2
+          --hardware L40S --budget 2 --seeds 42,43,44,45,46
+          --rate 500 --num-requests 1000 --model meta-llama/llama-3.1-8b-instruct
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-robustness/l40s-llama8b-rate500.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-8/results/h-robustness/l40s-llama8b-rate500.json"

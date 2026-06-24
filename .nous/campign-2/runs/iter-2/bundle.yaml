@@ -1,0 +1,91 @@
+metadata:
+  iteration: 2
+  family: "pareto-search-convergence"
+  research_question: "At rate=2000 where the optimal BLIS configuration is non-obvious (TP=4/2 beats TP=8/1 due to queue bottleneck), does hierarchical decomposition converge to 95% of optimal throughput in fewer evaluations than random search or NSGA-II?"
+
+arm_selection_rationale: >
+  h-main tests the core convergence-speed hypothesis at rate=2000 where the search problem is genuinely hard
+  (optimal config is non-obvious, occupies 0.017% of space). h-control-negative tests at rate=50 where the
+  search is trivially easy (RP-C2-1: TP=8/1 dominates, any strategy finds it quickly). h-robustness verifies
+  the hierarchical advantage is stable across workload seeds. NSGA-II is included as the "intelligent baseline"
+  suggested by iteration 1's handoff.
+
+arms:
+  - type: h-main
+    prediction: >
+      At rate=2000, hierarchical search will reach 95% of optimal throughput (38,373 tok/s) in fewer
+      evaluations than random search. Specifically: hierarchical converges within ~20 evaluations
+      (Phase 1 identifies TP=4/2 in 15 evals, then 5 within-tier samples find batch=512), while
+      random search requires ~150+ evaluations (probability of hitting TP=4/2 with batch=512 is
+      ~0.017% per sample, needing ~60 draws to reach any config within 95% by chance given the
+      5760/71040 = 8% probability of landing in the TP=4/2 tier and then the ~1/6 probability
+      of hitting batch≥512). NSGA-II will converge faster than random but slower than hierarchical
+      because it needs ~20 random warmup evaluations before its surrogate model becomes effective.
+    mechanism: >
+      At rate=2000, the single-instance queue bottleneck causes TP=8/1 to underperform TP=4/2
+      (scheduling_delay_p99 = 6794ms for TP=8/1 vs 142ms for TP=4/2). Hierarchical Phase 1
+      evaluates each tier at max-throughput profile (batch=512, tokens=8192), which directly
+      measures realized throughput under queue pressure. This correctly identifies TP=4/2 as the
+      best tier in a single evaluation per tier (15 total). Phase 2 then only needs to confirm
+      batch=512 is optimal within that tier. Random search wastes ~92% of evaluations on tiers
+      and batch sizes that are far from optimal.
+    diagnostic: >
+      If hierarchical does NOT converge faster: (1) Check whether Phase 1's max-throughput profile
+      (batch=512) correctly identifies TP=4/2 as the best tier — if Phase 1 uses a different profile,
+      it might rank TP=8/1 higher (as happens at rate=500 where TP=8/1 with batch=512 wins).
+      (2) Check whether random search gets lucky by hitting the TP=4/2 tier early (8% per draw
+      means ~2 hits in first 25 samples). (3) If NSGA-II beats hierarchical, it may be because
+      the Optuna sampler exploits batch-size correlation across tiers faster than LHS within a tier.
+    code_changes:
+      - file: "search_pareto_iter2.py"
+        intent: >
+          Create a new Python script implementing three search strategies for BLIS configuration
+          optimization at rate=2000. The script should: (1) define the 71,040-config search space
+          with all valid TP×instances combinations and secondary knobs, (2) implement uniform random
+          sampling, (3) implement hierarchical search (Phase 1: 15 evals at max-throughput profile
+          per tier, rank by tokens_per_sec; Phase 2: remaining budget allocated to top-3 tiers via
+          Latin Hypercube Sampling), (4) implement NSGA-II via Optuna with 20-sample random warmup,
+          (5) track convergence curves (best_throughput_so_far after each evaluation), (6) compute
+          evals_to_95pct metric, (7) output results as JSON including convergence curves, final
+          configs, and summary statistics. CLI args: --strategy {random,hierarchical,nsga2},
+          --budget N, --rate N, --num-requests N, --seed N, --output path.
+        rationale: >
+          A new script isolates iteration 2 from the complex iteration-10 search_blis.py. The
+          convergence-curve tracking is the key addition over iteration 1's hypervolume-only metric.
+
+  - type: h-control-negative
+    prediction: >
+      At rate=50 (where TP=8/1 trivially dominates per RP-C2-1 and secondary knobs have minimal
+      effect), all three strategies will reach 95% of optimal throughput within the first 50
+      evaluations. The difference in convergence speed between strategies will be less than 2x
+      (e.g., hierarchical at ~15 evals vs random at ~25 evals), because any strategy that samples
+      even one TP=8/1 config achieves near-optimal throughput regardless of secondary knob settings.
+    mechanism: >
+      At rate=50, TP=8/1 achieves 14,232 tok/s (iteration 1 data) which simultaneously maximizes
+      throughput and minimizes latency. Random search hits TP=8/1 with probability 1920/71040 = 2.7%
+      per draw, meaning ~37 draws for 63% probability of at least one hit. But ANY TP=8/1 config
+      (regardless of batch size, scheduler, etc.) gives tokens_per_sec ≈ 14,232 because secondary
+      knobs are irrelevant at this unsaturated rate (RP-C2-3). Hierarchical Phase 1 finds TP=8/1
+      at eval 15 (guaranteed), gaining only a ~22 evaluation advantage over random's expected ~37.
+    diagnostic: >
+      If convergence speed differs by more than 2x at rate=50: check whether secondary knobs
+      actually matter at this rate (contradicting RP-C2-3). Also verify that the 95% threshold
+      at rate=50 (0.95 × 14232 = 13520) is met by configs other than TP=8/1 (e.g., TP=4/2
+      scored 11985 at rate=50 — below threshold, so only TP=8/1 configs qualify).
+
+  - type: h-robustness
+    prediction: >
+      At rate=2000, hierarchical search's Phase 1 will correctly identify TP=4/2 as the top-performing
+      tier across all tested seeds (42, 123, 456). The convergence speed (evals_to_95pct) will be
+      consistent across seeds with coefficient of variation < 30%.
+    mechanism: >
+      The TP=4/2 advantage at rate=2000 is structural: it arises from the queue distribution benefit
+      of 2 instances (halving per-instance arrival rate from 2000 to 1000 req/s) combined with TP=4's
+      high per-step throughput. This structural advantage is independent of workload request-length
+      distribution (which varies by seed). RP-C2-2 confirmed Phase 1 tier stability at rate=50;
+      this arm tests whether the same stability holds at rate=2000 where the optimal tier is different.
+    diagnostic: >
+      If TP=4/2 is NOT identified as the top tier for some seeds: check whether those seeds produce
+      unusually short requests that reduce queueing pressure, allowing TP=8/1's higher per-step
+      throughput to compensate for its single-queue bottleneck. Also check if the seed changes
+      the relative ordering between TP=4/2 and TP=8/1 (which are close: 40392 vs 38591 = 4.5% gap).

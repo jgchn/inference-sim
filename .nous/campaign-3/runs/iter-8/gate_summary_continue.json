@@ -1,0 +1,11 @@
+{
+  "gate_type": "continue",
+  "summary": "Iteration 8 refuted the hypothesis that Pareto density alone is a universal predictor of whether NSGA-II or random search converges faster. Model architecture emerged as an independent, dominant factor: Qwen consistently favors NSGA-II (gap = +4.6 to +31.0 evals) while Llama consistently favors random search (gap = -22.9 to -25.3 evals), regardless of density level.",
+  "key_points": [
+    "Density-gap hypothesis refuted: Qwen at higher density (6.06% vs 4.5%) showed a LARGER NSGA-II advantage (+31.0 vs +4.6 evals), directly inverting the predicted direction; the four (density, gap) data points do not form a monotone curve.",
+    "Model architecture is the dominant variable: Qwen always favors NSGA-II, Llama always favors random search \u2014 both at rate=50 and rate=75 \u2014 making architecture a stronger predictor of algorithm preference than Pareto density.",
+    "Rate=75 creates sharper optimization gradients for Qwen: higher queueing pressure at rate=75 produces stronger KV-stress dominance boundaries, giving NSGA-II's crossover operator more exploitable structure and amplifying its advantage from +4.6 to +31.0 evals.",
+    "RP-10 (density increases with rate) holds for Qwen (4.5% \u2192 6.06%) but fails for Llama (5.33% \u2192 4.83%), indicating that rate and architecture interact non-trivially to shape the Pareto landscape.",
+    "Next iteration should investigate what structural property \u2014 beyond density \u2014 explains the per-architecture algorithm preference. Candidate mechanisms: landscape smoothness (gradient exploitability), multimodality, or the sharpness of dominance boundaries under different load regimes."
+  ]
+}

@@ -1,0 +1,114 @@
+metadata:
+  iteration: 2
+  family: "search-algorithm-optimization"
+  research_question: "Does bracket K=1 hierarchical search generalize to L40S hardware (tightest TP margin: 2.1%) and remain robust across BLIS seed variation (workload changes)?"
+
+arms:
+  - type: h-main
+    prediction: >
+      Bracket K=1 on L40S hard llama (1000 req/rate=500, blis_seed=42) achieves
+      5/5 Phase 1 correct identification of TP=4/2inst on all 5 search seeds.
+      evals_to_best=3 on all seeds, matching the H100/A100 result despite L40S's
+      tighter TP margin (2.1% vs 7.6-8.3% on H100). Phase 1 max-profile scores:
+      TP=1=0.0673, TP=2=0.0898, TP=4=0.1097, TP=8=0.1074. The 1% threshold
+      (0.99*0.109668=0.108571) is crossed at eval 3 (TP=4/2inst with mr=512).
+    mechanism: >
+      The max profile (mr=512, mt=8192, pf=4096) creates a compute-saturated regime
+      on L40S where TP=4/2inst's dual-instance parallelism outweighs TP=8/1inst's
+      per-request compute advantage. L40S's low bandwidth (0.864 TB/s vs H100's
+      3.35 TB/s) makes TP=8/1inst less dominant because weight-loading overhead is
+      proportionally higher, but the max profile still correctly discriminates. The
+      bracket algorithm is hardware-agnostic — it uses parameter range boundaries,
+      not hardware-specific knowledge.
+    diagnostic: >
+      If Phase 1 selects TP=8 instead of TP=4: verify L40S max-profile scores match
+      probed values (TP=4=0.1097, TP=8=0.1074). The 2.1% margin is the tightest
+      tested — if it flips, investigate whether BLIS version or hardware config changed.
+      If evals_to_best > 3: check whether the GLOBAL_BEST_TABLE entry (0.109668) is
+      correct and whether eval 3 score matches the probed value.
+    code_changes:
+      - file: "search_blis_iter7.py"
+        intent: >
+          Copy search_blis_iter6.py (from iter-6 h-main.patch) to search_blis_iter7.py.
+          Add L40S entries to GLOBAL_BEST_TABLE:
+          ("llama-3.1-8b", "L40S", 500, 1000): 0.109668 and
+          ("llama-3.1-8b", "L40S", 200, 200): 0.078308.
+        rationale: >
+          L40S global best values are needed for evals_to_best computation. These
+          are the max-profile TP=4/2inst scores confirmed by manual probing.
+      - file: "search_blis_iter7.py"
+        intent: >
+          Replace --blis-seed (single int) with --blis-seeds (comma-separated string,
+          default "42"). Parse into a list of integers. The main execution loop becomes:
+          for each strategy, for each blis_seed, for each search_seed -> run. Each run
+          result dict includes a "blis_seed" field. Update the summary table to include
+          a BlisSeed column.
+        rationale: >
+          Multi-seed support is needed for the h-robustness arm which tests across
+          blis_seeds 42-46. The nested loop structure separates workload variation
+          (blis_seed) from search algorithm variation (search_seed).
+
+  - type: h-robustness
+    prediction: >
+      Bracket K=1 on H100 hard llama achieves 5/5 Phase 1 correct identification of
+      TP=4/2inst at EACH of 5 blis_seeds (42-46), for a total of 25/25 correct across
+      all (blis_seed, search_seed) combinations. evals_to_best=3 at each blis_seed.
+      TP=4 margins with max profile: seed=42 7.6%, seed=43 9.1%, seed=44 7.6%,
+      seed=45 9.5%, seed=46 9.1%. All Phase 1 TP=4 scores (0.2089-0.2184) exceed the
+      1% threshold (0.207103) of the seed=42 global best (0.209195).
+    mechanism: >
+      BLIS seed controls workload generation (arrival times, prompt/output lengths) but
+      not the TP-level compute advantage, which is determined by hardware characteristics.
+      The max profile (mr=512) saturates batch capacity at all seeds, ensuring the TP
+      ranking is determined by compute efficiency rather than capacity constraints. H100's
+      wide TP=4 margin (7.6-9.5%) provides substantial safety buffer across workload
+      variations.
+    diagnostic: >
+      If Phase 1 fails at a specific blis_seed: run the manual probe for that seed
+      (TP=4/2inst vs TP=8/1inst with mr=512) to check if the margin actually flipped.
+      If evals_to_best varies across seeds: check whether the GLOBAL_BEST_TABLE entry
+      (0.209195, from seed=42) is too high for seeds with lower actual global bests,
+      pushing the threshold above what Phase 1 can reach.
+
+  - type: h-control-negative
+    prediction: >
+      Bracket-min-only (K=1, min profile: mr=32, mt=2048, pf=0) on L40S hard llama
+      selects the WRONG Phase 1 winner on 5/5 search seeds. The winner will be
+      TP=2/4inst (score 0.04753) instead of TP=4/2inst, because at mr=32 on L40S,
+      4 instances with TP=2 provides the best balance of capacity (4x32=128 slots)
+      and per-instance speed. This is a different failure mode from H100 where min-only
+      selects TP=1/8inst. Phase 2 TPE within TP=2/4inst will be trapped, achieving
+      best_score below the 1% threshold of the global best.
+    mechanism: >
+      At mr=32, the capacity-limited regime dominates. L40S's specific failure mode
+      (TP=2/4inst) differs from H100's (TP=1/8inst) because L40S's low bandwidth
+      makes TP=1 per-request latency slow enough that even 8 instances can't compensate,
+      while 4 instances with 2-way TP balances capacity and speed. Phase 1 min-profile
+      scores on L40S: TP=1=0.0428, TP=2=0.0475, TP=4=0.0468, TP=8=0.0425 — a non-
+      monotonic ranking unlike H100's strictly monotonic instance-count ranking.
+    diagnostic: >
+      If Phase 1 selects TP=4/2inst despite min profile: verify min-profile scores
+      match probed values. If the failure mode is TP=1/8inst (like H100) instead of
+      TP=2/4inst: the hardware-specific mechanism prediction is wrong but the negative
+      control still succeeds (wrong TP either way).
+
+  - type: h-ablation
+    prediction: >
+      Flat TPE on L40S hard llama (1000 req/rate=500) finds the global best but with
+      higher median evals_to_best than bracket K=1. Based on RP-10, flat TPE achieves
+      median ~26 evals on H100 hard. On L40S with tighter margins, TPE may take longer
+      because the TP=4 vs TP=8 fitness gap is smaller (2.1% on L40S vs 7.6% on H100),
+      requiring more samples for the Bayesian model to distinguish them. Bracket K=1's
+      evals_to_best=3 should represent at least a 5x improvement over flat TPE's median.
+    mechanism: >
+      Flat TPE must discover the correct TP level through Bayesian modeling of the full
+      10-dimensional space. With L40S's tight TP margin, TPE needs more samples to
+      build a model that reliably identifies TP=4 over TP=8. Bracket K=1 bypasses this
+      entirely with 4 deterministic Phase 1 evaluations, then uses TPE only for the
+      7-dimensional secondary parameter space within the correct TP level.
+    diagnostic: >
+      If flat TPE achieves evals_to_best <= 5 on L40S: investigate whether TPE got
+      lucky with early TP=4 samples. Check across all 5 seeds — low median would
+      suggest the tight margin doesn't impede TPE as much as expected. If flat TPE
+      fails to find global best within budget=100: the tight margin makes convergence
+      unreliable, strengthening the case for hierarchical search.

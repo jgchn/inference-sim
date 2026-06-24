@@ -1,0 +1,3597 @@
+{
+  "params": {
+    "budget": 200,
+    "rate": 5.0,
+    "seed": 42,
+    "strategy": "both"
+  },
+  "summaries": {
+    "random": {
+      "hypervolume": 109295135.57787102,
+      "pareto_size": 13,
+      "evals_successful": 200,
+      "wall_time_s": 20.379543791001197,
+      "best_throughput": 2489.360303066293,
+      "best_latency_ms": 3507.2733,
+      "pareto_front": [
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        }
+      ]
+    },
+    "hierarchical": {
+      "hypervolume": 109295135.57787102,
+      "pareto_size": 48,
+      "evals_successful": 200,
+      "wall_time_s": 24.208808958996087,
+      "best_throughput": 2489.360303066293,
+      "best_latency_ms": 3507.2733,
+      "pareto_front": [
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 2489.360303066293,
+          "e2e_p99_ms": 3507.2733,
+          "tp": 8,
+          "num_instances": 1
+        }
+      ]
+    }
+  },
+  "reference": {
+    "combined_pareto_size": 61,
+    "combined_hypervolume": 109295135.57787102,
+    "ref_latency": 47412.18149799999,
+    "combined_pareto_front": [
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1
+      }
+    ]
+  },
+  "raw_results": {
+    "random": [
+      {
+        "tokens_per_sec": 2014.6242331231115,
+        "e2e_p99_ms": 16226.264079999999,
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2012.9134125455544,
+        "e2e_p99_ms": 16149.24527,
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2027.9892644972474,
+        "e2e_p99_ms": 15115.468299999999,
+        "tp": 1,
+        "num_instances": 8,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360185345991,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2021.3034579298867,
+        "e2e_p99_ms": 15157.848039999999,
+        "tp": 1,
+        "num_instances": 7,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2026.6118650018789,
+        "e2e_p99_ms": 15158.1263,
+        "tp": 1,
+        "num_instances": 7,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2026.6118650018789,
+        "e2e_p99_ms": 15158.1263,
+        "tp": 1,
+        "num_instances": 7,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2017.1215264660361,
+        "e2e_p99_ms": 15674.55742,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2025.1288167509442,
+        "e2e_p99_ms": 15129.16015,
+        "tp": 1,
+        "num_instances": 8,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2017.8689944909083,
+        "e2e_p99_ms": 15656.246939999999,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2014.6242331231115,
+        "e2e_p99_ms": 16226.377929999999,
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2023.376784114334,
+        "e2e_p99_ms": 15306.81844,
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2018.6685714805053,
+        "e2e_p99_ms": 15301.177889999999,
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2021.3034579298867,
+        "e2e_p99_ms": 15157.848039999999,
+        "tp": 1,
+        "num_instances": 7,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2014.6242331231115,
+        "e2e_p99_ms": 16226.264079999999,
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360185345991,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2023.376784114334,
+        "e2e_p99_ms": 15306.81844,
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2022.9184155669532,
+        "e2e_p99_ms": 15137.127849999999,
+        "tp": 1,
+        "num_instances": 6,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2004.0085500710145,
+        "e2e_p99_ms": 16156.68412,
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2025.0546512013493,
+        "e2e_p99_ms": 15310.17293,
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2027.7646711322097,
+        "e2e_p99_ms": 15148.47688,
+        "tp": 1,
+        "num_instances": 8,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2265.086993565924,
+        "e2e_p99_ms": 8711.886579999999,
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2019.8683507510734,
+        "e2e_p99_ms": 15747.50326,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2017.8689944909083,
+        "e2e_p99_ms": 15656.246939999999,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2021.8392126806548,
+        "e2e_p99_ms": 15312.180139999999,
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2004.0085119253658,
+        "e2e_p99_ms": 16156.6826,
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2251.4231138108476,
+        "e2e_p99_ms": 9130.45089,
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2022.4113031588436,
+        "e2e_p99_ms": 15129.42246,
+        "tp": 1,
+        "num_instances": 7,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2023.3760452701802,
+        "e2e_p99_ms": 15306.81844,
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2265.0871397624082,
+        "e2e_p99_ms": 8711.886579999999,
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.4474194256,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2265.0871397624082,
+        "e2e_p99_ms": 8711.886579999999,
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 1977.4304864591313,
+        "e2e_p99_ms": 17808.403179999998,
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2268.795138802241,
+        "e2e_p99_ms": 8549.42528,
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2027.041428085169,
+        "e2e_p99_ms": 15334.705399999999,
+        "tp": 1,
+        "num_instances": 6,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 1977.4304864591313,
+        "e2e_p99_ms": 17808.403179999998,
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2027.7646711322097,
+        "e2e_p99_ms": 15148.47688,
+        "tp": 1,
+        "num_instances": 8,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 1977.4316006762433,
+        "e2e_p99_ms": 17808.27148,
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2251.4231138108476,
+        "e2e_p99_ms": 9130.45089,
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2025.0546512013493,
+        "e2e_p99_ms": 15310.17293,
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2004.0085119253658,
+        "e2e_p99_ms": 16156.6826,
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2017.8689944909083,
+        "e2e_p99_ms": 15656.245309999998,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 1778.0896431319602,
+        "e2e_p99_ms": 43101.98317999999,
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2020.238886023676,
+        "e2e_p99_ms": 15214.74928,
+        "tp": 1,
+        "num_instances": 6,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2021.3034579298867,
+        "e2e_p99_ms": 15157.848039999999,
+        "tp": 1,
+        "num_instances": 7,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2025.0546512013493,
+        "e2e_p99_ms": 15310.17293,
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2008.5556204902437,
+        "e2e_p99_ms": 15684.18789,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2019.8683507510734,
+        "e2e_p99_ms": 15747.50326,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2266.1619013202103,
+        "e2e_p99_ms": 8538.60325,
+        "tp": 2,
+        "num_instances": 3,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2266.1615598713115,
+        "e2e_p99_ms": 8538.60325,
+        "tp": 2,
+        "num_instances": 3,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2267.547127922249,
+        "e2e_p99_ms": 8473.362729999999,
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2023.8348157718633,
+        "e2e_p99_ms": 15553.33851,
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2412.345124966063,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2410.951741760463,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2021.8408434357523,
+        "e2e_p99_ms": 15312.180139999999,
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2017.1215264660361,
+        "e2e_p99_ms": 15674.55742,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2268.7952365859383,
+        "e2e_p99_ms": 8549.42528,
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2025.1288167509442,
+        "e2e_p99_ms": 15129.16015,
+        "tp": 1,
+        "num_instances": 8,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2268.7952365859383,
+        "e2e_p99_ms": 8549.42528,
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360185345991,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2265.0871397624082,
+        "e2e_p99_ms": 8711.886579999999,
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2025.1288167509442,
+        "e2e_p99_ms": 15129.16015,
+        "tp": 1,
+        "num_instances": 8,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2267.3312353595647,
+        "e2e_p99_ms": 8565.300510000001,
+        "tp": 2,
+        "num_instances": 3,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2017.1215264660361,
+        "e2e_p99_ms": 15674.55583,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2017.8689944909083,
+        "e2e_p99_ms": 15656.246939999999,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2025.1288167509442,
+        "e2e_p99_ms": 15129.16015,
+        "tp": 1,
+        "num_instances": 8,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2008.5556204902437,
+        "e2e_p99_ms": 15684.18789,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2263.4144747421674,
+        "e2e_p99_ms": 8678.86678,
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2267.547127922249,
+        "e2e_p99_ms": 8473.362729999999,
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2025.0546512013493,
+        "e2e_p99_ms": 15310.17293,
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2267.5815104468093,
+        "e2e_p99_ms": 8473.362729999999,
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2267.582584917502,
+        "e2e_p99_ms": 8473.362729999999,
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2406.4474194256,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2014.6242331231115,
+        "e2e_p99_ms": 16226.377929999999,
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2267.3312353595647,
+        "e2e_p99_ms": 8565.300510000001,
+        "tp": 2,
+        "num_instances": 3,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2023.3760452701802,
+        "e2e_p99_ms": 15306.81844,
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 1977.4304864591313,
+        "e2e_p99_ms": 17808.403179999998,
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.4474194256,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2019.8683507510734,
+        "e2e_p99_ms": 15747.50326,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2017.1215264660361,
+        "e2e_p99_ms": 15674.55742,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.4474194256,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2009.3161179742356,
+        "e2e_p99_ms": 16185.492859999998,
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2026.6118650018789,
+        "e2e_p99_ms": 15158.1263,
+        "tp": 1,
+        "num_instances": 7,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2267.3312353595647,
+        "e2e_p99_ms": 8565.300510000001,
+        "tp": 2,
+        "num_instances": 3,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 1977.4316006762433,
+        "e2e_p99_ms": 17808.27148,
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2009.3161179742356,
+        "e2e_p99_ms": 16185.492859999998,
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2023.8348157718633,
+        "e2e_p99_ms": 15553.33851,
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2021.8408434357523,
+        "e2e_p99_ms": 15312.180139999999,
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2008.5556204902437,
+        "e2e_p99_ms": 15684.18789,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2014.6242331231115,
+        "e2e_p99_ms": 16226.264079999999,
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2268.7952365859383,
+        "e2e_p99_ms": 8549.42528,
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2023.8348157718633,
+        "e2e_p99_ms": 15553.33851,
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2025.1288167509442,
+        "e2e_p99_ms": 15129.16015,
+        "tp": 1,
+        "num_instances": 8,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2267.3312353595647,
+        "e2e_p99_ms": 8565.300510000001,
+        "tp": 2,
+        "num_instances": 3,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2022.9183378290916,
+        "e2e_p99_ms": 15137.127849999999,
+        "tp": 1,
+        "num_instances": 6,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2028.9505391031933,
+        "e2e_p99_ms": 15088.41379,
+        "tp": 1,
+        "num_instances": 8,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2267.931402151465,
+        "e2e_p99_ms": 8469.043,
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2027.9892644972474,
+        "e2e_p99_ms": 15115.468299999999,
+        "tp": 1,
+        "num_instances": 8,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2004.0085119253658,
+        "e2e_p99_ms": 16156.6826,
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2267.5815104468093,
+        "e2e_p99_ms": 8473.362729999999,
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2266.1619013202103,
+        "e2e_p99_ms": 8538.60325,
+        "tp": 2,
+        "num_instances": 3,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2017.8689944909083,
+        "e2e_p99_ms": 15656.246939999999,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2023.8337264560794,
+        "e2e_p99_ms": 15553.33851,
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2410.951741760463,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2019.8682344956476,
+        "e2e_p99_ms": 15747.50326,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 1977.4304864591313,
+        "e2e_p99_ms": 17808.403179999998,
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2412.345124966063,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2263.4144747421674,
+        "e2e_p99_ms": 8678.86678,
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2021.3034579298867,
+        "e2e_p99_ms": 15157.848039999999,
+        "tp": 1,
+        "num_instances": 7,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2025.1288167509442,
+        "e2e_p99_ms": 15129.16015,
+        "tp": 1,
+        "num_instances": 8,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2265.0871397624082,
+        "e2e_p99_ms": 8711.886579999999,
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 1977.4316006762433,
+        "e2e_p99_ms": 17808.27148,
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2251.4231138108476,
+        "e2e_p99_ms": 9130.45089,
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360185345991,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2025.1288167509442,
+        "e2e_p99_ms": 15129.16015,
+        "tp": 1,
+        "num_instances": 8,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2009.3166164980046,
+        "e2e_p99_ms": 16185.492859999998,
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2022.4113031588436,
+        "e2e_p99_ms": 15129.42246,
+        "tp": 1,
+        "num_instances": 7,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2268.7952365859383,
+        "e2e_p99_ms": 8549.42528,
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2021.3034579298867,
+        "e2e_p99_ms": 15157.848039999999,
+        "tp": 1,
+        "num_instances": 7,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2023.8337264560794,
+        "e2e_p99_ms": 15553.33851,
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 1734.6402729554882,
+        "e2e_p99_ms": 21829.64755,
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 1977.4316006762433,
+        "e2e_p99_ms": 17808.27148,
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2023.8337264560794,
+        "e2e_p99_ms": 15553.33851,
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2011.1355345501668,
+        "e2e_p99_ms": 15438.42528,
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2266.1619013202103,
+        "e2e_p99_ms": 8538.60325,
+        "tp": 2,
+        "num_instances": 3,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2412.3451802405552,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2410.119176618387,
+        "e2e_p99_ms": 5159.6386299999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2022.4113031588436,
+        "e2e_p99_ms": 15129.42246,
+        "tp": 1,
+        "num_instances": 7,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2017.1215264660361,
+        "e2e_p99_ms": 15674.55742,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 1977.4304864591313,
+        "e2e_p99_ms": 17808.403179999998,
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2027.041428085169,
+        "e2e_p99_ms": 15334.705399999999,
+        "tp": 1,
+        "num_instances": 6,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360185345991,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2267.547127922249,
+        "e2e_p99_ms": 8473.362729999999,
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2251.4227767889734,
+        "e2e_p99_ms": 9130.45089,
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2251.4227767889734,
+        "e2e_p99_ms": 9130.45089,
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2019.8683507510734,
+        "e2e_p99_ms": 15747.50326,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2267.931402151465,
+        "e2e_p99_ms": 8469.043,
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2251.4231138108476,
+        "e2e_p99_ms": 9130.45089,
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2017.8689944909083,
+        "e2e_p99_ms": 15656.246939999999,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2267.547127922249,
+        "e2e_p99_ms": 8473.362729999999,
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2014.6242331231115,
+        "e2e_p99_ms": 16226.377929999999,
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2011.1355345501668,
+        "e2e_p99_ms": 15438.42528,
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2027.041428085169,
+        "e2e_p99_ms": 15334.705399999999,
+        "tp": 1,
+        "num_instances": 6,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2027.7646711322097,
+        "e2e_p99_ms": 15148.47688,
+        "tp": 1,
+        "num_instances": 8,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2021.3034579298867,
+        "e2e_p99_ms": 15157.848039999999,
+        "tp": 1,
+        "num_instances": 7,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2018.6709712422314,
+        "e2e_p99_ms": 15301.177889999999,
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2267.931402151465,
+        "e2e_p99_ms": 8469.043,
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2267.3312353595647,
+        "e2e_p99_ms": 8565.300510000001,
+        "tp": 2,
+        "num_instances": 3,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2014.6242331231115,
+        "e2e_p99_ms": 16226.377929999999,
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2262.460115173966,
+        "e2e_p99_ms": 8661.959219999999,
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2025.1288167509442,
+        "e2e_p99_ms": 15129.16015,
+        "tp": 1,
+        "num_instances": 8,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2267.547127922249,
+        "e2e_p99_ms": 8473.362729999999,
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2023.3760452701802,
+        "e2e_p99_ms": 15306.81844,
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2263.4144747421674,
+        "e2e_p99_ms": 8678.86678,
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 1778.0896431319602,
+        "e2e_p99_ms": 43101.98317999999,
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2017.8689944909083,
+        "e2e_p99_ms": 15656.246939999999,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2015.9458131412277,
+        "e2e_p99_ms": 15423.75138,
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2009.3161179742356,
+        "e2e_p99_ms": 16185.492859999998,
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2019.8682344956476,
+        "e2e_p99_ms": 15747.50326,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2262.460115173966,
+        "e2e_p99_ms": 8661.959219999999,
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2022.9183378290916,
+        "e2e_p99_ms": 15137.127849999999,
+        "tp": 1,
+        "num_instances": 6,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2265.824843789539,
+        "e2e_p99_ms": 8528.04195,
+        "tp": 2,
+        "num_instances": 3,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2268.795138802241,
+        "e2e_p99_ms": 8549.42528,
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2262.460017935586,
+        "e2e_p99_ms": 8661.959219999999,
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2017.1215264660361,
+        "e2e_p99_ms": 15674.55742,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2022.9183378290916,
+        "e2e_p99_ms": 15137.127849999999,
+        "tp": 1,
+        "num_instances": 6,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2027.9892644972474,
+        "e2e_p99_ms": 15115.468299999999,
+        "tp": 1,
+        "num_instances": 8,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2021.1271347749819,
+        "e2e_p99_ms": 15130.33253,
+        "tp": 1,
+        "num_instances": 7,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2014.6242331231115,
+        "e2e_p99_ms": 16226.377929999999,
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2021.8408434357523,
+        "e2e_p99_ms": 15312.180139999999,
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2251.4231138108476,
+        "e2e_p99_ms": 9130.45089,
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2028.443133962175,
+        "e2e_p99_ms": 15229.51726,
+        "tp": 1,
+        "num_instances": 6,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 1977.4304864591313,
+        "e2e_p99_ms": 17808.403179999998,
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2412.345124966063,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      }
+    ],
+    "hierarchical": [
+      {
+        "tokens_per_sec": 1977.4304864591313,
+        "e2e_p99_ms": 17808.403179999998,
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2009.3161179742356,
+        "e2e_p99_ms": 16185.492859999998,
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2017.8689944909083,
+        "e2e_p99_ms": 15656.246939999999,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2015.9458131412277,
+        "e2e_p99_ms": 15423.75138,
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2021.8408434357523,
+        "e2e_p99_ms": 15312.180139999999,
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2022.9183378290916,
+        "e2e_p99_ms": 15137.127849999999,
+        "tp": 1,
+        "num_instances": 6,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2021.3034579298867,
+        "e2e_p99_ms": 15157.848039999999,
+        "tp": 1,
+        "num_instances": 7,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2025.1288167509442,
+        "e2e_p99_ms": 15129.16015,
+        "tp": 1,
+        "num_instances": 8,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2251.4231138108476,
+        "e2e_p99_ms": 9130.45089,
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2262.460115173966,
+        "e2e_p99_ms": 8661.959219999999,
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2266.1619013202103,
+        "e2e_p99_ms": 8538.60325,
+        "tp": 2,
+        "num_instances": 3,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2267.931402151465,
+        "e2e_p99_ms": 8469.043,
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2410.119176618387,
+        "e2e_p99_ms": 5159.6386299999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2489.360185345991,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360185345991,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2489.360185345991,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360185345991,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360185345991,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360185345991,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2489.360185345991,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360185345991,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360185345991,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360185345991,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360185345991,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2489.360185345991,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360185345991,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360185345991,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360185345991,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2489.360303066293,
+        "e2e_p99_ms": 3507.2733,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2409.5311809222585,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2409.5311809222585,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2410.118293858209,
+        "e2e_p99_ms": 5159.6386299999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2412.345124966063,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2409.5311809222585,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2409.5311809222585,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2410.951741760463,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2409.5311809222585,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2410.119176618387,
+        "e2e_p99_ms": 5159.6386299999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2412.345124966063,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2412.345124966063,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2410.118293858209,
+        "e2e_p99_ms": 5159.6386299999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2410.951741760463,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2412.345124966063,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2410.119176618387,
+        "e2e_p99_ms": 5159.6386299999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2410.951741760463,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2412.345124966063,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2410.119176618387,
+        "e2e_p99_ms": 5159.6386299999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2412.3451802405552,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2410.119176618387,
+        "e2e_p99_ms": 5159.6386299999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2410.951741760463,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2412.3451802405552,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2409.5311809222585,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2412.345124966063,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2410.951355285932,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2412.345124966063,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2410.119176618387,
+        "e2e_p99_ms": 5159.6386299999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2410.119176618387,
+        "e2e_p99_ms": 5159.6386299999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2409.5311809222585,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2412.3451802405552,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2409.5311809222585,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2409.5311809222585,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2410.951741760463,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2410.119176618387,
+        "e2e_p99_ms": 5159.6386299999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2410.119176618387,
+        "e2e_p99_ms": 5159.6386299999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2412.345124966063,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2410.119176618387,
+        "e2e_p99_ms": 5159.6386299999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2410.119176618387,
+        "e2e_p99_ms": 5159.6386299999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2409.5311809222585,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2412.345124966063,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2410.951355285932,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2412.3451802405552,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2409.5311809222585,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2412.345124966063,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2409.5311809222585,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2409.5311809222585,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2410.119176618387,
+        "e2e_p99_ms": 5159.6386299999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2412.345124966063,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2412.345124966063,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2409.5311809222585,
+        "e2e_p99_ms": 5159.3916899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2412.345124966063,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2410.119176618387,
+        "e2e_p99_ms": 5159.6386299999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2412.345124966063,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2410.119176618387,
+        "e2e_p99_ms": 5159.6386299999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2410.119176618387,
+        "e2e_p99_ms": 5159.6386299999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2410.119176618387,
+        "e2e_p99_ms": 5159.6386299999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2412.3451802405552,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2412.3451802405552,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2410.118293858209,
+        "e2e_p99_ms": 5159.6386299999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2410.119176618387,
+        "e2e_p99_ms": 5159.6386299999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2412.3451802405552,
+        "e2e_p99_ms": 5166.49755,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2410.119176618387,
+        "e2e_p99_ms": 5159.6386299999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.4474194256,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.4474194256,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.4474194256,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2406.4474194256,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.4474194256,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2406.4474194256,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2406.4474194256,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2406.4474194256,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.4474194256,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2406.4474194256,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2406.4474194256,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2406.4474194256,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.4474194256,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2406.4474194256,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.4474194256,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.4474194256,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 2406.44736442105,
+        "e2e_p99_ms": 5300.14905,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      }
+    ]
+  },
+  "phase1_scores": {
+    "1x1": 1977.4304864591313,
+    "1x2": 2009.3161179742356,
+    "1x3": 2017.8689944909083,
+    "1x4": 2015.9458131412277,
+    "1x5": 2021.8408434357523,
+    "1x6": 2022.9183378290916,
+    "1x7": 2021.3034579298867,
+    "1x8": 2025.1288167509442,
+    "2x1": 2251.4231138108476,
+    "2x2": 2262.460115173966,
+    "2x3": 2266.1619013202103,
+    "2x4": 2267.931402151465,
+    "4x1": 2406.44736442105,
+    "4x2": 2410.119176618387,
+    "8x1": 2489.360303066293
+  },
+  "top_tiers": [
+    "8x1",
+    "4x2",
+    "4x1"
+  ]
+}

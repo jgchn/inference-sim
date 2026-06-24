@@ -1,0 +1,11 @@
+{
+  "gate_type": "continue",
+  "summary": "Four iterations have established that NSGA-II consistently outperforms random search on BLIS, but the efficiency gap is smaller than hoped (~47 evaluations on the reduced 900-config space vs. ~40 on the full 25,200-config space), and a critical discovery emerged: block_size_in_tokens is highly differentiating for high-TP configs, dramatically affecting KV token capacity and preemption behavior in ways the reduced-space design inadvertently suppressed.",
+  "key_points": [
+    "NSGA-II vs. random convergence gap grew modestly from ~40 evals (iter-3, full space) to ~47 evals (iter-4, reduced space); NSGA-II reached 95% of exhaustive hypervolume at eval=117 vs. random at eval=164, confirming directional benefit but well short of the predicted 80-eval gap.",
+    "Block_size=32 vs. block_size=16 at tp=8 causes a qualitative regime shift: 107 preemptions \u2192 0, ttft_p99 2323ms \u2192 25ms, and rps 21.35 \u2192 26.28 \u2014 because block_size multiplies effective KV token capacity (48k vs. 96k tokens at kv_blocks=3000). Fixing block_size=16 in the 'reduced' space inadvertently capped tp=8 performance below its stress-free threshold.",
+    "Full-space NSGA-II (including block_size sweep) reached a hypervolume ceiling 10.4% higher than the reduced-space exhaustive Pareto front (5.85e10 vs. 5.30e10), converging to 95% of its own ceiling at eval=71 \u2014 faster than predicted, because block_size is a high-leverage gene that NSGA-II exploits efficiently through crossover.",
+    "The reduced space is now known to be exhaustible in ~74 seconds (900 configs at ~83ms each), providing an absolute ground-truth reference that eliminates prior ambiguity about what fraction of optimal is being achieved.",
+    "Next iteration should restore block_size_in_tokens to the search space and investigate whether a tighter budget (100 evals rather than 200) or finer kv_blocks granularity further amplifies the NSGA-II advantage; alternatively, test portability by varying workload (request rate, prefix length, or model) to see if learned Pareto structures transfer."
+  ]
+}

@@ -1,0 +1,969 @@
+{
+  "params": {
+    "budget": 100,
+    "rate": 50.0,
+    "seed": 42,
+    "strategy": "hierarchical"
+  },
+  "summaries": {
+    "hierarchical": {
+      "hypervolume": 318582661.2603829,
+      "pareto_size": 18,
+      "evals_successful": 100,
+      "wall_time_s": 9.083045708015561,
+      "best_throughput": 14231.668727434791,
+      "best_latency_ms": 4719.33815,
+      "pareto_front": [
+        {
+          "tokens_per_sec": 14231.641794434274,
+          "e2e_p99_ms": 4719.33815,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 14231.641794434274,
+          "e2e_p99_ms": 4719.33815,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 14231.641794434274,
+          "e2e_p99_ms": 4719.33815,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 14231.668727434791,
+          "e2e_p99_ms": 4719.377879999999,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 14231.668727434791,
+          "e2e_p99_ms": 4719.377879999999,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 14231.668727434791,
+          "e2e_p99_ms": 4719.377879999999,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 14231.668727434791,
+          "e2e_p99_ms": 4719.377879999999,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 14231.668727434791,
+          "e2e_p99_ms": 4719.377879999999,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 14231.668727434791,
+          "e2e_p99_ms": 4719.377879999999,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 14231.668727434791,
+          "e2e_p99_ms": 4719.377879999999,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 14231.668727434791,
+          "e2e_p99_ms": 4719.377879999999,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 14231.668727434791,
+          "e2e_p99_ms": 4719.377879999999,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 14231.668727434791,
+          "e2e_p99_ms": 4719.377879999999,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 14231.668727434791,
+          "e2e_p99_ms": 4719.377879999999,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 14231.668727434791,
+          "e2e_p99_ms": 4719.377879999999,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 14231.668727434791,
+          "e2e_p99_ms": 4719.377879999999,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 14231.668727434791,
+          "e2e_p99_ms": 4719.377879999999,
+          "tp": 8,
+          "num_instances": 1
+        },
+        {
+          "tokens_per_sec": 14231.668727434791,
+          "e2e_p99_ms": 4719.377879999999,
+          "tp": 8,
+          "num_instances": 1
+        }
+      ]
+    }
+  },
+  "reference": {
+    "combined_pareto_size": 18,
+    "combined_hypervolume": 318582661.2603829,
+    "ref_latency": 27104.812922000005,
+    "combined_pareto_front": [
+      {
+        "tokens_per_sec": 14231.641794434274,
+        "e2e_p99_ms": 4719.33815,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 14231.641794434274,
+        "e2e_p99_ms": 4719.33815,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 14231.641794434274,
+        "e2e_p99_ms": 4719.33815,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1
+      }
+    ]
+  },
+  "raw_results": {
+    "hierarchical": [
+      {
+        "tokens_per_sec": 3989.466462574169,
+        "e2e_p99_ms": 24640.73902,
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 4867.881240379898,
+        "e2e_p99_ms": 19683.503,
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 5261.041493527738,
+        "e2e_p99_ms": 18015.04797,
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 5443.9971582957405,
+        "e2e_p99_ms": 17206.14468,
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 5538.39161387286,
+        "e2e_p99_ms": 16788.827240000002,
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 5656.818090599034,
+        "e2e_p99_ms": 16102.37949,
+        "tp": 1,
+        "num_instances": 6,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 5707.786198457821,
+        "e2e_p99_ms": 16403.74469,
+        "tp": 1,
+        "num_instances": 7,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 5739.861007282856,
+        "e2e_p99_ms": 15911.3599,
+        "tp": 1,
+        "num_instances": 8,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 6993.157490115245,
+        "e2e_p99_ms": 13422.16815,
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 8342.931061343626,
+        "e2e_p99_ms": 10851.14014,
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 8861.056841067995,
+        "e2e_p99_ms": 10038.94658,
+        "tp": 2,
+        "num_instances": 3,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 8989.153538878332,
+        "e2e_p99_ms": 9487.88202,
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 10786.990693733356,
+        "e2e_p99_ms": 7703.419940000001,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 11985.171364317586,
+        "e2e_p99_ms": 6325.86254,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 12113.205697608677,
+        "e2e_p99_ms": 4769.50945,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 12113.19454815352,
+        "e2e_p99_ms": 4769.517449999999,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 8425.367332395155,
+        "e2e_p99_ms": 10882.7128,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 8425.359241354348,
+        "e2e_p99_ms": 10885.47645,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 12113.205697608677,
+        "e2e_p99_ms": 4769.50945,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 12113.205697608677,
+        "e2e_p99_ms": 4769.50945,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 14231.641794434274,
+        "e2e_p99_ms": 4719.33815,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 14231.641794434274,
+        "e2e_p99_ms": 4719.33815,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 8425.367332395155,
+        "e2e_p99_ms": 10882.7128,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 12113.205697608677,
+        "e2e_p99_ms": 4769.50945,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 14231.641794434274,
+        "e2e_p99_ms": 4719.33815,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 8259.772440060517,
+        "e2e_p99_ms": 8405.121969999998,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 12472.664733961621,
+        "e2e_p99_ms": 5772.958289999999,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 8259.782160229355,
+        "e2e_p99_ms": 8405.106969999999,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 14231.668727434791,
+        "e2e_p99_ms": 4719.377879999999,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 8259.782160229355,
+        "e2e_p99_ms": 8405.106969999999,
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 11849.063713280615,
+        "e2e_p99_ms": 6262.59508,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 9080.002287206366,
+        "e2e_p99_ms": 8953.604309999999,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 9104.027011328713,
+        "e2e_p99_ms": 6963.213589999999,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 11902.76592730655,
+        "e2e_p99_ms": 6296.8471899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 11902.76592730655,
+        "e2e_p99_ms": 6296.8471899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 11904.009465135925,
+        "e2e_p99_ms": 6284.97595,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 11985.171364317586,
+        "e2e_p99_ms": 6325.86254,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 11849.063713280615,
+        "e2e_p99_ms": 6262.59508,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 9154.35949829359,
+        "e2e_p99_ms": 7506.28633,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 12023.597689475704,
+        "e2e_p99_ms": 6230.52849,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 11855.757984973832,
+        "e2e_p99_ms": 6333.40801,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 12023.597689475704,
+        "e2e_p99_ms": 6230.52849,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 11530.230028538093,
+        "e2e_p99_ms": 6270.03964,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 12023.597689475704,
+        "e2e_p99_ms": 6230.52849,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 11985.171364317586,
+        "e2e_p99_ms": 6325.86254,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 12023.597689475704,
+        "e2e_p99_ms": 6230.52849,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 11872.168671804935,
+        "e2e_p99_ms": 6332.2556,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 9104.027011328713,
+        "e2e_p99_ms": 6963.213589999999,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 11855.749974550261,
+        "e2e_p99_ms": 6333.35956,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 9290.681256618425,
+        "e2e_p99_ms": 7095.269159999999,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 11855.757984973832,
+        "e2e_p99_ms": 6333.40801,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 11902.76592730655,
+        "e2e_p99_ms": 6296.8471899999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 12023.597689475704,
+        "e2e_p99_ms": 6230.52849,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 11985.171364317586,
+        "e2e_p99_ms": 6325.86254,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 12023.597689475704,
+        "e2e_p99_ms": 6230.52849,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 11872.161977958433,
+        "e2e_p99_ms": 6332.2051599999995,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 12023.597689475704,
+        "e2e_p99_ms": 6230.52849,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 11985.171364317586,
+        "e2e_p99_ms": 6325.86254,
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 10241.136837976777,
+        "e2e_p99_ms": 7656.6234699999995,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 10786.990693733356,
+        "e2e_p99_ms": 7703.419940000001,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 10786.990693733356,
+        "e2e_p99_ms": 7703.419940000001,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 10241.136837976777,
+        "e2e_p99_ms": 7656.6234699999995,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 8134.387919798065,
+        "e2e_p99_ms": 8317.628839999998,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 10241.136837976777,
+        "e2e_p99_ms": 7656.6234699999995,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 5505.239107057559,
+        "e2e_p99_ms": 14607.711140000001,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 10786.990693733356,
+        "e2e_p99_ms": 7703.419940000001,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 10786.986272878108,
+        "e2e_p99_ms": 7703.423940000001,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 8134.387919798065,
+        "e2e_p99_ms": 8317.628839999998,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 10786.990693733356,
+        "e2e_p99_ms": 7703.419940000001,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 10241.136837976777,
+        "e2e_p99_ms": 7656.6234699999995,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 5609.771601699503,
+        "e2e_p99_ms": 17113.52422,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 10377.577760863278,
+        "e2e_p99_ms": 7656.19406,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 8134.387919798065,
+        "e2e_p99_ms": 8317.628839999998,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 10786.990693733356,
+        "e2e_p99_ms": 7703.419940000001,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 10786.990693733356,
+        "e2e_p99_ms": 7703.419940000001,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 10786.990693733356,
+        "e2e_p99_ms": 7703.419940000001,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 5609.771601699503,
+        "e2e_p99_ms": 17113.52422,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 5505.239107057559,
+        "e2e_p99_ms": 14607.711140000001,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 8425.036286665378,
+        "e2e_p99_ms": 10479.542179999999,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 10786.990693733356,
+        "e2e_p99_ms": 7703.419940000001,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf"
+      },
+      {
+        "tokens_per_sec": 5505.235076863451,
+        "e2e_p99_ms": 14607.72514,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs"
+      },
+      {
+        "tokens_per_sec": 8134.387919798065,
+        "e2e_p99_ms": 8317.628839999998,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 10786.990693733356,
+        "e2e_p99_ms": 7703.419940000001,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "reverse-priority"
+      },
+      {
+        "tokens_per_sec": 10786.990693733356,
+        "e2e_p99_ms": 7703.419940000001,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 8134.382891912886,
+        "e2e_p99_ms": 8317.63684,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      },
+      {
+        "tokens_per_sec": 10241.13185702881,
+        "e2e_p99_ms": 7656.62847,
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "priority-fcfs"
+      }
+    ]
+  },
+  "phase1_scores": {
+    "1x1": 3989.466462574169,
+    "1x2": 4867.881240379898,
+    "1x3": 5261.041493527738,
+    "1x4": 5443.9971582957405,
+    "1x5": 5538.39161387286,
+    "1x6": 5656.818090599034,
+    "1x7": 5707.786198457821,
+    "1x8": 5739.861007282856,
+    "2x1": 6993.157490115245,
+    "2x2": 8342.931061343626,
+    "2x3": 8861.056841067995,
+    "2x4": 8989.153538878332,
+    "4x1": 10786.990693733356,
+    "4x2": 11985.171364317586,
+    "8x1": 14231.668727434791
+  },
+  "top_tiers": [
+    "8x1",
+    "4x2",
+    "4x1"
+  ]
+}

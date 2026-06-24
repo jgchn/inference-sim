@@ -1,0 +1,11 @@
+{
+  "gate_type": "continue",
+  "summary": "Iteration 9 tested whether KV-cliff landscape structure (measured as Neighbor Dominance Rate) causally explains NSGA-II's advantage over random search in BLIS. Three of four arms were refuted, but the refutations are informative: NSGA-II now wins for both models at rate=100, the KV cliff is not the sole exploitable structure, and multiple parameter axes collectively drive the advantage.",
+  "key_points": [
+    "NSGA-II wins for BOTH models at rate=100: Qwen gap=+62.3 evals (predicted \u2265+31, confirmed and exceeded), Llama gap=+40.3 evals (predicted negative ~-25, fully reversed). The Llama-random-wins pattern from iterations 7\u20138 breaks at high load \u2014 a rate-dependent transition between 75 and 100 req/s where Llama enters a KV-stressed regime that NSGA-II can exploit.",
+    "Removing the KV cliff (fixing kv_blocks=10000, 300-config cliff-free space) did NOT eliminate NSGA-II's advantage for Qwen \u2014 a +29 eval gap persisted. This refutes the hypothesis that the KV cliff is the sole causal driver. Other axes (batch size NDR\u22480.50, block_size NDR\u22480.27, scheduler NDR\u22480.22) collectively provide enough gradient structure for NSGA-II to exploit even without preemption stress.",
+    "kv_blocks is the single highest-NDR axis for both models (Qwen=0.707, Llama=0.727), confirming it dominates the landscape \u2014 but overall NDR is nearly identical between models (Qwen=35.60%, Llama=35.75%), meaning overall NDR does not explain which model benefits more from NSGA-II at a given rate.",
+    "Revised understanding: NSGA-II has a broad structural advantage in BLIS at high load driven by multiple high-NDR axes, not exclusively by the KV cliff. The rate breakpoint for Llama (between 75 and 100 req/s) is a new open question worth quantifying.",
+    "Next iteration should: (1) test at rate=75 and rate=50 with full all_results saves to compute NDR at those rates and check whether NDR predicts gap sign across the full time series, and (2) identify the precise rate breakpoint for Llama by testing rate=85 or rate=90 \u2014 this would characterize when Llama transitions from 'smooth' to 'exploitable' landscape and either validate or refine the KV-stress threshold mechanism."
+  ]
+}

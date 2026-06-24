@@ -1,0 +1,72 @@
+[
+  {
+    "id": "RP-24",
+    "statement": "The TP winner in bracket K=1 Phase 1 is rate-dependent on H100: TP=8/1inst wins at arrival rates <= 125 req/s, TP=4/2inst wins at rates >= 150 req/s (qwen3-14b, 1000 req). The crossover is at ~125 req/s, where both TP levels score within 1% of each other. This rate-dependent transition is model-independent on H100: llama-3.1-8b shows the same direction (TP=8 at rate=100, TP=4 at rate>=500).",
+    "confidence": "high",
+    "regime": "H100, 1000 req, qwen3-14b and llama-3.1-8b, max-profile secondary params (mr=512, mt=8192, pf=4096)",
+    "evidence": ["iteration-5-h-main", "iteration-5-h-robustness", "iteration-5-h-ablation"],
+    "contradicts": [],
+    "extraction_iteration": 5,
+    "mechanism": "At low arrival rates (<= 125 req/s), the system is under-saturated: queuing pressure is minimal, and per-request throughput dominates. TP=8/1inst uses all 8 GPUs for a single instance, maximizing per-request compute bandwidth. TP=4/2inst splits GPUs into two lower-bandwidth instances; without queuing pressure to exploit the 2x instance count, the higher per-request throughput of TP=8 wins. At high rates (>= 150 req/s), queuing pressure builds and 2-instance capacity benefit dominates, reversing the TP ranking. The max-profile (mr=512) is required to reveal this effect — with default params (mr=64), TP=4/2inst wins at all rates.",
+    "applicability_bounds": "Applies to H100 (3.35 TB/s bandwidth). Crossover rate may differ on other hardware (A100-SXM, L40S) due to different compute-bandwidth tradeoffs. Requires max-profile secondary params (mr >= 256) to observe TP=8 advantage at low rates. Default params (mr=64) mask the rate-dependent effect.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-25",
+    "statement": "Bracket K=1 hierarchical search correctly adapts to rate-dependent TP winner transitions without any algorithm modification. At rate=100 (H100, TP=8 wins), it achieves 25/25 Phase 1 correctness with evals_to_best=4 across all 5 blis_seeds × 5 search_seeds. At rate=125 (crossover, ~0% margin), it achieves 25/25 evals_to_best=3 because TP=4 at position 3 already exceeds the 1% threshold. The algorithm is rate-regime agnostic: the same max-profile Phase 1 reveals the correct competitive dynamics at any rate.",
+    "confidence": "high",
+    "regime": "H100, qwen3-14b, 1000 req, rates 100 and 125, budget=100",
+    "evidence": ["iteration-5-h-main", "iteration-5-h-robustness", "iteration-5-h-ablation"],
+    "contradicts": [],
+    "extraction_iteration": 5,
+    "mechanism": "The max-profile Phase 1 creates a compute-saturated regime where the rate-dependent TP advantage fully expresses. At rate=100, TP=8 wins by 5-7%, allowing Phase 1 to identify the winner clearly. At rate=125 (crossover), TP=4 and TP=8 are within 1% of each other, but the 1% threshold in evals_to_best makes both TP=4 (position 3) and TP=8 (position 4) acceptable, so evals_to_best=3 regardless of which wins. The algorithm needs no rate-specific tuning.",
+    "applicability_bounds": "Tested on H100 with qwen3-14b. Extends RP-15/16 to rate-varied regimes. The evals_to_best=4 when TP=8 wins (vs evals_to_best=3 when TP=4 wins) is an inherent consequence of the Phase 1 evaluation order [TP=1, TP=2, TP=4, TP=8].",
+    "superseded_by": null,
+    "category": "algorithm",
+    "status": "active"
+  },
+  {
+    "id": "RP-26",
+    "statement": "At rate=100 (H100, qwen3-14b, TP=8 wins by 5-7%), flat TPE converges dramatically faster than at rate=500: median evals_to_best=6 versus median=26 on A100-SXM rate=500. The monotonic TP fitness landscape at rate=100 (TP1 < TP2 < TP4 < TP8) provides extremely clean signal for TPE's surrogate model, enabling rapid convergence. Despite this faster convergence, bracket K=1 (evals_to_best=4) still outperforms flat TPE (median=6) by 33%.",
+    "confidence": "high",
+    "regime": "H100, qwen3-14b, rate=100, 1000 req, blis_seed=42, 5 search seeds",
+    "evidence": ["iteration-5-h-control-negative"],
+    "contradicts": [],
+    "extraction_iteration": 5,
+    "mechanism": "When the TP fitness landscape is monotonic (TP1 < TP2 < TP4 < TP8), TPE's density ratio estimation converges quickly because the 'good' region is concentrated at high-TP. At rate=500 (non-monotonic: TP4 > TP8), TPE must resolve a more complex landscape. The degenerate secondary params for TP=8/1inst (routing, block_size no-ops) do not impede TPE convergence — the dominant TP signal overwhelms the noise.",
+    "applicability_bounds": "Applies when the TP landscape is monotonically increasing (under-saturated regime). At rate >= 150 on H100, the landscape reverses (TP4 > TP8), but TPE still converges as long as the TP=4 advantage is detectable. The key insight is that monotonic landscapes are universally easier for surrogate-model-based search.",
+    "superseded_by": null,
+    "category": "algorithm",
+    "status": "active"
+  },
+  {
+    "id": "RP-15",
+    "statement": "Bracket Phase 1 profiles (always evaluate max and min of each secondary parameter, max-first ordering) achieve 5/5 Phase 1 correctness on all tested regimes (H100 hard llama, A100 easy llama, A100 hard qwen, L40S hard llama) while reducing evals_to_best from 7 to 3 or 4. Extended in iter-3: bracket K=1 also achieves 5/5 Phase 1 correctness for qwen3-14b on L40S (different TP winner TP=8 vs llama's TP=4) and H100 (TP=4 winner), confirming model-agnostic Phase 1 identification across both models and all hardware configurations tested. Extended in iter-5: bracket K=1 achieves 25/25 Phase 1 correctness on H100 at rate=100 (TP=8 winner, the reverse of rate>=150 behavior) and 25/25 evals_to_best=3 at rate=125 (crossover point). Rate-regime agnosticism confirmed.",
+    "confidence": "high",
+    "regime": "All tested: H100/A100-SXM/L40S, qwen3-14b and llama-3.1-8b, rates 100-1000, easy and hard regimes",
+    "evidence": ["iteration-3-h-main", "iteration-3-h-robustness", "iteration-5-h-main", "iteration-5-h-robustness", "iteration-5-h-ablation"],
+    "contradicts": [],
+    "extraction_iteration": 5,
+    "mechanism": "The max-profile creates a compute-saturated regime where the rate-dependent TP advantage (whether TP=8 at low rates or TP=4 at high rates) fully expresses, enabling reliable Phase 1 identification regardless of rate regime.",
+    "applicability_bounds": "Tested across 3 hardware types (H100, A100-SXM, L40S), 2 models (qwen3-14b, llama-3.1-8b), rates 100-1000, request counts 200 and 1000. evals_to_best=3 when TP=4 wins (position 3), evals_to_best=4 when TP=8 wins (position 4). At crossover rates (~125 for H100 qwen), evals_to_best=3 because TP=4 reaches threshold before TP=8 is evaluated.",
+    "superseded_by": null,
+    "category": "algorithm",
+    "status": "active"
+  },
+  {
+    "id": "RP-16",
+    "statement": "Bracket K=1 (max-only profile) is sufficient for Phase 1 TP identification and achieves evals_to_best of 3 or 4 depending on winner TP position in the evaluation order. Extended in iter-3: K=1 achieves 25/25 correctness for qwen3-14b on L40S hard (5 blis_seeds x 5 search seeds), including near-zero margin seeds (seed=43: 0.03%, seed=45: 0.11%). The min profile is universally redundant for Phase 1 correctness across all tested models and hardware. Extended in iter-5: K=1 achieves 25/25 correctness at rate=100 on H100 (TP=8 winner, evals_to_best=4) and 25/25 evals_to_best=3 at rate=125 (crossover, TP=4 and TP=8 within 1%). Rate-regime portability confirmed.",
+    "confidence": "high",
+    "regime": "All tested regimes including rate=100 and rate=125 on H100, qwen3-14b",
+    "evidence": ["iteration-3-h-ablation", "iteration-5-h-main", "iteration-5-h-robustness", "iteration-5-h-ablation"],
+    "contradicts": [],
+    "extraction_iteration": 5,
+    "mechanism": "The max-profile (mr=512, mt=8192, pf=4096) saturates the compute path for each TP level, revealing the rate-dependent competitive advantage. The min profile adds no discriminative power because it fails to saturate the compute path, causing secondary params to dominate over TP-level differences.",
+    "applicability_bounds": "evals_to_best is 3 when TP=4 wins (position 3) or when TP=8 and TP=4 are within 1% (crossover point), and 4 when TP=8 wins (position 4). This asymmetry is an inherent consequence of the [TP=1, TP=2, TP=4, TP=8] evaluation order.",
+    "superseded_by": null,
+    "category": "algorithm",
+    "status": "active"
+  }
+]

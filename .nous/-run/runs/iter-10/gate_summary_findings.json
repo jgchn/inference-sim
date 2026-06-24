@@ -1,0 +1,10 @@
+{
+  "gate_type": "findings",
+  "summary": "All three hypotheses confirmed with zero discrepancies. The 'lean bracket' strategy (evaluating only TP=4 and TP=8 with max-profile settings, budget of 2 evaluations) matched the global best configuration on all 16 workload-GPU regimes tested (8 H100 + 8 A100-SXM), while the model-aware formula achieved only 62.5% accuracy on H100 and 50% on A100-SXM when workload prompt distributions vary.",
+  "key_points": [
+    "Lean bracket achieved 100% accuracy across all 16 regimes (80/80 seed-regime combinations): it found the global-best TP choice in at most 2 evaluations every time, confirming it is workload-agnostic and hardware-agnostic.",
+    "The analytical formula (control-negative) failed on exactly the predicted cases: 3/8 H100 failures all at rate=100 for long-prompt workloads (contentgen 8.4% below best, summarization 2.8%, multidoc 2.3%), plus 4/8 A100-SXM failures including a 55.7% miss on multidoc-rate500 due to KV cache capacity \u2014 confirming the formula is structurally blind to prompt token distribution.",
+    "Key mechanism identified: longer prompt distributions (mean \u2265 1024 tokens) shift the TP crossover rate below the formula's predicted threshold, making TP=4/2-instance superior even at low request rates. On A100-SXM, multidoc (avg 10240 tokens) at rate=500 is an anomaly where TP=8 wins despite high rate, because TP=4/2-instance runs out of KV cache capacity.",
+    "The simulator is fully deterministic: all 5 random seeds produced identical results per regime, confirming no stochastic noise in the search space evaluation."
+  ]
+}

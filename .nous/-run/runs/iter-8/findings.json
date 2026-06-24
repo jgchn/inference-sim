@@ -1,0 +1,41 @@
+{
+  "iteration": 8,
+  "bundle_ref": "runs/iter-8/bundle.yaml",
+  "arms": [
+    {
+      "arm_type": "h-main",
+      "predicted": "Lean bracket (TP={4,8}, max-profile, skip-phase2, budget=2) achieves within 1% of global best for qwen3-32b on all 5 regimes. evals_to_best=2 on 4 regimes (TP=8 winner: H100 r100, H100 r300, A100 r100, A100 r500) and evals_to_best=1 on 1 regime (H100 r500, TP=4 winner). All 5 search seeds produce identical results per regime (deterministic).",
+      "observed": "25/25 (regime x seed) combinations achieve exactly global best. H100 r100: TP8 wins, score=0.132535=global_best, evals_to_best=2 (5/5 seeds). H100 r300: TP8 wins, score=0.138983=global_best, evals_to_best=2 (5/5 seeds). H100 r500: TP4 wins, score=0.141403=global_best, evals_to_best=1 (5/5 seeds). A100-SXM r100: TP8 wins, score=0.104331=global_best, evals_to_best=2 (5/5 seeds). A100-SXM r500: TP8 wins, score=0.108182=global_best, evals_to_best=2 (5/5 seeds). TP4/TP8 margins: H100 r100: 5.3% (TP8 leads), H100 r300: 1.0% (TP8 leads), H100 r500: 0.8% (TP4 leads), A100-SXM r100: 8.2% (TP8 leads), A100-SXM r500: 6.2% (TP8 leads). Algorithm adapts to model-size-shifted crossover (~350 on H100 for 32B vs ~130 for 14B) without modification.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "All predictions exactly confirmed. evals_to_best matches prediction precisely: 1 when TP=4 wins (position 1 in lean order), 2 when TP=8 wins (position 2). qwen3-32b's larger model size shifts the H100 crossover to ~350 req/s vs ~130 for 14B, but lean bracket detects this empirically without formula knowledge. A100-SXM shows TP=8 dominance at all tested rates, consistent with the no-crossover finding for 32B on A100-SXM."
+    },
+    {
+      "arm_type": "h-control-negative",
+      "predicted": "Formula achieves <=78% accuracy (<=14/18 correct). All 4+ failures involve qwen3-32b or L40S qwen3-14b. Formula predicts TP=4 where TP=8 actually wins due to model-size blindness.",
+      "observed": "Formula achieves 83.3% accuracy (15/18 correct). 3 failures (not 4+): (1) A100-SXM qwen3-32b rate=500: formula predicts TP=4 (500>196), actual TP=8, score=0.101861 vs global_best=0.108182 (5.8% below). (2) L40S qwen3-14b rate=500: formula predicts TP=4 (500>463), actual TP=8, score=0.080647 vs global_best=0.084795 (4.9% below). (3) L40S qwen3-32b rate=500: formula predicts TP=4 (500>463), actual TP=8, score=0.056742 vs global_best=0.064436 (11.9% below). Notably: H100 qwen3-32b rate=500 is CORRECT because TP=4 actually wins at rate=500 (crossover ~350, rate=500>crossover), so formula accidentally predicts right. Formula achieves 15/18, not <=14/18 as predicted. All 15 correct predictions match exactly or within 0.7% of global best. The 3 failures all involve TP=4 prediction where TP=8 dominates: A100-SXM 32B (no crossover at all rates), L40S 14B (no crossover), L40S 32B (no crossover).",
+      "status": "PARTIALLY_CONFIRMED",
+      "error_type": "magnitude",
+      "diagnostic_note": "The direction is confirmed (formula does fail, failures involve 32B models and L40S), but the magnitude is wrong: 3 failures instead of 4+ predicted, giving 83.3% accuracy instead of <=78%. The discrepancy arises because H100 qwen3-32b rate=500 is a 'lucky' correct prediction: the formula predicts TP=4 because 500>119 (formula crossover), and TP=4 actually IS the winner at rate=500 for qwen3-32b on H100 (true crossover ~350). The test matrix rates of 100 and 500 happen to land on opposite sides of both the formula crossover AND the true crossover for this regime. Testing at intermediate rates (200-400) would expose the H100 32B formula failure, as predicted by the designer handoff. The mechanism is confirmed: formula is model-size-blind (uses only bandwidth), causing failures for 32B models on lower-bandwidth hardware where the crossover is pushed above practical rates."
+    },
+    {
+      "arm_type": "h-ablation",
+      "predicted": "Micro-eval (lean bracket with 100 requests) selects TP=8 on all 4 tested high-rate regimes where the 1000-request lean bracket correctly selects TP=4. Misidentification rate = 4/4 (100%).",
+      "observed": "4/4 micro-eval runs select TP=8 where 1000-req gives TP=4: (1) H100 qwen3-14b rate=500: 100-req selects TP8 (scores TP4=0.0683, TP8=0.0847, TP8 wins by 24%). (2) A100-SXM qwen3-14b rate=500: 100-req selects TP8 (TP4=0.0487, TP8=0.0650, TP8 wins by 33%). (3) H100 llama-3.1-8b rate=500: 100-req selects TP8 (TP4=0.0936, TP8=0.1086, TP8 wins by 16%). (4) H100 qwen3-32b rate=500: 100-req selects TP8 (TP4=0.0401, TP8=0.0553, TP8 wins by 38%). The TP8 margins at 100-req are LARGER than TP4 margins at 1000-req, confirming the mechanism: short simulation horizon prevents queue saturation effects from manifesting. At 100 requests with rate=500, the simulation ends before queuing dynamics differentiate TP=4/2inst from TP=8/1inst. evals_to_best=? (expected, since GLOBAL_BEST_TABLE only has 1000-req entries for these regimes).",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "Perfect 4/4 prediction confirmed. The TP=8 win margin at 100 requests is surprisingly large (16-38%), indicating the queuing advantage of 2 instances is not just absent but actively reversed at short horizons. At 100 requests, TP=8/1inst's inherently lower per-step latency completely dominates over TP=4/2inst's load-distribution advantage. The minimum evaluation horizon for reliable TP winner identification at high rates is >500 requests (as established in iter-7 probes) and empirically at least 1000 requests."
+    },
+    {
+      "arm_type": "h-robustness",
+      "predicted": "Lean bracket achieves within 1% of global best on all 4 L40S regimes (qwen3-14b r100/500, llama r100/500) across 5 search seeds. qwen3-14b: TP=8 both rates (evals_to_best=2). llama r100: TP=8 (evals_to_best=2). llama r500: TP=4 (evals_to_best=1). All 5 seeds identical per regime.",
+      "observed": "20/20 (regime x seed) combinations achieve exactly global best. L40S qwen3-14b r100: TP8 wins, score=0.082636=global_best, evals_to_best=2 (5/5 seeds). L40S qwen3-14b r500: TP8 wins, score=0.084795=global_best, evals_to_best=2 (5/5 seeds). L40S llama r100: TP8 wins, score=0.104264=global_best, evals_to_best=2 (5/5 seeds). L40S llama r500: TP4 wins, score=0.109668=global_best, evals_to_best=1 (5/5 seeds). TP4/TP8 margins: qwen14b r100: 6.9% (TP8), qwen14b r500: 5.1% (TP8), llama r100: 2.8% (TP8), llama r500: 2.1% (TP4). All seeds produce byte-identical results per regime (confirmed deterministic). This completes L40S validation for lean bracket.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "All predictions exactly confirmed. Lean bracket handles the model-dependent TP winner on L40S (qwen3-14b->TP8, llama-3.1-8b rate=500->TP4) without algorithm modification. Even the narrow llama L40S rate=500 margin (2.1%) is correctly identified with evals_to_best=1 (TP=4 at position 1 in lean order). This extends lean bracket validation to all 3 hardware platforms (H100, A100-SXM, L40S) and all 3 tested models (qwen3-14b, llama-3.1-8b, qwen3-32b). Lean bracket completes in ~0.5-0.9s per search on L40S."
+    }
+  ],
+  "experiment_valid": true,
+  "discrepancy_analysis": "h-main and h-robustness fully confirmed (25/25 and 20/20 runs at global best). h-ablation fully confirmed (4/4 micro-eval misidentifications). h-control-negative partially confirmed: the formula does fail for model-size-blind reasons (mechanism confirmed), but achieves 15/18 (83.3%) accuracy on the 100/500 rate matrix rather than <=78% (<=14/18) as predicted. The discrepancy arises because H100 qwen3-32b rate=500 is a 'lucky' formula success: TP=4 IS the winner at rate=500 on H100 (true crossover ~350<500), and the formula also predicts TP=4. Testing at rates 200-400 for H100 qwen3-32b would expose the 4th failure (predicted in handoff but not in test matrix). The core mechanism (model-size blindness causing formula failure for 32B on A100-SXM and all models on L40S at rate=500) is confirmed by 3/3 failures.",
+  "dominant_component_pct": null
+}

@@ -1,0 +1,59 @@
+metadata:
+  iteration: 3
+  bundle_ref: "runs/iter-3/bundle.yaml"
+  description: >
+    Tests extremes-first Phase 1 (4 evals) vs sequential Phase 1 (15 evals) for
+    identifying optimal parallelism tier, and TPE vs LHS Phase 2 at high load.
+    Hardware portability tested on H100 (TP=4/2 optimal) vs A100-SXM (TP=8/1 optimal).
+
+setup:
+  - cmd: "go build -o blis main.go"
+    description: "Build BLIS binary in worktree"
+
+arms:
+  - arm_id: "h-main"
+    conditions:
+      - name: "extremes-tpe-h100-rate5000"
+        cmd: >
+          python3 search_blis_iter3_c2.py --strategy extremes-tpe
+          --hardware H100 --rate 5000 --num-requests 1000 --budget 50
+          --seeds 42,123,456 --blis-seed 42
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-3/results/h-main/extremes-tpe-h100-rate5000.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-3/results/h-main/extremes-tpe-h100-rate5000.json"
+      - name: "sequential-lhs-h100-rate5000"
+        cmd: >
+          python3 search_blis_iter3_c2.py --strategy sequential-lhs
+          --hardware H100 --rate 5000 --num-requests 1000 --budget 50
+          --seeds 42,123,456 --blis-seed 42
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-3/results/h-main/sequential-lhs-h100-rate5000.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-3/results/h-main/sequential-lhs-h100-rate5000.json"
+
+  - arm_id: "h-control-negative"
+    conditions:
+      - name: "all-strategies-h100-rate50"
+        cmd: >
+          python3 search_blis_iter3_c2.py --strategy all
+          --hardware H100 --rate 50 --num-requests 1000 --budget 50
+          --seeds 42,123,456 --blis-seed 42
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-3/results/h-control-negative/all-h100-rate50.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-3/results/h-control-negative/all-h100-rate50.json"
+
+  - arm_id: "h-ablation"
+    conditions:
+      - name: "extremes-lhs-h100-rate5000"
+        cmd: >
+          python3 search_blis_iter3_c2.py --strategy extremes-lhs
+          --hardware H100 --rate 5000 --num-requests 1000 --budget 50
+          --seeds 42,123,456 --blis-seed 42
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-3/results/h-ablation/extremes-lhs-h100-rate5000.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-3/results/h-ablation/extremes-lhs-h100-rate5000.json"
+
+  - arm_id: "h-robustness"
+    conditions:
+      - name: "extremes-tpe-a100-rate2000"
+        cmd: >
+          python3 search_blis_iter3_c2.py --strategy extremes-tpe
+          --hardware A100-SXM --rate 2000 --num-requests 1000 --budget 50
+          --seeds 42,123,456 --blis-seed 42
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-3/results/h-robustness/extremes-tpe-a100-rate2000.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-3/results/h-robustness/extremes-tpe-a100-rate2000.json"

@@ -1,0 +1,72 @@
+[
+  {
+    "id": "RP-1",
+    "statement": "In BLIS configuration search, TP (tensor parallelism) is the dominant performance knob — all near-optimal configs (within 1% of global best) require TP=8 at fixed GPU count of 8. TP alone accounts for ~87% of fitness variance across the 10-dimensional search space.",
+    "confidence": "high",
+    "regime": "qwen3-14b and llama-3.1-8b on H100, A100-SXM, L40S; fitness objective throughput:0.4,p99_ttft:0.3,p99_e2e:0.3",
+    "evidence": ["iteration-1-h-main"],
+    "contradicts": [],
+    "extraction_iteration": 1,
+    "mechanism": "TP=8 maximizes compute parallelism — each request executes across all 8 GPUs simultaneously, reducing per-token latency proportionally. The fitness objective (throughput + latency terms) benefits from reduced latency at all percentiles.",
+    "applicability_bounds": "Holds when total GPU count = 8 (single H100 SXM node). Breaks when TP × instances < total GPUs (memory constraint or small batch regimes).",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-2",
+    "statement": "TPE-based Bayesian optimization converges faster than random search for BLIS configuration search, but both find the global optimum within 100 evaluations due to the extreme dominance of a single parameter (TP). TPE's advantage manifests at very low budgets (20-50 evals): 5/5 seed success rate vs random's 3/5 at budget=50.",
+    "confidence": "high",
+    "regime": "rate=50, 200 requests, H100, qwen3-14b, budget=100, 5 search seeds",
+    "evidence": ["iteration-1-h-main"],
+    "contradicts": [],
+    "extraction_iteration": 1,
+    "mechanism": "TPE builds a probabilistic model of parameter→fitness relationships after each evaluation. With TP as the dominant factor (~87% of variance), TPE quickly learns to concentrate sampling on TP=8 configs. Random must discover TP=8 by chance, requiring more evaluations on average.",
+    "applicability_bounds": "Holds for 10D BLIS space. Advantage shrinks as budget grows (both converge by budget=100). LHS also effective at budget=50 due to stratified coverage.",
+    "superseded_by": null,
+    "category": "algorithmic",
+    "status": "active"
+  },
+  {
+    "id": "RP-4",
+    "statement": "TPE outperforms random search even in extremely small discrete spaces (15 feasible points). A 15-point space with a strongly dominant mode (TP=8/1inst scores 13% above median) has enough structure for TPE to exploit: mean evals-to-best of 6.2 (TPE) vs 13.6 (random), a 2.2x speedup.",
+    "confidence": "high",
+    "regime": "Restricted to TP + num_instances only (15 valid combos), rate=50, 200 requests, H100, qwen3-14b",
+    "evidence": ["iteration-1-h-control-negative"],
+    "contradicts": ["Prior prediction that TPE advantage requires large search spaces"],
+    "extraction_iteration": 1,
+    "mechanism": "Even with 15 feasible points, TP=8/1inst creates a unimodal dominant peak. After 2-3 evaluations sampling TP values, TPE's model assigns high probability to TP=8 configs. Random sampling requires more trials to encounter TP=8/1inst specifically by chance.",
+    "applicability_bounds": "Applies when the fitness landscape has a strong dominant mode (>10% above median). In uniform landscapes, TPE overhead eliminates advantage.",
+    "superseded_by": null,
+    "category": "algorithmic",
+    "status": "active"
+  },
+  {
+    "id": "RP-5",
+    "statement": "BLIS evaluations complete in ~70-90ms per run (200 requests, rate=50 req/s). 500 evaluations complete in under 40 seconds wall clock, making broad search feasible for capacity planning workflows.",
+    "confidence": "high",
+    "regime": "200 requests, rate=50, H100, qwen3-14b, latency-model=trained-physics",
+    "evidence": ["iteration-1-h-main"],
+    "contradicts": [],
+    "extraction_iteration": 1,
+    "mechanism": "BLIS is a CPU-only discrete-event simulator with O(N log N) complexity in requests. The trained-physics latency model computes analytically without GPU execution.",
+    "applicability_bounds": "Wall-clock scales linearly with budget and requests. At rate=200: ~60ms per eval (fewer simulation steps to reach steady state). At 1000 requests: ~250ms per eval.",
+    "superseded_by": null,
+    "category": "performance",
+    "status": "active"
+  },
+  {
+    "id": "RP-18",
+    "statement": "Under high arrival rate (rate=200 vs rate=50), TPE's advantage over random search is larger (+6.87% fitness gap at budget=50 vs +5.36%). High load creates sharper fitness gradients — undersized configs saturate and show dramatically worse metrics, concentrating the optimal region and making Bayesian modeling more effective.",
+    "confidence": "medium",
+    "regime": "H100, qwen3-14b, 200 requests, budget=100, 5 search seeds; comparison rate=50 vs rate=200",
+    "evidence": ["iteration-1-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 1,
+    "mechanism": "At high rates, low-TP and small-batch configs reach queue saturation quickly, producing near-zero throughput and very high latency. This creates steep fitness cliffs that TPE's model detects and avoids after 2-3 saturated evaluations. Random wastes proportionally more budget on these clearly-bad regions.",
+    "applicability_bounds": "Effect size (1.5x) is modest. At extreme overload (rate >> capacity), all configs fail and both methods perform equally poorly. Sharpest advantage expected in moderately overloaded regimes where good configs can still serve requests but bad configs saturate.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  }
+]

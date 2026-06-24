@@ -1,0 +1,44 @@
+{
+  "arm": "h-main",
+  "rate": 100,
+  "algorithm": "nsga2",
+  "pop_size": 40,
+  "n_gens": 4,
+  "total_evals": 200,
+  "exhaustive_hv": 65197799999.99999,
+  "final_hv": 64393200000.0,
+  "final_hv_pct": 98.76590927914746,
+  "final_pareto_size": 61,
+  "convergence": [
+    {
+      "eval": 40,
+      "hv": 55881000000.0,
+      "pareto_size": 16,
+      "hv_pct": 85.70994726815937
+    },
+    {
+      "eval": 80,
+      "hv": 59437800000.0,
+      "pareto_size": 13,
+      "hv_pct": 91.16534606995943
+    },
+    {
+      "eval": 120,
+      "hv": 63801000000.0,
+      "pareto_size": 26,
+      "hv_pct": 97.85759642196517
+    },
+    {
+      "eval": 160,
+      "hv": 64088999999.99999,
+      "pareto_size": 35,
+      "hv_pct": 98.29932911846718
+    },
+    {
+      "eval": 200,
+      "hv": 64393200000.0,
+      "pareto_size": 61,
+      "hv_pct": 98.76590927914746
+    }
+  ]
+}

@@ -1,0 +1,1447 @@
+{
+  "pareto_front": [
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 3000
+      },
+      "objectives": {
+        "neg_rps": -21.354674340682436,
+        "ttft_p99_ms": 2323.1353299999996,
+        "gpu_count": 8,
+        "total_kv_blocks": 3000
+      }
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 7500
+      },
+      "objectives": {
+        "neg_rps": -26.281958368589486,
+        "ttft_p99_ms": 25.456909999999997,
+        "gpu_count": 8,
+        "total_kv_blocks": 7500
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000
+      },
+      "objectives": {
+        "neg_rps": -11.039820854619027,
+        "ttft_p99_ms": 7121.342,
+        "gpu_count": 4,
+        "total_kv_blocks": 2000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 4000
+      },
+      "objectives": {
+        "neg_rps": -22.35930213487735,
+        "ttft_p99_ms": 28.4912,
+        "gpu_count": 8,
+        "total_kv_blocks": 4000
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 7,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000
+      },
+      "objectives": {
+        "neg_rps": -11.230257908487998,
+        "ttft_p99_ms": 46.82476,
+        "gpu_count": 7,
+        "total_kv_blocks": 2000
+      }
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 3000
+      },
+      "objectives": {
+        "neg_rps": -21.354674340682436,
+        "ttft_p99_ms": 2323.1353299999996,
+        "gpu_count": 8,
+        "total_kv_blocks": 3000
+      }
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 7500
+      },
+      "objectives": {
+        "neg_rps": -26.281958368589486,
+        "ttft_p99_ms": 25.456909999999997,
+        "gpu_count": 8,
+        "total_kv_blocks": 7500
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 5000
+      },
+      "objectives": {
+        "neg_rps": -17.709303378873102,
+        "ttft_p99_ms": 3498.8927999999996,
+        "gpu_count": 4,
+        "total_kv_blocks": 5000
+      }
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 3000
+      },
+      "objectives": {
+        "neg_rps": -21.354674340682436,
+        "ttft_p99_ms": 2323.1353299999996,
+        "gpu_count": 8,
+        "total_kv_blocks": 3000
+      }
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 5000
+      },
+      "objectives": {
+        "neg_rps": -25.165732074291757,
+        "ttft_p99_ms": 619.72565,
+        "gpu_count": 8,
+        "total_kv_blocks": 5000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 7500
+      },
+      "objectives": {
+        "neg_rps": -18.740297796450196,
+        "ttft_p99_ms": 1104.5730099999998,
+        "gpu_count": 4,
+        "total_kv_blocks": 7500
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 4000
+      },
+      "objectives": {
+        "neg_rps": -10.456309695398811,
+        "ttft_p99_ms": 49.74746,
+        "gpu_count": 4,
+        "total_kv_blocks": 4000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 7500
+      },
+      "objectives": {
+        "neg_rps": -19.14445351678825,
+        "ttft_p99_ms": 1398.4998899999998,
+        "gpu_count": 4,
+        "total_kv_blocks": 7500
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 4000
+      },
+      "objectives": {
+        "neg_rps": -10.456309695398811,
+        "ttft_p99_ms": 49.74746,
+        "gpu_count": 4,
+        "total_kv_blocks": 4000
+      }
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 4000
+      },
+      "objectives": {
+        "neg_rps": -23.672849738835204,
+        "ttft_p99_ms": 1252.9002600000001,
+        "gpu_count": 8,
+        "total_kv_blocks": 4000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 7500
+      },
+      "objectives": {
+        "neg_rps": -19.14445351678825,
+        "ttft_p99_ms": 1398.4998899999998,
+        "gpu_count": 4,
+        "total_kv_blocks": 7500
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000
+      },
+      "objectives": {
+        "neg_rps": -16.0686529985633,
+        "ttft_p99_ms": 1462.8107499999996,
+        "gpu_count": 8,
+        "total_kv_blocks": 2000
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 10000
+      },
+      "objectives": {
+        "neg_rps": -6.861603212904535,
+        "ttft_p99_ms": 82.16937,
+        "gpu_count": 1,
+        "total_kv_blocks": 10000
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 5000
+      },
+      "objectives": {
+        "neg_rps": -10.74366753462966,
+        "ttft_p99_ms": 8178.559119999999,
+        "gpu_count": 2,
+        "total_kv_blocks": 5000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 5000
+      },
+      "objectives": {
+        "neg_rps": -17.709303378873102,
+        "ttft_p99_ms": 3498.8927999999996,
+        "gpu_count": 4,
+        "total_kv_blocks": 5000
+      }
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 3000
+      },
+      "objectives": {
+        "neg_rps": -21.354674340682436,
+        "ttft_p99_ms": 2323.1353299999996,
+        "gpu_count": 8,
+        "total_kv_blocks": 3000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 5000
+      },
+      "objectives": {
+        "neg_rps": -17.709303378873102,
+        "ttft_p99_ms": 3498.8927999999996,
+        "gpu_count": 4,
+        "total_kv_blocks": 5000
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 2000
+      },
+      "objectives": {
+        "neg_rps": -6.6657232446367765,
+        "ttft_p99_ms": 18866.844409999998,
+        "gpu_count": 2,
+        "total_kv_blocks": 2000
+      }
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 5000
+      },
+      "objectives": {
+        "neg_rps": -25.165732074291757,
+        "ttft_p99_ms": 619.72565,
+        "gpu_count": 8,
+        "total_kv_blocks": 5000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 4000
+      },
+      "objectives": {
+        "neg_rps": -22.35930213487735,
+        "ttft_p99_ms": 28.4912,
+        "gpu_count": 8,
+        "total_kv_blocks": 4000
+      }
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 7500
+      },
+      "objectives": {
+        "neg_rps": -26.281958368589486,
+        "ttft_p99_ms": 25.456909999999997,
+        "gpu_count": 8,
+        "total_kv_blocks": 7500
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 64,
+        "total_kv_blocks": 2000
+      },
+      "objectives": {
+        "neg_rps": -6.6657232446367765,
+        "ttft_p99_ms": 18866.844409999998,
+        "gpu_count": 2,
+        "total_kv_blocks": 2000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 4000
+      },
+      "objectives": {
+        "neg_rps": -22.35930213487735,
+        "ttft_p99_ms": 28.4912,
+        "gpu_count": 8,
+        "total_kv_blocks": 4000
+      }
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 4000
+      },
+      "objectives": {
+        "neg_rps": -24.838173092757412,
+        "ttft_p99_ms": 2736.9098299999996,
+        "gpu_count": 8,
+        "total_kv_blocks": 4000
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 3000
+      },
+      "objectives": {
+        "neg_rps": -10.78875393236595,
+        "ttft_p99_ms": 49.964259999999996,
+        "gpu_count": 5,
+        "total_kv_blocks": 3000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 4000
+      },
+      "objectives": {
+        "neg_rps": -22.35930213487735,
+        "ttft_p99_ms": 28.4912,
+        "gpu_count": 8,
+        "total_kv_blocks": 4000
+      }
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 7500
+      },
+      "objectives": {
+        "neg_rps": -26.281958368589486,
+        "ttft_p99_ms": 25.456909999999997,
+        "gpu_count": 8,
+        "total_kv_blocks": 7500
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000
+      },
+      "objectives": {
+        "neg_rps": -6.6657232446367765,
+        "ttft_p99_ms": 18866.844409999998,
+        "gpu_count": 2,
+        "total_kv_blocks": 2000
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 64,
+        "total_kv_blocks": 2000
+      },
+      "objectives": {
+        "neg_rps": -8.479141354663236,
+        "ttft_p99_ms": 9411.211979999998,
+        "gpu_count": 3,
+        "total_kv_blocks": 2000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 5000
+      },
+      "objectives": {
+        "neg_rps": -17.709303378873102,
+        "ttft_p99_ms": 3498.8927999999996,
+        "gpu_count": 4,
+        "total_kv_blocks": 5000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000
+      },
+      "objectives": {
+        "neg_rps": -18.590007424848963,
+        "ttft_p99_ms": 4322.09726,
+        "gpu_count": 8,
+        "total_kv_blocks": 2000
+      }
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 7500
+      },
+      "objectives": {
+        "neg_rps": -26.281958368589486,
+        "ttft_p99_ms": 25.456909999999997,
+        "gpu_count": 8,
+        "total_kv_blocks": 7500
+      }
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 4000
+      },
+      "objectives": {
+        "neg_rps": -23.672849738835204,
+        "ttft_p99_ms": 1252.9002600000001,
+        "gpu_count": 8,
+        "total_kv_blocks": 4000
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 5000
+      },
+      "objectives": {
+        "neg_rps": -5.905005235968143,
+        "ttft_p99_ms": 17104.94004,
+        "gpu_count": 1,
+        "total_kv_blocks": 5000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 4000
+      },
+      "objectives": {
+        "neg_rps": -15.58616001983183,
+        "ttft_p99_ms": 3794.72626,
+        "gpu_count": 4,
+        "total_kv_blocks": 4000
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 64,
+        "total_kv_blocks": 3000
+      },
+      "objectives": {
+        "neg_rps": -8.439937836481858,
+        "ttft_p99_ms": 11703.01103,
+        "gpu_count": 2,
+        "total_kv_blocks": 3000
+      }
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 4000
+      },
+      "objectives": {
+        "neg_rps": -24.838173092757412,
+        "ttft_p99_ms": 2736.9098299999996,
+        "gpu_count": 8,
+        "total_kv_blocks": 4000
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 7500
+      },
+      "objectives": {
+        "neg_rps": -6.547560431363757,
+        "ttft_p99_ms": 11092.67218,
+        "gpu_count": 1,
+        "total_kv_blocks": 7500
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 3000
+      },
+      "objectives": {
+        "neg_rps": -10.78875393236595,
+        "ttft_p99_ms": 49.964259999999996,
+        "gpu_count": 5,
+        "total_kv_blocks": 3000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 7500
+      },
+      "objectives": {
+        "neg_rps": -18.740297796450196,
+        "ttft_p99_ms": 1104.5730099999998,
+        "gpu_count": 4,
+        "total_kv_blocks": 7500
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 5000
+      },
+      "objectives": {
+        "neg_rps": -10.075203840264695,
+        "ttft_p99_ms": 7028.48678,
+        "gpu_count": 2,
+        "total_kv_blocks": 5000
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 64,
+        "total_kv_blocks": 2000
+      },
+      "objectives": {
+        "neg_rps": -11.333211841302393,
+        "ttft_p99_ms": 8823.58089,
+        "gpu_count": 4,
+        "total_kv_blocks": 2000
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 5000
+      },
+      "objectives": {
+        "neg_rps": -15.19040604335114,
+        "ttft_p99_ms": 39.4323,
+        "gpu_count": 4,
+        "total_kv_blocks": 5000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 10000
+      },
+      "objectives": {
+        "neg_rps": -19.159455526592843,
+        "ttft_p99_ms": 33.639269999999996,
+        "gpu_count": 4,
+        "total_kv_blocks": 10000
+      }
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 5000
+      },
+      "objectives": {
+        "neg_rps": -25.165732074291757,
+        "ttft_p99_ms": 619.72565,
+        "gpu_count": 8,
+        "total_kv_blocks": 5000
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 5000
+      },
+      "objectives": {
+        "neg_rps": -10.74366753462966,
+        "ttft_p99_ms": 8178.559119999999,
+        "gpu_count": 2,
+        "total_kv_blocks": 5000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 3000
+      },
+      "objectives": {
+        "neg_rps": -14.245870620712527,
+        "ttft_p99_ms": 5347.8153999999995,
+        "gpu_count": 4,
+        "total_kv_blocks": 3000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 64,
+        "total_kv_blocks": 2000
+      },
+      "objectives": {
+        "neg_rps": -18.590007424848963,
+        "ttft_p99_ms": 4322.09726,
+        "gpu_count": 8,
+        "total_kv_blocks": 2000
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 3,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000
+      },
+      "objectives": {
+        "neg_rps": -13.59428838692281,
+        "ttft_p99_ms": 3950.84328,
+        "gpu_count": 6,
+        "total_kv_blocks": 2000
+      }
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 7500
+      },
+      "objectives": {
+        "neg_rps": -26.281958368589486,
+        "ttft_p99_ms": 25.456909999999997,
+        "gpu_count": 8,
+        "total_kv_blocks": 7500
+      }
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 7500
+      },
+      "objectives": {
+        "neg_rps": -26.281958368589486,
+        "ttft_p99_ms": 25.456909999999997,
+        "gpu_count": 8,
+        "total_kv_blocks": 7500
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 64,
+        "total_kv_blocks": 2000
+      },
+      "objectives": {
+        "neg_rps": -16.0686529985633,
+        "ttft_p99_ms": 1462.8107499999996,
+        "gpu_count": 8,
+        "total_kv_blocks": 2000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 64,
+        "total_kv_blocks": 3000
+      },
+      "objectives": {
+        "neg_rps": -14.208670812946258,
+        "ttft_p99_ms": 5312.48605,
+        "gpu_count": 4,
+        "total_kv_blocks": 3000
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000
+      },
+      "objectives": {
+        "neg_rps": -3.653058979349568,
+        "ttft_p99_ms": 37365.75541,
+        "gpu_count": 1,
+        "total_kv_blocks": 2000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 3000
+      },
+      "objectives": {
+        "neg_rps": -14.245870620712527,
+        "ttft_p99_ms": 5347.8153999999995,
+        "gpu_count": 4,
+        "total_kv_blocks": 3000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 4000
+      },
+      "objectives": {
+        "neg_rps": -22.35930213487735,
+        "ttft_p99_ms": 28.4912,
+        "gpu_count": 8,
+        "total_kv_blocks": 4000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 5000
+      },
+      "objectives": {
+        "neg_rps": -16.75868300884054,
+        "ttft_p99_ms": 2639.80014,
+        "gpu_count": 4,
+        "total_kv_blocks": 5000
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 64,
+        "total_kv_blocks": 2000
+      },
+      "objectives": {
+        "neg_rps": -9.77238168577493,
+        "ttft_p99_ms": 5490.25,
+        "gpu_count": 4,
+        "total_kv_blocks": 2000
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000
+      },
+      "objectives": {
+        "neg_rps": -11.039820854619027,
+        "ttft_p99_ms": 7121.342,
+        "gpu_count": 4,
+        "total_kv_blocks": 2000
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 5000
+      },
+      "objectives": {
+        "neg_rps": -5.636512312186126,
+        "ttft_p99_ms": 15965.41845,
+        "gpu_count": 1,
+        "total_kv_blocks": 5000
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 7500
+      },
+      "objectives": {
+        "neg_rps": -9.835300516377867,
+        "ttft_p99_ms": 53.56891,
+        "gpu_count": 3,
+        "total_kv_blocks": 7500
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 5000
+      },
+      "objectives": {
+        "neg_rps": -10.075203840264695,
+        "ttft_p99_ms": 7028.48678,
+        "gpu_count": 2,
+        "total_kv_blocks": 5000
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 64,
+        "total_kv_blocks": 4000
+      },
+      "objectives": {
+        "neg_rps": -10.456309695398811,
+        "ttft_p99_ms": 49.74746,
+        "gpu_count": 4,
+        "total_kv_blocks": 4000
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 4000
+      },
+      "objectives": {
+        "neg_rps": -9.406675362510928,
+        "ttft_p99_ms": 8691.71815,
+        "gpu_count": 2,
+        "total_kv_blocks": 4000
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 7500
+      },
+      "objectives": {
+        "neg_rps": -6.547560431363757,
+        "ttft_p99_ms": 11092.67218,
+        "gpu_count": 1,
+        "total_kv_blocks": 7500
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000
+      },
+      "objectives": {
+        "neg_rps": -15.96476767351667,
+        "ttft_p99_ms": 1391.3671599999998,
+        "gpu_count": 8,
+        "total_kv_blocks": 2000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 5000
+      },
+      "objectives": {
+        "neg_rps": -17.709303378873102,
+        "ttft_p99_ms": 3498.8927999999996,
+        "gpu_count": 4,
+        "total_kv_blocks": 5000
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 7500
+      },
+      "objectives": {
+        "neg_rps": -12.066681689685371,
+        "ttft_p99_ms": 3055.7019499999983,
+        "gpu_count": 2,
+        "total_kv_blocks": 7500
+      }
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 4000
+      },
+      "objectives": {
+        "neg_rps": -23.672849738835204,
+        "ttft_p99_ms": 1252.9002600000001,
+        "gpu_count": 8,
+        "total_kv_blocks": 4000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 5000
+      },
+      "objectives": {
+        "neg_rps": -16.75868300884054,
+        "ttft_p99_ms": 2639.80014,
+        "gpu_count": 4,
+        "total_kv_blocks": 5000
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 3000
+      },
+      "objectives": {
+        "neg_rps": -10.78875393236595,
+        "ttft_p99_ms": 49.964259999999996,
+        "gpu_count": 5,
+        "total_kv_blocks": 3000
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 4000
+      },
+      "objectives": {
+        "neg_rps": -5.2269753955291485,
+        "ttft_p99_ms": 19527.559839999998,
+        "gpu_count": 1,
+        "total_kv_blocks": 4000
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 4000
+      },
+      "objectives": {
+        "neg_rps": -8.441338857120378,
+        "ttft_p99_ms": 4818.109499999996,
+        "gpu_count": 2,
+        "total_kv_blocks": 4000
+      }
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 3000
+      },
+      "objectives": {
+        "neg_rps": -21.354674340682436,
+        "ttft_p99_ms": 2323.1353299999996,
+        "gpu_count": 8,
+        "total_kv_blocks": 3000
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 4000
+      },
+      "objectives": {
+        "neg_rps": -5.2269753955291485,
+        "ttft_p99_ms": 19527.559839999998,
+        "gpu_count": 1,
+        "total_kv_blocks": 4000
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 64,
+        "total_kv_blocks": 2000
+      },
+      "objectives": {
+        "neg_rps": -11.039820854619027,
+        "ttft_p99_ms": 7121.342,
+        "gpu_count": 4,
+        "total_kv_blocks": 2000
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000
+      },
+      "objectives": {
+        "neg_rps": -6.6657232446367765,
+        "ttft_p99_ms": 18866.844409999998,
+        "gpu_count": 2,
+        "total_kv_blocks": 2000
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 10000
+      },
+      "objectives": {
+        "neg_rps": -6.861603212904535,
+        "ttft_p99_ms": 82.16937,
+        "gpu_count": 1,
+        "total_kv_blocks": 10000
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 3,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 64,
+        "total_kv_blocks": 3000
+      },
+      "objectives": {
+        "neg_rps": -16.026748001344323,
+        "ttft_p99_ms": 36.65788,
+        "gpu_count": 6,
+        "total_kv_blocks": 3000
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000
+      },
+      "objectives": {
+        "neg_rps": -7.738255069911266,
+        "ttft_p99_ms": 8469.29683,
+        "gpu_count": 3,
+        "total_kv_blocks": 2000
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 3000
+      },
+      "objectives": {
+        "neg_rps": -10.78875393236595,
+        "ttft_p99_ms": 49.964259999999996,
+        "gpu_count": 5,
+        "total_kv_blocks": 3000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 4000
+      },
+      "objectives": {
+        "neg_rps": -16.200200785288533,
+        "ttft_p99_ms": 5422.52189,
+        "gpu_count": 4,
+        "total_kv_blocks": 4000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 4000
+      },
+      "objectives": {
+        "neg_rps": -22.35930213487735,
+        "ttft_p99_ms": 28.4912,
+        "gpu_count": 8,
+        "total_kv_blocks": 4000
+      }
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 3000
+      },
+      "objectives": {
+        "neg_rps": -10.78875393236595,
+        "ttft_p99_ms": 49.964259999999996,
+        "gpu_count": 5,
+        "total_kv_blocks": 3000
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 10000
+      },
+      "objectives": {
+        "neg_rps": -12.196867441944285,
+        "ttft_p99_ms": 47.7681,
+        "gpu_count": 2,
+        "total_kv_blocks": 10000
+      }
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 7500
+      },
+      "objectives": {
+        "neg_rps": -26.281958368589486,
+        "ttft_p99_ms": 25.456909999999997,
+        "gpu_count": 8,
+        "total_kv_blocks": 7500
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 64,
+        "total_kv_blocks": 2000
+      },
+      "objectives": {
+        "neg_rps": -6.6657232446367765,
+        "ttft_p99_ms": 18866.844409999998,
+        "gpu_count": 2,
+        "total_kv_blocks": 2000
+      }
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 4,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000
+      },
+      "objectives": {
+        "neg_rps": -16.0686529985633,
+        "ttft_p99_ms": 1462.8107499999996,
+        "gpu_count": 8,
+        "total_kv_blocks": 2000
+      }
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 5000
+      },
+      "objectives": {
+        "neg_rps": -17.709303378873102,
+        "ttft_p99_ms": 3498.8927999999996,
+        "gpu_count": 4,
+        "total_kv_blocks": 5000
+      }
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 7500
+      },
+      "objectives": {
+        "neg_rps": -26.281958368589486,
+        "ttft_p99_ms": 25.456909999999997,
+        "gpu_count": 8,
+        "total_kv_blocks": 7500
+      }
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 3000
+      },
+      "objectives": {
+        "neg_rps": -21.354674340682436,
+        "ttft_p99_ms": 2323.1353299999996,
+        "gpu_count": 8,
+        "total_kv_blocks": 3000
+      }
+    }
+  ],
+  "final_hv": 51804492298.27878,
+  "total_evals": 200,
+  "pareto_size": 96
+}

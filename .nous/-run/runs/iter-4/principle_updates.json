@@ -1,0 +1,58 @@
+[
+  {
+    "id": "RP-20",
+    "statement": "Bracket K=1 hierarchical search is robust to BLIS workload variation across seeds on A100-SXM qwen3-14b: 25/25 (blis_seed x search_seed) combinations achieve Phase 1 correctness and evals_to_best=3. Extended from H100 llama (iter-3 confirmation) to A100-SXM qwen, including seeds with the tightest TP=4 margins in the campaign (seed=42: 1.07%, seed=44: 1.24%). The max profile's compute-saturated regime is stable across workload realizations and hardware platforms.",
+    "confidence": "high",
+    "regime": "A100-SXM qwen3-14b hard (1000 req/rate=500), seeds 42-46. Previously confirmed for H100 llama.",
+    "evidence": ["iteration-4-h-main", "iteration-4-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 4,
+    "mechanism": "Phase 1 bracket evaluation (max-profile) is deterministic per blis_seed: fixed workload → fixed BLIS evaluation → fixed Phase 1 score. All 5 blis_seeds have TP4 Phase 1 scores above threshold (0.137432), so evals_to_best=3 holds at every (blis_seed, search_seed) combination. Seeds 42 and 44 with tight 1.07%/1.24% margins still have Phase 1 TP4 scores (0.138290, 0.139425) well above the threshold derived from the corrected global best (0.138820).",
+    "applicability_bounds": "Holds for A100-SXM (2.039 TB/s) and H100 (3.35 TB/s) hardware where TP=4 is the winner. On L40S (0.864 TB/s) where qwen→TP=8, evals_to_best=4 (TP=8 is the 4th eval in PHASE1_TP_CONFIGS). Determinism requires a fixed GLOBAL_BEST_TABLE entry that cleanly separates the winner TP's Phase 1 score from the threshold.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-21",
+    "statement": "The TP winner in bracket K=1 Phase 1 is model-dependent on low-bandwidth hardware (L40S, 0.864 TB/s): qwen3-14b→TP=8/1inst, llama-3.1-8b→TP=4/2inst. On high-bandwidth hardware (H100: 3.35 TB/s, A100-SXM: 2.039 TB/s), both models favor TP=4/2inst. The 2x3 (model x hardware) matrix is now complete: all cells confirmed with bracket K=1. Bracket K=1 identifies the correct model-dependent TP winner without any model-specific configuration changes — the algorithm is fully model-agnostic.",
+    "confidence": "high",
+    "regime": "All 6 cells: qwen3-14b and llama-3.1-8b on H100, A100-SXM, and L40S at 1000 req/rate=500.",
+    "evidence": ["iteration-3-h-main", "iteration-3-h-robustness", "iteration-4-h-main", "iteration-4-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 4,
+    "mechanism": "A100-SXM (2.039 TB/s) has sufficient bandwidth for TP=4/2inst to dominate: two instances provide higher aggregate throughput via overlapping batch execution, while TP=4 weight sharding is adequate at this bandwidth. On L40S (0.864 TB/s), qwen's 14B parameter size creates a severe weight-loading bottleneck at TP=4, tipping the balance to TP=8. The bandwidth threshold for qwen's TP winner transition lies between 0.864 TB/s (L40S, TP=8) and 2.039 TB/s (A100-SXM, TP=4).",
+    "applicability_bounds": "Valid for hard regime (1000 req/rate=500). Easy regime (200 req/rate=200) shows TP=8 dominance on all hardware due to lower concurrent demand. The bandwidth threshold for qwen TP winner transition (0.864–2.039 TB/s) cannot be pinpointed more precisely with standard hardware configurations.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-22",
+    "statement": "TPE convergence reliability at tight TP margins is hardware/model-specific, not universal. On L40S: the margin threshold for reliable flat TPE convergence at budget=100 lies between 2.1% (llama failure: 4/5 seeds fail) and 5.1% (qwen success: 4/5 exact). On A100-SXM: flat TPE succeeds at 1.07% margin (5/5 within-threshold, median evals_to_best=26) and at 4.47% margin (5/5 within-threshold, median evals_to_best=6). The [2.1%, 5.1%] bound is specific to L40S hardware and cannot be universally applied. A100-SXM's higher absolute fitness landscape allows more configurations to exceed the 1% threshold, making TPE convergence easier at equivalent relative margins.",
+    "confidence": "high",
+    "regime": "L40S hard (llama 2.1%, qwen 5.1%) and A100-SXM hard (qwen 1.07%, qwen 4.47%), 1000 req/rate=500.",
+    "evidence": ["iteration-3-h-ablation", "iteration-3-h-control-negative", "iteration-4-h-ablation", "iteration-4-h-control-negative"],
+    "contradicts": [],
+    "extraction_iteration": 4,
+    "mechanism": "TPE convergence depends on: (1) relative TP margin (how distinguishable TP winner configs are from non-winners), AND (2) how many TP-winner configurations exceed the absolute 1% threshold (global_best × 0.99). On A100-SXM qwen, threshold=0.137432 is exceeded by many TP4/2inst configurations (not just max-profile), because A100-SXM's higher FLOP/bandwidth ratio creates a broader above-threshold region. On L40S llama at 2.1%, the threshold region is narrower, requiring more specific (TP=4+high-batch) configurations. Margin width still causally affects speed: within A100-SXM, 4.47% margin → median 6 evals, 1.07% margin → median 26 evals.",
+    "applicability_bounds": "The hardware-specificity means flat TPE cannot be ruled in or out based solely on relative margin width. Hardware characteristics (absolute fitness range, threshold coverage) must be considered. Bracket K=1 remains hardware-agnostic and achieves evals_to_best=3 in all tested configurations, making it the recommended default regardless of margin width.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-23",
+    "statement": "The global best for qwen3-14b on A100-SXM hard regime (1000 req/rate=500) is 0.138820, achievable with TP=4/2inst using round-robin routing (not least-loaded). Phase 1 max-profile (least-loaded) achieves 0.138290. Round-robin routing provides a 0.38% improvement over least-loaded for this hardware/workload. This is the first regime in the campaign where Phase 2 adds genuine value beyond Phase 1: flat TPE within TP=4/2inst discovers the routing improvement in 4/5 search seeds within budget=100.",
+    "confidence": "high",
+    "regime": "qwen3-14b A100-SXM hard (1000 req/rate=500), seed=42.",
+    "evidence": ["iteration-4-h-main", "iteration-4-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 4,
+    "mechanism": "Round-robin distributes requests uniformly between the 2 instances, while least-loaded can create imbalance when one instance temporarily has more in-flight requests. At 1000 req/rate=500 with A100-SXM timing characteristics, round-robin's uniform distribution marginally improves throughput. This effect is seed-dependent: at seed=46, least-loaded (0.147057) outperforms round-robin (0.146765), while at seed=42, round-robin wins. The routing effect is a small secondary optimization discoverable by Phase 2 TPE.",
+    "applicability_bounds": "Only matters for 2-instance configs (TP=4/2inst). Single-instance configs have degenerate routing (RP note: routing_policy has no effect at 1 instance). The routing advantage is seed-dependent and small (0.38%). The global best table entry 0.138820 is based on seed=42; other seeds may have slightly different optima.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  }
+]

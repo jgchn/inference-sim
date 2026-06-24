@@ -1,0 +1,58 @@
+[
+  {
+    "id": "RP-5",
+    "statement": "In the BLIS configuration space, TP, num_instances, AND total_kv_blocks are dominant parameters when kv_blocks is constrained. block_size_in_tokens is ALSO dominant for high-TP configurations because it multiplies the effective KV token capacity (effective_kv_tokens = total_kv_blocks × block_size). For tp=8,inst=1 at kv=3000: block_size=16 → 48k token capacity (107 preemptions, ttft=2323ms) vs block_size=32 → 96k token capacity (0 preemptions, ttft=25ms). block_size is non-differentiating only when the KV token capacity is already well above the threshold for the GPU tier (all blocks above 4000 for tp=2,inst=2). routing_policy, gpu_memory_utilization remain secondary differentiators.",
+    "confidence": "high",
+    "regime": "BLIS with qwen/qwen3-14b on H100, rate=50 req/s, prefix_tokens=512. block_size differentiation is most pronounced for high-TP single-instance configs where kv_blocks×block_size crosses the preemption-free threshold.",
+    "evidence": ["iteration-4-h-ablation", "iteration-4-block-size-probe"],
+    "contradicts": ["RP-5-prior"],
+    "extraction_iteration": 4,
+    "mechanism": "total_kv_blocks specifies the NUMBER of KV blocks per instance, not tokens. Effective KV token capacity = total_kv_blocks × block_size_in_tokens. For tp=8,inst=1 at kv=3000: block_size=16 gives 48k tokens (below the ~80k threshold for tp=8 at rate=50), causing heavy preemption (107 events). block_size=32 gives 96k tokens (above threshold), eliminating preemptions entirely. The cliff interaction between total_kv_blocks and block_size creates qualitatively different operating regimes, making block_size a structural parameter for high-TP configs, not merely a secondary one.",
+    "applicability_bounds": "The block_size differentiation is most extreme for tp=8 (highest compute, most token throughput per batch). For tp=1,2,4 at moderate kv_blocks, block_size has less impact because those tiers are not as memory-stressed. The effect disappears when total_kv_blocks is already large enough that even block_size=16 provides adequate token capacity.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-6",
+    "statement": "NSGA-II's convergence advantage over random search on BLIS manifests as both final solution QUALITY (+1.7% HV at 200 evals) AND a moderate convergence SPEED advantage (~47 eval gap to 95% of exhaustive reference). Parameter space reduction from 9 to 5 parameters amplified the speed gap from ~40 evals (iter-3) to ~47 evals. The amplification is modest because the reduced space has 22% random coverage at 200 evals and 26.4% Pareto density — both too easy for random to create a large gap. Budget=200 evals on 900-config space is insufficient to expose a clear 80-eval gap.",
+    "confidence": "high",
+    "regime": "BLIS 4-objective optimization (rps, ttft, gpu_count, total_kv_blocks), 5-parameter reduced space (900 configs), budget=200 evals, NSGA-II pop=40 4-gens vs uniform random.",
+    "evidence": ["iteration-3-nsga2-vs-random", "iteration-4-h-main", "iteration-4-h-control-negative"],
+    "contradicts": [],
+    "extraction_iteration": 4,
+    "mechanism": "At 200/900 = 22% random coverage, random search has high probability of sampling at least one config from each KV-stress regime per GPU tier. NSGA-II's crossover focuses on exploiting tp×kv_blocks interactions but with 22% random coverage, random already achieves broad coverage without needing crossover exploitation. To expose a gap >80 evals, the space would need either: (1) budget reduced to <100 evals (11% coverage), (2) space enlarged by adding more kv_blocks granularity, or (3) problem made harder by introducing more conditional interactions.",
+    "applicability_bounds": "Budget=200 on 900 configs (22% coverage). If budget were 100 evals (11%), the gap would likely be larger. The gap finding also assumes the 4-objective space; the 3-objective space has 65% Pareto density making gaps even smaller.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-8",
+    "statement": "In BLIS, the EFFECTIVE KV cache capacity in tokens is total_kv_blocks × block_size_in_tokens per instance. When sweeping total_kv_blocks as a hyperparameter, the block_size_in_tokens must be treated as a co-variate that modulates the actual capacity. Fixing block_size=16 while sweeping total_kv_blocks=[2000-10000] yields token capacity [32k-160k tokens]; fixing block_size=32 yields [64k-320k tokens]. For tp=8 at rate=50 req/s, the stress-free threshold is approximately 80k-96k tokens per instance — only accessible with block_size=32 at kv_blocks=3000, or block_size=16 at kv_blocks>=5000.",
+    "confidence": "high",
+    "regime": "BLIS with qwen/qwen3-14b on H100, rate=50 req/s, prefix_tokens=512. Validated empirically at tp=8,inst=1: block_size=32 at kv=3000 achieves rps=26.28, ttft_p99=25ms, 0 preemptions; block_size=16 at kv=3000 achieves rps=21.35, ttft_p99=2323ms, 107 preemptions.",
+    "evidence": ["iteration-4-h-ablation", "iteration-4-block-size-probe"],
+    "contradicts": [],
+    "extraction_iteration": 4,
+    "mechanism": "The KV cache stores all active tokens. Each block contains block_size_in_tokens tokens. A larger block_size allows more tokens to be stored in the same number of blocks, reducing the probability of preemption. At tp=8, the high token throughput rate means the KV cache fills faster, making the token capacity (not block count) the binding constraint.",
+    "applicability_bounds": "Applies to any BLIS configuration where total_kv_blocks is near the preemption threshold. The absolute token threshold varies with model, TP, and request workload (input/output length distribution). block_size differentiation is less impactful when kv_blocks is far above or below the preemption cliff.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-7",
+    "statement": "Adding total_kv_blocks as a searchable parameter in BLIS's 4-objective formulation reduces Pareto density from ~65% (3-obj) to ~26% (4-obj, blocks in [2k-10k], block_size fixed at 16). With an appropriately configured search space (including block_size as a co-variate), the density would be lower. At density=26% and 22% budget-to-space coverage ratio, NSGA-II achieves a ~47-eval convergence speed advantage over random at budget=200 — larger than iter-3's 40-eval gap but insufficient for the predicted 80-eval gap.",
+    "confidence": "high",
+    "regime": "BLIS 4-objective space with reduced 5-parameter search space (900 configs), budget=200 evals.",
+    "evidence": ["iteration-3-h-control", "iteration-4-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 4,
+    "mechanism": "Pareto density at 26% means 74% of configs are dominated. The remaining 26% non-dominated configs are distributed across multiple GPU tiers with genuine tradeoffs from the kv_blocks cliff and batch scheduling bottleneck. Random search at 22% coverage still finds enough Pareto-optimal configs for competitive HV, capping the algorithm advantage.",
+    "applicability_bounds": "5-parameter reduced space fixing block_size=16, routing=round-robin, gpu_mem=0.9. If block_size is included as a search parameter, Pareto density would decrease further as block_size=32 configs dominate block_size=16 configs for high-TP tiers.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  }
+]

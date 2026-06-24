@@ -1,0 +1,40 @@
+metadata:
+  iteration: 3
+  family: "adaptive-phase1-portability"
+  research_question: "Can an extremes-first Phase 1 strategy (4 evals at max-instance per TP level) identify the optimal parallelism tier as accurately as full sequential Phase 1 (15 evals), and does it generalize across hardware where the optimal tier differs (H100: TP=4/2 vs A100-SXM: TP=8/1)?"
+
+# Arms chosen:
+# - h-main: Tests extremes-first Phase 1 + Bayesian Phase 2 on H100 at rate=5000
+#   (rate=5000 gives 26% secondary knob variance for meaningful Phase 2 testing)
+# - h-control-negative: Rate=50 where secondary knobs have zero effect (RP-C2-3),
+#   so Phase 2 should add no value and extremes-first should dominate on Phase 1 speed alone
+# - h-robustness: Hardware portability — same algorithm on A100-SXM where optimal tier
+#   is TP=8/1 (not TP=4/2 as on H100)
+# - h-ablation: Remove Bayesian Phase 2 (use LHS instead) to test if the Phase 2
+#   improvement is specifically from TPE's surrogate model vs just sampling more
+
+arms:
+  - type: h-main
+    prediction: "At rate=5000 on H100, extremes-first Phase 1 (4 evals) + TPE Phase 2 reaches 95% of optimal score in fewer total evaluations than full-sequential Phase 1 (15 evals) + LHS Phase 2 across all 3 seeds. Specifically: extremes-first identifies TP=4/2 as optimal in eval 3 (third position in max-instance ordering), giving it an 11-eval head start on Phase 2 optimization. TPE Phase 2 exploits the strong batch-size signal (26% score range) to converge to batch=512 within 5-10 additional trials, reaching 95% by eval ~8-13 total vs sequential's eval ~20+ (15 Phase 1 + 5 Phase 2)."
+    mechanism: "The extremes-first strategy exploits the proven monotonicity of score with instance count within each TP level (RP-C2-6 basis): evaluating only max-instance per TP correctly ranks TP levels in 4 evals instead of 15. At rate=5000, secondary knobs (especially batch size: 128→512 gives 0.140→0.176) create enough variance for TPE's tree-structured Parzen estimator to learn the batch-size dominance from early trials, directing subsequent samples toward high-batch configurations. The combination of fast Phase 1 + informed Phase 2 should outperform both slow Phase 1 + LHS and fast Phase 1 + LHS."
+    diagnostic: "If extremes-first does NOT converge faster: (1) Check if max-instance configs fail to correctly rank TP levels at rate=5000 — if TP=4/2 with batch=512 no longer dominates, the monotonicity assumption breaks. (2) If Phase 1 is correct but TPE Phase 2 is slow, check whether TPE needs more than 10 trials to learn the batch dominance — the prior may be too diffuse for a 5-option categorical. (3) If sequential still wins despite Phase 1 disadvantage, measure whether sequential's accidental Phase 1 evaluations of sub-optimal tiers provide useful information to Phase 2."
+
+  - type: h-control-negative
+    prediction: "At rate=50 on H100, extremes-first Phase 1 identifies TP=8/1 as optimal in 4 evals, while full-sequential reaches it at eval 15 (last position). However, Phase 2 adds zero improvement on either strategy because all secondary knob combinations produce identical scores within TP=8/1 at rate=50 (RP-C2-3). Final scores at budget=50 are identical for both strategies — the advantage is purely in Phase 1 speed."
+    mechanism: "At rate=50, request load is far below any tier's capacity. All requests complete without queueing regardless of batch size, scheduler, or routing. The scheduling and batching knobs only matter under saturation — at rate=50, every request is immediately scheduled. Therefore Phase 2 exploration of secondary knobs yields no improvement, and the only differentiator between strategies is Phase 1 tier identification speed."
+    diagnostic: "If Phase 2 somehow improves score at rate=50: check whether the fitness function's TTFT or p99 components are sensitive to secondary knobs even at low load. If so, RP-C2-3 is narrower than believed (applies to throughput but not latency components of the composite score)."
+
+  - type: h-ablation
+    prediction: "At rate=5000 on H100, extremes-first + LHS Phase 2 converges more slowly than extremes-first + TPE Phase 2 by 3-10 evaluations to reach 95% of within-tier optimum. LHS distributes samples uniformly across the secondary knob space, while TPE concentrates on high-batch configurations after observing the batch-size dominance in early trials."
+    mechanism: "Latin Hypercube Sampling guarantees space-filling coverage but is agnostic to the fitness landscape. At rate=5000, the landscape is dominated by batch size (26% score range) with scheduler adding 2-4%. TPE builds a surrogate model after each evaluation, learning that batch=512 correlates with high scores and sampling it more frequently. This adaptive allocation gives TPE a convergence speed advantage over the fixed-distribution LHS in landscapes with one dominant dimension."
+    diagnostic: "If LHS matches or beats TPE: (1) Check if 50-budget Phase 2 is too few trials for TPE to build an accurate surrogate (TPE needs ~10 observations before it outperforms random). (2) Check if the batch-size dominance is so extreme that even uniform LHS hits batch=512 early enough (P=0.2 per trial for 5 options → expected 5 trials to first batch=512 hit). If so, the advantage window is too narrow for TPE to demonstrate superiority."
+
+  - type: h-robustness
+    prediction: "On A100-SXM at rate=2000, extremes-first correctly identifies TP=8/1 as the optimal tier (not TP=4/2 which wins on H100) across all 3 seeds without any hardware-specific tuning. The algorithm's tier identification is correct on both H100 and A100-SXM using identical code and parameters."
+    mechanism: "The extremes-first strategy makes no assumption about which TP level is optimal — it evaluates all 4 max-instance configs and picks the highest score. On H100, TP=4/2 wins because the higher per-instance bandwidth of H100 allows TP=4 to process decode tokens fast enough that 2 instances exceed TP=8's single-instance throughput under load. On A100-SXM, lower memory bandwidth means TP=8 is needed for adequate per-request decode throughput, and the scheduling bottleneck that hurts TP=8/1 on H100 doesn't manifest on A100 (capacity ceiling hit sooner). The algorithm adapts by simply measuring rather than predicting."
+    diagnostic: "If extremes-first picks wrong tier on A100-SXM: check whether the TP=8/1 vs TP=4/2 gap (0.1372 vs 0.1368 = 0.3%) is within noise for some seeds. If the gap is seed-dependent, the test needs a wider margin — try rate=3000 where TP=8/1 may have a clearer advantage, or accept that at 0.3% gap the tiers are effectively tied and either answer is correct."
+
+code_changes:
+  - file: "search_blis_iter3_c2.py"
+    intent: "Create a new Python script (~350 lines) implementing four search strategies: (1) extremes-first Phase 1 (4 evals at max-instance per TP level with batch=512) + TPE Phase 2, (2) extremes-first + LHS Phase 2, (3) full-sequential Phase 1 (15 evals) + LHS Phase 2, (4) random search. Each strategy tracks convergence curve (best_score_so_far per eval). Main CLI: --strategy {extremes-tpe,extremes-lhs,sequential-lhs,random,all} --hardware {H100,A100-SXM} --rate N --budget N --seeds comma-separated --output path.json. Uses --fitness-weights for composite scoring."
+    rationale: "Self-contained script per iteration convention. Extends iter-2 approach with extremes-first Phase 1 addressing RP-C2-7 weakness, adds TPE Phase 2 as the Bayesian alternative to LHS, and supports multi-hardware runs for portability testing."

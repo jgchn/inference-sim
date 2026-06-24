@@ -1,0 +1,217 @@
+3,8c3,7
+< BLIS Configuration Search Script - Iteration 7
+< Extends iter-6 with:
+<   1. --tp-candidates flag: 'all' (default: TP=1,2,4,8) or 'lean' (TP=4,8 only)
+<   2. --skip-phase2 boolean flag: when set, return Phase 1 result without Phase 2 TPE
+<   3. GLOBAL_BEST_TABLE updated with iter-5/iter-6 findings for rate=100/125/200 regimes
+<   4. A100-SXM qwen rate=500 global best updated to 0.138820 (weighted routing)
+---
+> BLIS Configuration Search Script - Iteration 8
+> Extends iter-7 with:
+>   1. GLOBAL_BEST_TABLE updated with qwen3-32b (all hardware) and L40S entries
+>   2. 'formula-predict' strategy: uses bandwidth formula crossover_rate=400/BW to predict
+>      TP winner, runs one BLIS eval, compares against GLOBAL_BEST_TABLE
+10,12c9,13
+< Tests whether bracket K=1 can be reduced from 100 evaluations (4 Phase 1 + 96 Phase 2)
+< to 2 evaluations (Phase 1 over TP={4,8} only, no Phase 2) while maintaining 1% accuracy.
+< This is a 50x budget reduction: ~200ms total search time vs ~10s.
+---
+> Tests:
+>   h-main: Lean bracket generalizes to qwen3-32b (larger model)
+>   h-control-negative: RP-27 bandwidth formula fails for 32B models and L40S
+>   h-ablation: Micro-eval (100 requests) misidentifies TP winner at high rates
+>   h-robustness: Lean bracket on L40S hardware (4 regimes x 5 seeds)
+15,16c16,17
+<   # h-main: lean bracket on H100 qwen rate=500 (4 regimes, 5 seeds each)
+<   python3 search_blis_iter7.py --strategy adaptive-hierarchical --phase1-k 1 \
+---
+>   # h-main: lean bracket on qwen3-32b H100 rate=500
+>   python3 search_blis_iter8.py --strategy adaptive-hierarchical --phase1-k 1 \
+19c20
+<       --rate 500 --num-requests 1000 --model qwen/qwen3-14b \
+---
+>       --rate 500 --num-requests 1000 --model qwen/qwen3-32b \
+22,27c23,26
+<   # h-control-negative: lean bracket with min-profile on H100 qwen rate=500
+<   python3 search_blis_iter7.py --strategy adaptive-hierarchical --phase1-k 1 \
+<       --phase1-profiles bracket-min-only --tp-candidates lean --skip-phase2 \
+<       --hardware H100 --budget 2 --seeds 42,43,44,45,46 \
+<       --rate 500 --num-requests 1000 --model qwen/qwen3-14b \
+<       --output results/h-control-negative/results.json
+---
+>   # h-control-negative: formula-predict on all 18 regimes
+>   python3 search_blis_iter8.py --strategy formula-predict \
+>       --hardware H100 --rate 500 --num-requests 1000 --model qwen/qwen3-32b \
+>       --output results/h-control-negative/h100-qwen32b-rate500.json
+29,37c28,29
+<   # h-ablation: lean bracket + mini Phase 2 (budget=12) on A100-SXM qwen rate=200
+<   python3 search_blis_iter7.py --strategy adaptive-hierarchical --phase1-k 1 \
+<       --phase1-profiles bracket --tp-candidates lean \
+<       --hardware A100-SXM --budget 12 --seeds 42,43,44,45,46 \
+<       --rate 200 --num-requests 1000 --model qwen/qwen3-14b \
+<       --output results/h-ablation/results.json
+< 
+<   # h-robustness: lean bracket across 5 blis_seeds x 5 search_seeds on H100
+<   python3 search_blis_iter7.py --strategy adaptive-hierarchical --phase1-k 1 \
+---
+>   # h-ablation: micro-eval (100 requests) lean bracket
+>   python3 search_blis_iter8.py --strategy adaptive-hierarchical --phase1-k 1 \
+39,41c31,40
+<       --hardware H100 --budget 2 --seeds 42,43,44,45,46 \
+<       --blis-seed 44 --rate 500 --num-requests 1000 --model qwen/qwen3-14b \
+<       --output results/h-robustness/blis44.json
+---
+>       --hardware H100 --budget 2 --seeds 42 \
+>       --rate 500 --num-requests 100 --model qwen/qwen3-14b \
+>       --output results/h-ablation/h100-qwen14b-100req.json
+> 
+>   # h-robustness: lean bracket on L40S
+>   python3 search_blis_iter8.py --strategy adaptive-hierarchical --phase1-k 1 \
+>       --phase1-profiles bracket --tp-candidates lean --skip-phase2 \
+>       --hardware L40S --budget 2 --seeds 42,43,44,45,46 \
+>       --rate 100 --num-requests 1000 --model qwen/qwen3-14b \
+>       --output results/h-robustness/l40s-qwen14b-rate100.json
+102a102
+> # Updated in iter-8: added qwen3-32b (all hardware) and L40S entries.
+111a112,114
+>     ("qwen3-32b", "H100", 100, 1000):     0.132535,   # added iter-8
+>     ("qwen3-32b", "H100", 300, 1000):     0.138983,   # added iter-8
+>     ("qwen3-32b", "H100", 500, 1000):     0.141403,   # added iter-8: TP=4/2inst, least-loaded
+119a123,131
+>     ("qwen3-32b", "A100-SXM", 100, 1000):    0.104331,   # added iter-8
+>     ("qwen3-32b", "A100-SXM", 500, 1000):    0.108182,   # added iter-8: TP=8/1inst
+>     # L40S entries — added iter-8
+>     ("qwen3-14b", "L40S", 100, 1000):     0.082636,
+>     ("qwen3-14b", "L40S", 500, 1000):     0.084795,
+>     ("llama-3.1-8b", "L40S", 100, 1000):  0.104264,
+>     ("llama-3.1-8b", "L40S", 500, 1000):  0.109668,
+>     ("qwen3-32b", "L40S", 100, 1000):     0.063243,
+>     ("qwen3-32b", "L40S", 500, 1000):     0.064436,
+790a803,828
+> 
+> 
+> # ── Formula predict strategy ───────────────────────────────────────────────
+> 
+> # Memory bandwidth (TB/s) per GPU type for crossover formula (RP-27).
+> HW_BANDWIDTH = {
+>     "H100": 3.35,
+>     "A100-SXM": 2.039,
+>     "A100-80": 2.039,
+>     "L40S": 0.864,
+> }
+> 
+> 
+> def run_formula_predict(num_requests: int, rate: float, blis_seed: int,
+>                         hardware: str) -> dict:
+>     """Predict optimal TP using RP-27 bandwidth formula and verify with one BLIS eval.
+> 
+>     Computes crossover_rate = 400 / bandwidth_TB_s. Predicts TP=4/2inst if
+>     rate > crossover, else TP=8/1inst. Applies max-profile secondary params.
+>     Runs one BLIS eval to get the actual score and compares against GLOBAL_BEST_TABLE.
+>     """
+>     hw_bandwidth = HW_BANDWIDTH.get(hardware)
+>     if hw_bandwidth is None:
+>         raise ValueError(f"Unknown hardware: {hardware}. Valid: {list(HW_BANDWIDTH)}")
+> 
+>     crossover_rate = 400.0 / hw_bandwidth
+791a830,835
+>     if rate > crossover_rate:
+>         predicted_tp = 4
+>         predicted_instances = 2
+>     else:
+>         predicted_tp = 8
+>         predicted_instances = 1
+792a837,894
+>     # Build max-profile config with predicted TP
+>     routing = "round-robin" if predicted_instances == 1 else "least-loaded"
+>     config = {
+>         "tp": predicted_tp,
+>         "num_instances": predicted_instances,
+>         "scheduler": "fcfs",
+>         "max_running": max(MAX_RUNNING_OPTIONS),    # 512
+>         "max_tokens": max(MAX_TOKENS_OPTIONS),       # 8192
+>         "prefill_threshold": max(PREFILL_THRESHOLD_OPTIONS),  # 4096
+>         "block_size": 16,
+>         "routing": routing,
+>         "admission": "always-admit",
+>         "preemption": "fcfs",
+>     }
+> 
+>     t0 = time.perf_counter()
+>     out = run_blis(config, num_requests=num_requests, rate=rate, seed=blis_seed)
+>     wall_time = time.perf_counter() - t0
+> 
+>     if out is None:
+>         return {
+>             "strategy": "formula-predict",
+>             "hardware": hardware,
+>             "hw_bandwidth_TBs": hw_bandwidth,
+>             "crossover_rate": crossover_rate,
+>             "predicted_tp": predicted_tp,
+>             "predicted_instances": predicted_instances,
+>             "score": None,
+>             "config": config,
+>             "wall_time_s": wall_time,
+>             "formula_correct": None,
+>             "error": "BLIS eval failed",
+>         }
+> 
+>     score = out["score"]
+>     mshort = model_shortname(MODEL)
+>     global_best = GLOBAL_BEST_TABLE.get((mshort, hardware, int(rate), num_requests))
+>     threshold = global_best * WITHIN_BEST_THRESHOLD if global_best is not None else None
+>     formula_correct = (score >= threshold) if threshold is not None else None
+> 
+>     return {
+>         "strategy": "formula-predict",
+>         "hardware": hardware,
+>         "hw_bandwidth_TBs": hw_bandwidth,
+>         "crossover_rate": crossover_rate,
+>         "predicted_tp": predicted_tp,
+>         "predicted_instances": predicted_instances,
+>         "score": score,
+>         "global_best": global_best,
+>         "threshold": threshold,
+>         "formula_correct": formula_correct,
+>         "config": config,
+>         "wall_time_s": wall_time,
+>         "evaluations": [{"eval_idx": 0, "score": score, "config": config,
+>                          "wall_time_s": out["wall_time_s"], "best_so_far": score}],
+>     }
+> 
+> 
+796c898
+<     parser = argparse.ArgumentParser(description="BLIS Configuration Search - Iteration 7")
+---
+>     parser = argparse.ArgumentParser(description="BLIS Configuration Search - Iteration 8")
+799c901,902
+<                                  "all", "h-main-strategies", "h-main-adaptive"],
+---
+>                                  "all", "h-main-strategies", "h-main-adaptive",
+>                                  "formula-predict"],
+878a982,1006
+>         # formula-predict runs once (no seed loop needed — single deterministic eval)
+>         if strategy == "formula-predict":
+>             print(f"[formula-predict] rate={args.rate} model={mshort} hardware={args.hardware}",
+>                   flush=True)
+>             t0 = time.perf_counter()
+>             run = run_formula_predict(args.num_requests, args.rate, args.blis_seed,
+>                                       args.hardware)
+>             wall = time.perf_counter() - t0
+>             run["wall_time_total_s"] = wall
+>             run["n_evaluations"] = len(run.get("evaluations", []))
+>             run["search_seed"] = args.blis_seed
+>             run["best_score"] = run.get("score") or 0.0
+> 
+>             if global_best is not None and run.get("score") is not None:
+>                 run["evals_to_best"] = compute_evals_to_best(run.get("evaluations", []), global_best)
+> 
+>             print(f"  crossover={run['crossover_rate']:.1f} predicted=TP{run['predicted_tp']}/{run['predicted_instances']}inst"
+>                   f" score={run.get('score', 'N/A')} global_best={run.get('global_best', 'N/A')}"
+>                   f" correct={run.get('formula_correct', 'N/A')}", flush=True)
+> 
+>             all_results["runs"].append(run)
+>             with open(args.output, "w") as f:
+>                 json.dump(all_results, f, indent=2)
+>             continue
+> 

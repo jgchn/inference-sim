@@ -1,0 +1,50 @@
+metadata:
+  iteration: 9
+  bundle_ref: "runs/iter-9/bundle.yaml"
+  research_question: "Does Neighbor Dominance Rate (NDR) causally determine the NSGA-II vs random convergence gap?"
+
+setup:
+  - cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-9-d8d621a7 && go build -o blis main.go"
+
+arms:
+  - arm_id: "h-robustness-qwen"
+    conditions:
+      - name: "exhaustive-sweep-qwen-r100"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-9/inputs/search_exhaustive_r100.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-9/results/h-robustness/all_results_qwen_r100.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-9/inputs/blis_common.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-9/inputs/search_exhaustive_r100.py"
+
+  - arm_id: "h-robustness-llama"
+    conditions:
+      - name: "exhaustive-sweep-llama-r100"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-9/inputs/search_exhaustive_llama_r100.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-9/results/h-robustness/all_results_llama_r100.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-9/inputs/blis_common.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-9/inputs/search_exhaustive_llama_r100.py"
+
+  - arm_id: "h-main"
+    conditions:
+      - name: "algorithm-comparison-qwen-r100"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-9/inputs/search_algorithms_qwen_r100.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-9/results/h-main/convergence_qwen_r100.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-9/results/h-robustness/all_results_qwen_r100.json"
+
+  - arm_id: "h-ablation"
+    conditions:
+      - name: "algorithm-comparison-llama-r100"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-9/inputs/search_algorithms_llama_r100.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-9/results/h-ablation/convergence_llama_r100.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-9/results/h-robustness/all_results_llama_r100.json"
+
+  - arm_id: "h-control-negative"
+    conditions:
+      - name: "cliff-free-qwen-r100"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-9/inputs/search_cliff_free_qwen_r100.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-9/results/h-control-negative/convergence_cliff_free_qwen_r100.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-9/results/h-robustness/all_results_qwen_r100.json"

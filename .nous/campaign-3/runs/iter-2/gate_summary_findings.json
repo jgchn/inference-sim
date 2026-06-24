@@ -1,0 +1,11 @@
+{
+  "gate_type": "findings",
+  "summary": "All three hypotheses were refuted. The BLIS search problem is trivially easy: ~60% of configurations per GPU tier achieve optimal metrics (batch size \u2265256 is the only meaningful knob), so random sampling saturates the Pareto frontier within 50 evaluations. Neither NSGA-II nor TPE provided any advantage over random search; TPE actually performed 7.1% worse due to conditional parameter space incompatibility.",
+  "key_points": [
+    "NSGA-II and random search both reached 95% of final hypervolume at the very first checkpoint (50 evals), not the predicted 200 vs 300-400 split. Final HV difference was only 0.02% (8,131,314 vs 8,129,464) \u2014 no meaningful advantage for NSGA-II.",
+    "The predicted per-tier Pareto-optimal density of 1-3% was wrong by 15-20x; actual density is ~60% because batch size is the only differentiating parameter (scheduler, routing, block size, gpu_memory_utilization have no effect at rate=50). This makes the frontier trivially discoverable.",
+    "TPE (Optuna multivariate) performed WORSE than random: final HV of 7,552,260 vs 8,129,464 (\u22127.1%). Optuna's multivariate TPE could not model conditional parameters (tp\u2192num_instances dependency), falling back to independent random sampling for key parameters across all 550 evaluations, missing the optimal tp=2,inst=1 configuration entirely.",
+    "Novel finding: model-based search (TPE) can be actively harmful compared to uniform random when conditional parameter structures break modeling assumptions \u2014 this is a practical anti-pattern for hyperparameter tuning in structured spaces.",
+    "The 3-objective formulation (throughput, P99 TTFT, GPU count) successfully created a meaningful 5-tier Pareto front, but the underlying search landscape is too flat (too many near-optimal configs) to differentiate algorithm performance."
+  ]
+}

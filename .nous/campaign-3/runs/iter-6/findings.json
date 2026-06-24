@@ -1,0 +1,41 @@
+{
+  "iteration": 6,
+  "bundle_ref": "runs/iter-6/bundle.yaml",
+  "arms": [
+    {
+      "arm_type": "h-robustness",
+      "predicted": "Pareto density at rate=100 will be <= 4.5% (lower than rate=50). Exhaustive HV will differ from rate=50's 5.857e10. The Pareto front will concentrate in high-TP + block_size=32 configs because higher arrival rate shifts KV stress threshold upward, causing more mid-range configs to be dominated.",
+      "observed": "Exhaustive HV at rate=100: 6.520e10 (6.52 × 10^10). Pareto count: 124 configs, density: 6.89% of 1800 configs. The density INCREASED vs rate=50 (6.89% vs 4.5%), the OPPOSITE of the prediction. More configs are Pareto-optimal at rate=100, not fewer. The higher throughput ceiling at rate=100 (best config: 32.01 rps vs ~26 rps at rate=50) opened new cost-performance tradeoff regions rather than concentrating the Pareto front. This is consistent with the diagnostic note: throughput-limited tp=1 configs became Pareto-optimal at rate=100 (best-cost-per-GPU tradeoff at low throughput demand), adding to the Pareto set without removing mid-range configs.",
+      "status": "REFUTED",
+      "error_type": "direction",
+      "diagnostic_note": "The density-increase mechanism: at rate=100, tp=1 configs with 0 preemptions but high TTFT (e.g., 43760ms) become Pareto-optimal because no other gpu_count=1 config does better — they represent the lowest-cost operating point. At rate=50, these configs were dominated by better-performing moderate configs; at rate=100, the throughput gap between tp=1 (always ~3.4 rps, compute-limited) and tp=2+ configs widens, creating a more pronounced cost-performance tradeoff. This adds configs to the Pareto set rather than removing them."
+    },
+    {
+      "arm_type": "h-main",
+      "predicted": "NSGA-II at rate=100 reaches 95% of exhaustive HV within 200 evals (success criterion 1). Convergence gap (NSGA-II vs random to reach 95%) >= 60 evals (criterion 2). Final HV gap (NSGA-II% - random%) >= 4.9% (criterion 3). Mechanism: sparser Pareto front at rate=100 gives crossover more exploitable structure.",
+      "observed": "NSGA-II final HV: 6.439e10 (98.77% of exhaustive HV 6.520e10). Convergence: 40→85.71%, 80→91.17%, 120→97.86%, 160→98.30%, 200→98.77%. Criterion 1 CONFIRMED: NSGA-II reaches 95% at interpolated eval≈103 (well within 200). Criterion 2 MARGINAL: convergence gap = 57.1 evals (random crosses 95% at eval≈160, vs NSGA-II at eval≈103). Just below the >=60 threshold. Criterion 3 REFUTED: final HV gap = 1.46% (98.77% - 97.31%), well below the >=4.9% prediction. The mechanism assumption was wrong: density is HIGHER at rate=100 (6.89% vs 4.5%), which makes random more competitive, shrinking the advantage.",
+      "status": "PARTIALLY_CONFIRMED",
+      "error_type": "magnitude",
+      "diagnostic_note": "The mechanism under test (sparser Pareto front → more exploitable crossover) was directionally wrong. The Pareto front at rate=100 is denser (6.89%), not sparser, and random search's improved density coverage reduces its relative disadvantage vs NSGA-II. NSGA-II does still reach 95% faster than random (103 vs 160 evals), confirming exploitation advantage exists. But the advantage weakened rather than strengthened with load, because random benefits more from higher density (more Pareto-optimal configs to stumble upon per random sample)."
+    },
+    {
+      "arm_type": "h-control-negative",
+      "predicted": "Random search at rate=100 fails to reach 95% of exhaustive HV within 200 evals, plateauing at 91-95%. Expected Pareto hits: ~(density × budget) = ~9 configs.",
+      "observed": "Random final HV: 6.344e10 (97.31% of exhaustive HV). Convergence: 40→85.96%, 80→93.17%, 120→94.57%, 160→94.99%, 200→97.31%. Random crosses 95% at interpolated eval≈160.2 (essentially at the eval=160 checkpoint). Prediction REFUTED: random does reach 95% within 200 evals (at eval≈160), and the final value of 97.31% significantly exceeds the predicted plateau of 91-95%. Expected hits prediction wrong: with density 6.89% × 200 evals = ~13.8 expected Pareto-optimal hits (not 9), since density was higher than predicted.",
+      "status": "REFUTED",
+      "error_type": "direction",
+      "diagnostic_note": "Higher Pareto density (6.89% vs the 4.5% used to compute the 9-hit estimate) means random expects ~13.8 Pareto-optimal hits in 200 evals. With 28 actual Pareto-optimal configs found at eval=200, each hit contributes meaningful HV coverage. The key failure: the prediction assumed density would decrease at rate=100, but it increased. This directly caused the random prediction to fail — denser Pareto front = random search more effective."
+    },
+    {
+      "arm_type": "h-ablation",
+      "predicted": "Rate=75 convergence gap >= 60 evals, monotonically between rate=50 (91 evals) and rate=100. Pareto density at rate=75 between rate=50 (4.5%) and rate=100. Confirms monotonic relationship: higher load → lower density → larger NSGA-II advantage.",
+      "observed": "Exhaustive HV at rate=75: 6.292e10. Pareto count: 109 configs, density: 6.06%. NSGA-II crosses 95% at eval≈112, random at eval≈160 → gap = 48.1 evals. NSGA-II final: 99.45%, random final: 97.33%, final HV gap: 2.12%. Monotonicity REFUTED on all metrics: (1) density at rate=75 = 6.06% > rate=50's 4.5% (predicted to be between 4.5% and rate=100's value, but rate=100 is also > 4.5%), (2) gap at rate=75 = 48 evals < rate=100's 57 evals (non-monotonic: rate=75 gap is smaller than rate=100 gap despite lower load), (3) the monotonic ordering would require gap_50 > gap_75 > gap_100, but observed is gap_50=91 > gap_100=57 > gap_75=48. Three-rate summary: rate=50 (density=4.5%, gap=91), rate=75 (density=6.06%, gap=48), rate=100 (density=6.89%, gap=57).",
+      "status": "REFUTED",
+      "error_type": "direction",
+      "diagnostic_note": "The monotonic hypothesis (higher load → lower density → larger gap) fails because: (1) higher load INCREASES density (new throughput-limited tradeoff regions emerge), and (2) even within the density → gap relationship, the rate=75 point is non-monotonic (lower gap than rate=100 despite lower density). The latter suggests that the Pareto front structure changes qualitatively between rates, not just quantitatively. The rate=75 landscape may have a different 'center of mass' that random search covers more efficiently per eval than rate=100's landscape."
+    }
+  ],
+  "experiment_valid": true,
+  "discrepancy_analysis": "The central prediction — that higher arrival rate would reduce Pareto density by eliminating dominated mid-range configs — was directionally wrong across all three rates tested. Instead, Pareto density INCREASES with load (4.5% at rate=50 → 6.06% at rate=75 → 6.89% at rate=100). The mechanism error: we predicted stress would eliminate mid-range configs from the Pareto set, but missed that higher throughput ceiling opens NEW Pareto-optimal cost-performance tradeoff regions (throughput-limited low-cost configs and higher-throughput high-cost configs both become part of the frontier). NSGA-II's advantage is PORTABLE across rates (it always reaches 95% well before random), but the advantage WEAKENS with load rather than strengthens. Success criteria summary: criterion 1 (NSGA-II reaches 95% in 200 evals) CONFIRMED at both rates; criterion 2 (gap >= 60 evals at rate=100) marginally FAILED (57 evals); criterion 3 (Pareto density at rate=100 <= 4.5%) FAILED (6.89%); criterion 4 (monotonic gap ordering) FAILED; criterion 5 (final HV gap >= 4.9% at rate=100) FAILED (1.46%).",
+  "dominant_component_pct": null
+}

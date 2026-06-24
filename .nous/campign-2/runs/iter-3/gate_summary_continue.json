@@ -1,0 +1,11 @@
+{
+  "gate_type": "continue",
+  "summary": "Iteration 3 confirmed that an 'extremes-first' Phase 1 strategy (4 evaluations) finds the optimal hardware tier 11 evaluations faster than full sequential search (14\u201315 evaluations) on both H100 and A100-SXM hardware, with the result holding across all three random seeds. The core hypothesis was fully validated; two secondary findings required minor corrections to the regime model.",
+  "key_points": [
+    "CONFIRMED: Extremes-first Phase 1 reaches 95% of optimal score at evaluation 3 (score 0.1755, threshold 0.1676) versus evaluation 14 for sequential search \u2014 an 11-eval head start \u2014 on H100 at rate=5000, deterministically across seeds 42/123/456. Both strategies ultimately reach the same best score of 0.176474.",
+    "CONFIRMED: Hardware portability holds \u2014 the same algorithm with zero tuning correctly identifies TP=4/2 as optimal on H100 and TP=8/1 as optimal on A100-SXM (scores 0.1372 vs 0.1363, a 0.66% gap that was stable across all seeds despite a prior warning it might flip).",
+    "PARTIALLY CONFIRMED: TPE Phase 2 beat LHS Phase 2 on only 2 of 3 seeds, with no consistent advantage. The reason: Phase 1 already locks in batch=512 (the dominant knob), leaving only routing policy (0.55% gap, 3 options) as the Phase 2 differentiator \u2014 too small a signal for TPE's surrogate model to exploit reliably.",
+    "REGIME CORRECTION (RP-C2-3): 'Secondary knobs have zero effect at low rate' was too broad. At rate=50, batch size still matters (batch=32 scores 0.063 vs batch=512 scores 0.132, a 2\u00d7 difference). The corrected claim is: at low rate, Phase 2 adds no improvement only because Phase 1 already uses the optimal batch=512, not because all configs are identical.",
+    "NEXT ITERATION should investigate: (1) rate-adaptive strategy selection \u2014 whether to skip Phase 2 entirely at low rates where Phase 1 already captures the optimum; (2) whether the TPE vs LHS comparison becomes meaningful at higher budgets or when Phase 1 deliberately withholds the optimal batch size to create a larger Phase 2 search space."
+  ]
+}

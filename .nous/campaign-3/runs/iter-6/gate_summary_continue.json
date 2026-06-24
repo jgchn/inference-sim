@@ -1,0 +1,11 @@
+{
+  "gate_type": "continue",
+  "summary": "Iteration 6 tested whether NSGA-II's convergence advantage over random search grows at higher arrival rates (rate=75, rate=100) compared to rate=50's 91-eval gap. The core hypothesis \u2014 that higher load concentrates the Pareto front, making crossover more exploitable \u2014 was wrong in direction: Pareto density actually increases with load (4.5% at rate=50 \u2192 6.06% at rate=75 \u2192 6.89% at rate=100), and NSGA-II's advantage weakens rather than strengthens.",
+  "key_points": [
+    "NSGA-II still reaches 95% of exhaustive hypervolume faster than random at all tested rates (rate=50 gap=91 evals, rate=100 gap=57 evals, rate=75 gap=48 evals), confirming portability \u2014 but the advantage shrinks at higher load, not grows.",
+    "The density-increase mechanism was missed: higher arrival rates open new cost-performance tradeoff regions (e.g., throughput-limited tp=1 configs become Pareto-optimal at rate=100 because no cheaper config does better), adding configs to the Pareto front rather than pruning dominated mid-range ones.",
+    "Random search benefited more from the higher Pareto density at rate=100 (final HV 97.31% vs predicted plateau of 91-95%), collapsing the final HV gap between NSGA-II and random to just 1.46% \u2014 far below the predicted 4.9%.",
+    "The gap ordering is non-monotonic: rate=50 (91 evals) > rate=100 (57 evals) > rate=75 (48 evals), suggesting the Pareto landscape changes qualitatively between rates, not just quantitatively \u2014 the rate=75 landscape may be structured differently rather than simply intermediate.",
+    "What's still unknown: whether NSGA-II's advantage is portable across model architectures (e.g., a smaller model with different KV thresholds). Iteration 7 is suggested to test model portability (e.g., Llama-3.1-8B) with the same 6-parameter space and NSGA-II vs random comparison, holding rate fixed at 50 or 100."
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "gate_type": "findings",
+  "summary": "The extremes-first search strategy (testing only 4 TP/instance combinations ordered by extremity) consistently reaches 95% of optimal fitness 11 fewer evaluations than sequential enumeration (eval 3 vs eval 14-15), confirmed across two hardware platforms (H100 and A100-SXM), two load levels (rate=50 and rate=5000), and all seeds. The algorithm correctly adapts to hardware without tuning \u2014 picking TP=4/2 on H100 and TP=8/1 on A100-SXM.",
+  "key_points": [
+    "MAIN HYPOTHESIS CONFIRMED: Extremes-first reaches 95% of optimal at eval 3 (score 0.1755, threshold 0.1676) vs sequential at eval 14, giving an 11-eval head start on Phase 2 optimization. Both converge to identical optimal (0.176474). Deterministic across all 3 seeds.",
+    "ROBUSTNESS CONFIRMED: On A100-SXM at rate=2000, extremes-first correctly identifies TP=8/1 (score 0.1372) over TP=4/2 (score 0.1363) \u2014 a different winner than H100 \u2014 with zero hardware-specific tuning. The 0.66% gap is stable across seeds.",
+    "CONTROL CONFIRMED with mechanism correction: At low load (rate=50), Phase 2 adds zero improvement because Phase 1 already uses the optimal batch size (512), NOT because secondary knobs have zero effect. Batch=32 vs batch=512 causes 2x difference in composite fitness. RP-C2-3 ('zero secondary knob effect at low rate') must be narrowed to throughput-only.",
+    "ABLATION PARTIALLY CONFIRMED: TPE vs LHS Phase 2 advantage is inconsistent (TPE wins 2/3 seeds). The improvement window is only 0.55% (routing policy: round-robin vs least-loaded), far smaller than the predicted 26% batch-size gap. Phase 1 already locks in batch=512, leaving routing as the only Phase 2 differentiator \u2014 too small for TPE's surrogate to show systematic advantage at budget=50.",
+    "BUG NOTE: Initial implementation incorrectly sorted Phase 1 results before building convergence curves, artificially reporting evals_to_95pct=1. Fixed to preserve evaluation order; corrected values are 3, 3, 14, 4 for the four arms respectively."
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "iteration": 3,
+  "bundle_ref": "runs/iter-3/bundle.yaml",
+  "arms": [
+    {
+      "arm_type": "h-main",
+      "predicted": "At rate=5000 on H100, extremes-first Phase 1 (4 evals) + TPE Phase 2 reaches 95% of optimal score in fewer total evaluations than full-sequential Phase 1 (15 evals) + LHS Phase 2 across all 3 seeds. Specifically: extremes-first identifies TP=4/2 as optimal in eval 3 (third position in max-instance ordering), giving it an 11-eval head start on Phase 2 optimization.",
+      "observed": "CONFIRMED with exact predicted mechanism. Extremes-tpe: evals_to_95pct=3 (all seeds 42/123/456), best=0.176474. Sequential-lhs: evals_to_95pct=14 (all seeds), best=0.176474. Extremes-first reaches 95% of optimal at eval 3 (TP=4/2 with batch=512 scores 0.1755 = 99.5% of optimal=0.176474), exactly at the 3rd position (TP=1/8, TP=2/4, TP=4/2). Sequential finds TP=4/2 at position 14 in VALID_TP_INSTANCES order. Both strategies eventually reach 100% optimal. Extremes-first requires 11 fewer evaluations to reach 95% threshold. Tier identification (TP=4/2) is deterministic across all seeds since BLIS is seeded. NOTE: Phase 1 scores 0.1755 (not 0.176474) because multi-instance Phase 1 uses least-loaded routing, but the threshold 0.95*0.176474=0.1676 is crossed regardless.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "Phase 1 eval 3 (TP=4/2, batch=512, least-loaded) gives 0.1755 which is 99.5% of optimal (round-robin gives 0.176474). The 95% threshold (0.1676) is crossed at eval 3 for all seeds, confirming the 11-eval head start prediction. Phase 2 TPE eventually discovers round-robin routing (eval 12-33 depending on seed) to reach 0.176474."
+    },
+    {
+      "arm_type": "h-control-negative",
+      "predicted": "At rate=50 on H100, extremes-first Phase 1 identifies TP=8/1 as optimal in 4 evals, while full-sequential reaches it at eval 15 (last position). Phase 2 adds zero improvement on either strategy because all secondary knob combinations produce identical scores within TP=8/1 at rate=50 (RP-C2-3). Final scores at budget=50 are identical for both strategies.",
+      "observed": "CONFIRMED in direction, with mechanism correction. Extremes strategies: evals_to_95pct=4 (all seeds), best=0.132219. Sequential-lhs: evals_to_95pct=15 (all seeds), best=0.132219. Random: evals_to_95pct varies 18-51 (best=0.125-0.132, never reliably finds optimal). Phase 2 adds zero improvement (all strategies plateau at 0.132219). HOWEVER, mechanism is wrong: secondary knobs do NOT have zero effect at rate=50. Batch=32 gives 0.062705 vs batch=512 gives 0.132219 (2x difference via p99_ttft/p99_e2e components). Phase 2 adds zero improvement because Phase 1 already uses batch=512 (the optimal), not because all configs are identical. RP-C2-3 must be narrowed: 'zero effect' applies to throughput-only, not composite fitness scoring.",
+      "status": "CONFIRMED",
+      "error_type": "regime",
+      "diagnostic_note": "Diagnostic note from bundle explicitly called this: 'If Phase 2 somehow improves score at rate=50: check whether the fitness function TTFT/p99 components are sensitive to secondary knobs even at low load. If so, RP-C2-3 is narrower than believed.' This IS the case — RP-C2-3 is narrower (throughput-only). The predicted outcome (Phase 2 adds no improvement) is still correct because Phase 1 uses batch=512 (optimal). RP-C2-3 needs update."
+    },
+    {
+      "arm_type": "h-ablation",
+      "predicted": "At rate=5000 on H100, extremes-first + LHS Phase 2 converges more slowly than extremes-first + TPE Phase 2 by 3-10 evaluations to reach 95% of within-tier optimum.",
+      "observed": "PARTIALLY_CONFIRMED. Both strategies reach 95% threshold at Phase 1 eval 3 (identical for TPE and LHS, since Phase 1 is the same). Phase 2 improvement window is tiny: Phase 1 score 0.1755 vs optimal 0.176474 = 0.55% gap. TPE finds improvement (round-robin routing) at evals 20, 33, 12 for seeds 42, 123, 456. LHS finds improvement at evals 32, 10, 33 for seeds 42, 123, 456. TPE wins on 2/3 seeds (42, 456) with advantages of 12 and 21 evals respectively. LHS wins on seed 123 by 23 evals. Average: TPE slightly faster but highly seed-dependent. MECHANISM MISMATCH: prediction said TPE learns batch-size dominance (26% range). In practice, Phase 1 already fixes batch=512. The actual Phase 2 differentiator is routing policy (round-robin vs least-loaded, a 0.55% gap), not batch size. TPE's startup trials (5 random) should hit round-robin within ~3 trials (P=1/3 per trial), but seed-dependence makes this inconsistent.",
+      "status": "PARTIALLY_CONFIRMED",
+      "error_type": "regime",
+      "diagnostic_note": "The Phase 2 improvement is only 0.55% (routing: least-loaded→round-robin) vs the predicted 26% (batch 128→512). The predicted mechanism was batch-size dominance, but Phase 1 already uses batch=512, making the actual Phase 2 knob routing. TPE should theoretically learn routing faster than LHS, but with only 3 options (round-robin/least-loaded/weighted) and 5 startup trials, both converge at similar speeds. The inconsistency across seeds (TPE wins 2/3) suggests the 0.55% improvement window is too small for TPE's surrogate model to show systematic advantage at budget=50."
+    },
+    {
+      "arm_type": "h-robustness",
+      "predicted": "On A100-SXM at rate=2000, extremes-first correctly identifies TP=8/1 as the optimal tier (not TP=4/2 which wins on H100) across all 3 seeds without any hardware-specific tuning.",
+      "observed": "CONFIRMED. A100-SXM Phase 1 scores: TP=1/8=0.0858, TP=2/4=0.1145, TP=4/2=0.1363, TP=8/1=0.1372. Extremes-first correctly picks TP=8/1 as top tier across all 3 seeds. Best score=0.137186 (100% of A100-SXM optimal). Phase 2 (TPE within TP=8/1) reaches 0.137186 immediately (TP=8/1 Phase 1 config with round-robin already achieves optimal). H100 vs A100-SXM comparison: H100 picks TP=4/2 (Phase 1 score 0.1755), A100-SXM picks TP=8/1 (Phase 1 score 0.1372). Same algorithm with zero hardware-specific tuning correctly adapts. Gap between TP=8/1 and TP=4/2 on A100-SXM is 0.9372-0.1363=0.0009 (0.66%), stable across all seeds. evals_to_95pct=3 because TP=4/2 at position 3 already scores 0.1363 > 0.95*0.1372=0.1303.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "The 0.3% gap mentioned in handoff warning corresponds to round-robin TP=4/2 (0.1368). With least-loaded routing (Phase 1 default for multi-instance), TP=4/2 gives 0.1363. TP=8/1 with round-robin gives 0.1372. Gap is 0.66%, enough for consistent identification. The prediction correctly anticipated this could be seed-dependent (warning), but the gap was stable."
+    }
+  ],
+  "experiment_valid": true,
+  "discrepancy_analysis": "All four arms produced valid results. Key finding: extremes-first Phase 1 (4 evals) outperforms sequential Phase 1 (14-15 evals) consistently across hardware and rate conditions. h-ablation TPE vs LHS advantage is inconsistent (2/3 seeds) and the mechanism differed from prediction (routing not batch-size is the Phase 2 differentiator). RP-C2-3 requires update: 'zero effect at low rate' applies only to throughput, not composite fitness. Bug fixed during execution: initial script sorted Phase 1 results before building convergence curve, artificially reporting evals_to_95pct=1; corrected to preserve evaluation order, giving correct values (3, 3, 14, 4).",
+  "dominant_component_pct": null
+}

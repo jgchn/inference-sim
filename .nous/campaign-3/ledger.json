@@ -1,0 +1,391 @@
+{
+  "iterations": [
+    {
+      "iteration": 0,
+      "family": "baseline",
+      "timestamp": "1970-01-01T00:00:00Z",
+      "candidate_id": "baseline",
+      "h_main_result": null,
+      "ablation_results": {},
+      "control_result": null,
+      "robustness_result": null,
+      "prediction_accuracy": null,
+      "principles_extracted": [],
+      "frontier_update": null
+    },
+    {
+      "iteration": 1,
+      "family": "search-algorithm-comparison",
+      "timestamp": "2026-05-28T14:15:45.195434+00:00",
+      "candidate_id": "iter-1",
+      "h_main_result": "REFUTED",
+      "ablation_results": {},
+      "control_result": "REFUTED",
+      "robustness_result": "REFUTED",
+      "prediction_accuracy": {
+        "arms_correct": 0,
+        "arms_total": 3,
+        "accuracy_pct": 0.0
+      },
+      "principles_extracted": [
+        {
+          "id": "RP-1",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-2",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-3",
+          "action": "INSERT"
+        }
+      ],
+      "frontier_update": null
+    },
+    {
+      "iteration": 2,
+      "family": "search-algorithm-convergence",
+      "timestamp": "2026-05-28T15:47:24.139198+00:00",
+      "candidate_id": "iter-2",
+      "h_main_result": "REFUTED",
+      "ablation_results": {},
+      "control_result": "REFUTED",
+      "robustness_result": "REFUTED",
+      "prediction_accuracy": {
+        "arms_correct": 0,
+        "arms_total": 3,
+        "accuracy_pct": 0.0
+      },
+      "principles_extracted": [
+        {
+          "id": "RP-1",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-2",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-3",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-4",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-5",
+          "action": "INSERT"
+        }
+      ],
+      "frontier_update": null
+    },
+    {
+      "iteration": 3,
+      "family": "kv-constrained-search-difficulty",
+      "timestamp": "2026-05-28T16:48:54.191195+00:00",
+      "candidate_id": "iter-3",
+      "h_main_result": "PARTIALLY_CONFIRMED",
+      "ablation_results": {},
+      "control_result": "PARTIALLY_CONFIRMED",
+      "robustness_result": "CONFIRMED",
+      "prediction_accuracy": {
+        "arms_correct": 1,
+        "arms_total": 3,
+        "accuracy_pct": 33.3
+      },
+      "principles_extracted": [
+        {
+          "id": "RP-1",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-2",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-5",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-6",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-7",
+          "action": "INSERT"
+        }
+      ],
+      "frontier_update": null
+    },
+    {
+      "iteration": 4,
+      "family": "search-space-reduction",
+      "timestamp": "2026-05-28T17:28:23.657822+00:00",
+      "candidate_id": "iter-4",
+      "h_main_result": "PARTIALLY_CONFIRMED",
+      "ablation_results": {
+        "ablation-0": "REFUTED"
+      },
+      "control_result": "CONFIRMED",
+      "robustness_result": "PARTIALLY_CONFIRMED",
+      "prediction_accuracy": {
+        "arms_correct": 1,
+        "arms_total": 4,
+        "accuracy_pct": 25.0
+      },
+      "principles_extracted": [
+        {
+          "id": "RP-5",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-6",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-7",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-8",
+          "action": "INSERT"
+        }
+      ],
+      "frontier_update": null
+    },
+    {
+      "iteration": 5,
+      "family": "search-algorithm-corrected-space",
+      "timestamp": "2026-05-28T18:04:46.910020+00:00",
+      "candidate_id": "iter-5",
+      "h_main_result": "CONFIRMED",
+      "ablation_results": {
+        "ablation-0": "PARTIALLY_CONFIRMED"
+      },
+      "control_result": "CONFIRMED",
+      "robustness_result": "PARTIALLY_CONFIRMED",
+      "prediction_accuracy": {
+        "arms_correct": 2,
+        "arms_total": 4,
+        "accuracy_pct": 50.0
+      },
+      "principles_extracted": [
+        {
+          "id": "RP-1",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-2",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-6",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-7",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-9",
+          "action": "INSERT"
+        }
+      ],
+      "frontier_update": null
+    },
+    {
+      "iteration": 6,
+      "family": "rate-portability",
+      "timestamp": "2026-05-28T18:55:27.243131+00:00",
+      "candidate_id": "iter-6",
+      "h_main_result": "PARTIALLY_CONFIRMED",
+      "ablation_results": {
+        "ablation-0": "REFUTED"
+      },
+      "control_result": "REFUTED",
+      "robustness_result": "REFUTED",
+      "prediction_accuracy": {
+        "arms_correct": 0,
+        "arms_total": 4,
+        "accuracy_pct": 0.0
+      },
+      "principles_extracted": [
+        {
+          "id": "RP-1",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-2",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-3",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-10",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-11",
+          "action": "INSERT"
+        }
+      ],
+      "frontier_update": null
+    },
+    {
+      "iteration": 7,
+      "family": "model-portability",
+      "timestamp": "2026-05-28T19:33:35.202522+00:00",
+      "candidate_id": "iter-7",
+      "h_main_result": "PARTIALLY_CONFIRMED",
+      "ablation_results": {
+        "ablation-0": "PARTIALLY_CONFIRMED"
+      },
+      "control_result": "CONFIRMED",
+      "robustness_result": "PARTIALLY_CONFIRMED",
+      "prediction_accuracy": {
+        "arms_correct": 1,
+        "arms_total": 4,
+        "accuracy_pct": 25.0
+      },
+      "principles_extracted": [
+        {
+          "id": "RP-11",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-12",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-13",
+          "action": "INSERT"
+        }
+      ],
+      "frontier_update": null
+    },
+    {
+      "iteration": 8,
+      "family": "density-gap-universality",
+      "timestamp": "2026-05-28T19:59:27.702012+00:00",
+      "candidate_id": "iter-8",
+      "h_main_result": "REFUTED",
+      "ablation_results": {
+        "ablation-0": "PARTIALLY_CONFIRMED"
+      },
+      "control_result": null,
+      "robustness_result": "PARTIALLY_CONFIRMED",
+      "prediction_accuracy": {
+        "arms_correct": 0,
+        "arms_total": 3,
+        "accuracy_pct": 0.0
+      },
+      "principles_extracted": [
+        {
+          "id": "RP-10",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-11",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-12",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-14",
+          "action": "INSERT"
+        }
+      ],
+      "frontier_update": null
+    },
+    {
+      "iteration": 9,
+      "family": "landscape-structure-causality",
+      "timestamp": "2026-05-28T20:36:44.269611+00:00",
+      "candidate_id": "iter-9",
+      "h_main_result": "CONFIRMED",
+      "ablation_results": {
+        "ablation-0": "REFUTED"
+      },
+      "control_result": "REFUTED",
+      "robustness_result": "PARTIALLY_CONFIRMED",
+      "prediction_accuracy": {
+        "arms_correct": 1,
+        "arms_total": 4,
+        "accuracy_pct": 25.0
+      },
+      "principles_extracted": [
+        {
+          "id": "RP-1",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-11",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-14",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-15",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-16",
+          "action": "INSERT"
+        }
+      ],
+      "frontier_update": null
+    },
+    {
+      "iteration": 10,
+      "family": "crossover-yield-mechanism",
+      "timestamp": "2026-05-29T00:28:02.285416+00:00",
+      "candidate_id": "iter-10",
+      "h_main_result": "REFUTED",
+      "ablation_results": {
+        "ablation-0": "PARTIALLY_CONFIRMED"
+      },
+      "control_result": "PARTIALLY_CONFIRMED",
+      "robustness_result": "PARTIALLY_CONFIRMED",
+      "prediction_accuracy": {
+        "arms_correct": 0,
+        "arms_total": 4,
+        "accuracy_pct": 0.0
+      },
+      "principles_extracted": [
+        {
+          "id": "RP-1",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-11",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-12",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-16",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-17",
+          "action": "INSERT"
+        },
+        {
+          "id": "RP-18",
+          "action": "INSERT"
+        }
+      ],
+      "frontier_update": null
+    }
+  ]
+}

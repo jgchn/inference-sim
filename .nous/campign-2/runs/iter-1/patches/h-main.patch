@@ -1,0 +1,457 @@
+diff --git a/search_pareto.py b/search_pareto.py
+new file mode 100644
+index 00000000..e91d48cb
+--- /dev/null
++++ b/search_pareto.py
+@@ -0,0 +1,451 @@
++#!/usr/bin/env python3
++"""
++BLIS Pareto Search Comparison — Campaign 2, Iteration 1
++
++Compares two configuration search strategies for discovering the Pareto frontier
++(maximize tokens_per_sec, minimize e2e_p99_ms) in BLIS's 86,400-config space.
++
++Strategies:
++  random       — uniform random sampling across full space
++  hierarchical — Phase 1: screen all TP×instances tiers (15 evals, max-throughput profile)
++                 Phase 2: Latin Hypercube Sampling within top-3 tiers
++
++Usage:
++  # h-main: compare both strategies at rate=50
++  python3 search_pareto.py --strategy both --budget 500 --rate 50 --seed 42 \
++      --output /path/to/results.json
++
++  # h-control-negative: compare at rate=5 (unsaturated)
++  python3 search_pareto.py --strategy both --budget 200 --rate 5 --seed 42 \
++      --output /path/to/results.json
++
++  # h-robustness: hierarchical only, different seeds
++  python3 search_pareto.py --strategy hierarchical --budget 100 --rate 50 --seed 123 \
++      --output /path/to/results.json
++"""
++
++import argparse
++import json
++import os
++import re
++import subprocess
++import sys
++import time
++from pathlib import Path
++from typing import Optional
++
++import numpy as np
++from scipy.stats import qmc
++
++# ── Configuration space ────────────────────────────────────────────────────
++
++BLIS_BINARY = Path(__file__).parent / "blis"
++MODEL = "qwen3-14b"
++HARDWARE = "H100"
++NUM_REQUESTS = 200
++
++TP_OPTIONS = [1, 2, 4, 8]
++VALID_TP_INSTANCES = [
++    (tp, ni)
++    for tp in TP_OPTIONS
++    for ni in range(1, 8 // tp + 1)
++]
++
++SECONDARY_KNOB_NAMES = [
++    "scheduler", "max_running", "max_tokens",
++    "prefill_threshold", "block_size", "routing", "admission", "preemption",
++]
++SECONDARY_KNOB_OPTIONS = {
++    "scheduler":         ["fcfs", "priority-fcfs", "sjf", "reverse-priority"],
++    "max_running":       [32, 64, 128, 256, 512],
++    "max_tokens":        [2048, 4096, 8192],
++    "prefill_threshold": [0, 1024, 2048, 4096],
++    "block_size":        [16, 32],
++    "routing":           ["round-robin", "least-loaded", "weighted"],
++    "admission":         ["always-admit", "tier-shed"],
++    "preemption":        ["fcfs", "priority"],
++}
++
++# Max-throughput profile for Phase 1 tier screening
++PHASE1_MAX_PROFILE = {
++    "scheduler":         "fcfs",
++    "max_running":       256,
++    "max_tokens":        8192,
++    "prefill_threshold": 0,
++    "block_size":        16,
++    "routing":           "least-loaded",
++    "admission":         "always-admit",
++    "preemption":        "fcfs",
++}
++
++
++# ── BLIS execution ─────────────────────────────────────────────────────────
++
++def build_cmd(config: dict, rate: float, seed: int) -> list[str]:
++    # Single-instance configs don't use routing-policy in a meaningful way
++    routing = config["routing"] if config["num_instances"] > 1 else "round-robin"
++    return [
++        str(BLIS_BINARY), "run",
++        "--model", MODEL,
++        "--hardware", HARDWARE,
++        "--latency-model", "trained-physics",
++        "--tp", str(config["tp"]),
++        "--num-instances", str(config["num_instances"]),
++        "--rate", str(rate),
++        "--num-requests", str(NUM_REQUESTS),
++        "--seed", str(seed),
++        "--scheduler", config["scheduler"],
++        "--max-num-running-reqs", str(config["max_running"]),
++        "--max-num-scheduled-tokens", str(config["max_tokens"]),
++        "--long-prefill-token-threshold", str(config["prefill_threshold"]),
++        "--block-size-in-tokens", str(config["block_size"]),
++        "--routing-policy", routing,
++        "--admission-policy", config["admission"],
++        "--preemption-policy", config["preemption"],
++    ]
++
++
++def parse_cluster_metrics(stdout: str) -> Optional[dict]:
++    """Extract cluster-level metrics block from BLIS stdout."""
++    blocks = re.findall(r"=== Simulation Metrics ===\s*(\{.*?\})", stdout, re.DOTALL)
++    for block_str in blocks:
++        try:
++            data = json.loads(block_str)
++            if data.get("instance_id") == "cluster" or len(blocks) == 1:
++                return data
++        except json.JSONDecodeError:
++            continue
++    return None
++
++
++def run_blis(config: dict, rate: float, seed: int) -> Optional[dict]:
++    """Run BLIS with config. Returns {config, tokens_per_sec, e2e_p99_ms} or None."""
++    cmd = build_cmd(config, rate, seed)
++    try:
++        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
++        if result.returncode != 0:
++            return None
++        metrics = parse_cluster_metrics(result.stdout)
++        if not metrics:
++            return None
++        tps = metrics.get("tokens_per_sec", 0.0)
++        e2e = metrics.get("e2e_p99_ms", 1e9)
++        completed = metrics.get("completed_requests", 0)
++        if tps <= 0 or completed == 0:
++            return None
++        return {
++            "config": config,
++            "tokens_per_sec": tps,
++            "e2e_p99_ms": e2e,
++            "completed_requests": completed,
++        }
++    except subprocess.TimeoutExpired:
++        return None
++    except Exception as exc:
++        print(f"  run_blis error: {exc}", file=sys.stderr)
++        return None
++
++
++# ── Pareto utilities ───────────────────────────────────────────────────────
++
++def pareto_front(results: list[dict]) -> list[dict]:
++    """Return Pareto-optimal subset (maximize throughput, minimize latency)."""
++    if not results:
++        return []
++    front = []
++    for r in results:
++        dominated = False
++        for other in results:
++            if other is r:
++                continue
++            # other dominates r if it's at least as good on both and better on one
++            if (other["tokens_per_sec"] >= r["tokens_per_sec"] and
++                    other["e2e_p99_ms"] <= r["e2e_p99_ms"] and
++                    (other["tokens_per_sec"] > r["tokens_per_sec"] or
++                     other["e2e_p99_ms"] < r["e2e_p99_ms"])):
++                dominated = True
++                break
++        if not dominated:
++            front.append(r)
++    return front
++
++
++def compute_hypervolume_2d(results: list[dict], ref_latency: float) -> float:
++    """
++    Compute 2D hypervolume dominated by the Pareto front.
++
++    Objectives: maximize tokens_per_sec, minimize e2e_p99_ms.
++    Reference point: (throughput=0, latency=ref_latency) — worse than all points.
++
++    HV = sum over sorted-by-throughput Pareto points of:
++         (tps_i - tps_{i-1}) * (ref_latency - e2e_i)
++    """
++    front = pareto_front(results)
++    if not front:
++        return 0.0
++    # Sort by throughput ascending
++    pts = sorted(front, key=lambda r: r["tokens_per_sec"])
++    hv = 0.0
++    prev_tps = 0.0
++    for r in pts:
++        tps = r["tokens_per_sec"]
++        height = ref_latency - r["e2e_p99_ms"]
++        if height > 0:
++            hv += (tps - prev_tps) * height
++        prev_tps = tps
++    return hv
++
++
++# ── Config sampling utilities ──────────────────────────────────────────────
++
++def sample_secondary_knobs_random(rng: np.random.Generator) -> dict:
++    """Uniformly sample all secondary knobs."""
++    config = {}
++    for knob in SECONDARY_KNOB_NAMES:
++        opts = SECONDARY_KNOB_OPTIONS[knob]
++        config[knob] = opts[rng.integers(0, len(opts))]
++    return config
++
++
++def lhs_configs_for_tier(tp: int, ni: int, n: int, lhs_seed: int) -> list[dict]:
++    """Generate n configs for (tp, ni) tier using Latin Hypercube Sampling."""
++    dims = len(SECONDARY_KNOB_NAMES)
++    sampler = qmc.LatinHypercube(d=dims, seed=lhs_seed)
++    samples = sampler.random(n)  # (n, dims) in [0, 1)
++    configs = []
++    for row in samples:
++        config = {"tp": tp, "num_instances": ni}
++        for j, knob in enumerate(SECONDARY_KNOB_NAMES):
++            opts = SECONDARY_KNOB_OPTIONS[knob]
++            idx = min(int(row[j] * len(opts)), len(opts) - 1)
++            config[knob] = opts[idx]
++        configs.append(config)
++    return configs
++
++
++# ── Search strategies ──────────────────────────────────────────────────────
++
++def random_search(budget: int, rate: float, seed: int) -> dict:
++    """Uniform random search over full (TP, instances, secondary-knobs) space."""
++    rng = np.random.default_rng(seed)
++    results = []
++    t0 = time.perf_counter()
++
++    for i in range(budget):
++        tp_idx = rng.integers(0, len(VALID_TP_INSTANCES))
++        tp, ni = VALID_TP_INSTANCES[tp_idx]
++        config = {"tp": tp, "num_instances": ni}
++        config.update(sample_secondary_knobs_random(rng))
++        result = run_blis(config, rate, seed)
++        if result:
++            results.append(result)
++        if (i + 1) % 100 == 0:
++            elapsed = time.perf_counter() - t0
++            print(f"  [random] {i+1}/{budget} evals, {len(results)} ok, "
++                  f"{elapsed:.1f}s", file=sys.stderr)
++
++    wall_time = time.perf_counter() - t0
++    return {
++        "strategy": "random",
++        "results": results,
++        "wall_time_s": wall_time,
++        "evals_attempted": budget,
++        "evals_successful": len(results),
++    }
++
++
++def hierarchical_search(budget: int, rate: float, seed: int,
++                        top_k: int = 3) -> dict:
++    """
++    Two-phase hierarchical search.
++
++    Phase 1: Evaluate each valid (TP, instances) pair with max-throughput profile.
++             Budget = len(VALID_TP_INSTANCES) = 15.
++    Phase 2: LHS within top-k tiers using remaining budget (budget - 15 evals).
++    """
++    results = []
++    phase1_scores = {}
++    t0 = time.perf_counter()
++
++    # Phase 1: screen all tiers
++    phase1_count = len(VALID_TP_INSTANCES)  # 15
++    print(f"  [hierarchical] Phase 1: {phase1_count} tier evals...", file=sys.stderr)
++
++    for tp, ni in VALID_TP_INSTANCES:
++        config = {"tp": tp, "num_instances": ni}
++        config.update(PHASE1_MAX_PROFILE)
++        if ni == 1:
++            config["routing"] = "round-robin"  # single-instance routing
++        result = run_blis(config, rate, seed)
++        if result:
++            results.append(result)
++            phase1_scores[(tp, ni)] = result["tokens_per_sec"]
++        else:
++            phase1_scores[(tp, ni)] = 0.0
++
++    # Select top-k tiers by throughput
++    sorted_tiers = sorted(phase1_scores.items(), key=lambda x: x[1], reverse=True)
++    top_tiers = [(tp, ni) for (tp, ni), _ in sorted_tiers[:top_k]]
++    print(f"  [hierarchical] Top-{top_k} tiers: {top_tiers}", file=sys.stderr)
++
++    # Phase 2: allocate remaining budget to top tiers via LHS
++    phase2_budget = max(0, budget - phase1_count)
++    if phase2_budget == 0:
++        print("  [hierarchical] Budget exhausted by Phase 1, skipping Phase 2",
++              file=sys.stderr)
++    budget_per_tier = phase2_budget // top_k if top_k > 0 else 0
++    remainder = phase2_budget - budget_per_tier * top_k
++
++    for idx, (tp, ni) in enumerate(top_tiers):
++        tier_budget = budget_per_tier + (1 if idx < remainder else 0)
++        if tier_budget == 0:
++            continue
++        lhs_seed = seed + idx * 1000  # deterministic, tier-specific
++        configs = lhs_configs_for_tier(tp, ni, tier_budget, lhs_seed)
++        print(f"  [hierarchical] Phase 2 tier (tp={tp}, ni={ni}): "
++              f"{tier_budget} LHS evals...", file=sys.stderr)
++        for i, config in enumerate(configs):
++            result = run_blis(config, rate, seed)
++            if result:
++                results.append(result)
++            if (i + 1) % 100 == 0:
++                elapsed = time.perf_counter() - t0
++                print(f"    tier ({tp},{ni}): {i+1}/{tier_budget}, "
++                      f"{elapsed:.1f}s", file=sys.stderr)
++
++    wall_time = time.perf_counter() - t0
++    return {
++        "strategy": "hierarchical",
++        "results": results,
++        "wall_time_s": wall_time,
++        "evals_attempted": budget,
++        "evals_successful": len(results),
++        "top_tiers": [f"{tp}x{ni}" for tp, ni in top_tiers],
++        "phase1_scores": {f"{tp}x{ni}": s for (tp, ni), s in phase1_scores.items()},
++    }
++
++
++# ── Main ───────────────────────────────────────────────────────────────────
++
++def compute_summary(sr: dict, ref_latency: float) -> dict:
++    """Compute summary metrics for a strategy result."""
++    res = sr["results"]
++    front = pareto_front(res)
++    hv = compute_hypervolume_2d(res, ref_latency)
++    return {
++        "hypervolume": hv,
++        "pareto_size": len(front),
++        "evals_successful": sr["evals_successful"],
++        "wall_time_s": sr["wall_time_s"],
++        "best_throughput": max((r["tokens_per_sec"] for r in front), default=0.0),
++        "best_latency_ms": min((r["e2e_p99_ms"] for r in front), default=0.0),
++        "pareto_front": [
++            {"tokens_per_sec": r["tokens_per_sec"], "e2e_p99_ms": r["e2e_p99_ms"],
++             "tp": r["config"]["tp"], "num_instances": r["config"]["num_instances"]}
++            for r in sorted(front, key=lambda x: x["tokens_per_sec"])
++        ],
++    }
++
++
++def main():
++    parser = argparse.ArgumentParser(description="BLIS Pareto Search Comparison")
++    parser.add_argument("--strategy", choices=["random", "hierarchical", "both"],
++                        default="both")
++    parser.add_argument("--budget", type=int, default=500,
++                        help="Number of BLIS evaluations per strategy")
++    parser.add_argument("--rate", type=float, default=50.0,
++                        help="Request arrival rate (req/s)")
++    parser.add_argument("--seed", type=int, default=42,
++                        help="RNG seed for workload and search")
++    parser.add_argument("--output", type=str, required=True,
++                        help="Output JSON file path")
++    args = parser.parse_args()
++
++    print(f"BLIS Pareto Search: strategy={args.strategy}, budget={args.budget}, "
++          f"rate={args.rate}, seed={args.seed}", file=sys.stderr)
++
++    strategy_results = {}
++
++    if args.strategy in ("random", "both"):
++        print("\nRunning random search...", file=sys.stderr)
++        strategy_results["random"] = random_search(args.budget, args.rate, args.seed)
++
++    if args.strategy in ("hierarchical", "both"):
++        print("\nRunning hierarchical search...", file=sys.stderr)
++        strategy_results["hierarchical"] = hierarchical_search(
++            args.budget, args.rate, args.seed)
++
++    # Compute reference hypervolume from all evaluated points combined
++    all_results = []
++    for sr in strategy_results.values():
++        all_results.extend(sr["results"])
++
++    if not all_results:
++        print("ERROR: No successful evaluations!", file=sys.stderr)
++        sys.exit(1)
++
++    ref_latency = max(r["e2e_p99_ms"] for r in all_results) * 1.1
++    print(f"\nReference latency for HV: {ref_latency:.1f}ms", file=sys.stderr)
++
++    summaries = {}
++    for strategy, sr in strategy_results.items():
++        summaries[strategy] = compute_summary(sr, ref_latency)
++        s = summaries[strategy]
++        print(f"\n{strategy.upper()} results:", file=sys.stderr)
++        print(f"  Hypervolume: {s['hypervolume']:.4e}", file=sys.stderr)
++        print(f"  Pareto front size: {s['pareto_size']}", file=sys.stderr)
++        print(f"  Best throughput: {s['best_throughput']:.1f} tok/s", file=sys.stderr)
++        print(f"  Best latency: {s['best_latency_ms']:.1f}ms", file=sys.stderr)
++        print(f"  Wall time: {s['wall_time_s']:.1f}s", file=sys.stderr)
++
++    if "random" in summaries and "hierarchical" in summaries:
++        r_hv = summaries["random"]["hypervolume"]
++        h_hv = summaries["hierarchical"]["hypervolume"]
++        ratio = h_hv / r_hv if r_hv > 0 else float("inf")
++        print(f"\nHierarchical / Random HV ratio: {ratio:.3f} "
++              f"({(ratio-1)*100:+.1f}%)", file=sys.stderr)
++
++    # Combined reference front
++    combined_front = pareto_front(all_results)
++    combined_hv = compute_hypervolume_2d(all_results, ref_latency)
++
++    output = {
++        "params": {
++            "budget": args.budget,
++            "rate": args.rate,
++            "seed": args.seed,
++            "strategy": args.strategy,
++        },
++        "summaries": summaries,
++        "reference": {
++            "combined_pareto_size": len(combined_front),
++            "combined_hypervolume": combined_hv,
++            "ref_latency": ref_latency,
++            "combined_pareto_front": [
++                {"tokens_per_sec": r["tokens_per_sec"], "e2e_p99_ms": r["e2e_p99_ms"],
++                 "tp": r["config"]["tp"], "num_instances": r["config"]["num_instances"]}
++                for r in sorted(combined_front, key=lambda x: x["tokens_per_sec"])
++            ],
++        },
++        # Store all raw results (trimmed to reduce file size)
++        "raw_results": {
++            strategy: [
++                {"tokens_per_sec": r["tokens_per_sec"], "e2e_p99_ms": r["e2e_p99_ms"],
++                 "tp": r["config"]["tp"], "num_instances": r["config"]["num_instances"],
++                 "scheduler": r["config"]["scheduler"]}
++                for r in sr["results"]
++            ]
++            for strategy, sr in strategy_results.items()
++        },
++        "phase1_scores": strategy_results.get("hierarchical", {}).get("phase1_scores"),
++        "top_tiers": strategy_results.get("hierarchical", {}).get("top_tiers"),
++    }
++
++    Path(args.output).parent.mkdir(parents=True, exist_ok=True)
++    with open(args.output, "w") as f:
++        json.dump(output, f, indent=2)
++    print(f"\nResults written to: {args.output}", file=sys.stderr)
++
++
++if __name__ == "__main__":
++    main()

@@ -1,0 +1,142 @@
+metadata:
+  iteration: 8
+  family: "model-size-generalization"
+  research_question: "Does the lean bracket search algorithm generalize to larger models (qwen3-32b), and does the RP-27 bandwidth formula break for model sizes beyond ~14B?"
+
+arms:
+  - type: h-main
+    prediction: >
+      Lean bracket (TP={4,8}, max-profile, no Phase 2, budget=2) achieves within 1%
+      of global best for qwen3-32b on all 5 regimes (H100 rates 100/300/500, A100-SXM
+      rates 100/500). evals_to_best=2 on 4 regimes (TP=8 winner at position 2) and
+      evals_to_best=1 on 1 regime (H100 rate=500, TP=4 winner at position 1). All 5
+      search seeds produce identical results per regime (deterministic). The algorithm
+      adapts to the model-size-shifted crossover (~350 on H100 vs ~130 for 14B) without
+      any algorithm modification.
+    mechanism: >
+      Lean bracket evaluates both TP=4 and TP=8 empirically with max-profile secondary
+      params, picking whichever scores higher. This empirical comparison is inherently
+      model-agnostic — it adapts to whatever the actual crossover is. qwen3-32b's larger
+      weight size (64GB vs 28GB for qwen3-14b) increases per-step weight loading time,
+      keeping TP=8's bandwidth pooling advantage relevant to higher rates (~350 on H100
+      vs ~130 for 14B). On A100-SXM (2.039 TB/s), 32B weights push the crossover beyond
+      any practical rate — TP=8 dominates universally.
+    diagnostic: >
+      If lean bracket fails on any regime: (1) Check if the global best requires routing
+      optimization that Phase 1 cannot discover (single-instance TP=8 is degenerate for
+      routing). (2) Check if the non-monotonicity at H100 rate=450 (TP=8 briefly wins
+      between TP=4-dominant rate=350 and rate=500) causes instability. (3) Verify the
+      global best scores are correct for qwen3-32b regimes.
+    code_changes:
+      - file: "search_blis_iter8.py"
+        intent: >
+          Add qwen3-32b entries to GLOBAL_BEST_TABLE: (qwen3-32b, H100, 100, 1000): 0.132535,
+          (qwen3-32b, H100, 300, 1000): 0.138983, (qwen3-32b, H100, 500, 1000): 0.141403,
+          (qwen3-32b, A100-SXM, 100, 1000): 0.104331, (qwen3-32b, A100-SXM, 500, 1000): 0.108182.
+        rationale: >
+          The lean bracket within-1% check requires global best reference values for each
+          (model, hardware, rate, num_requests) tuple. These values were established by
+          probing TP=4 and TP=8 with max-profile and testing routing variations.
+
+  - type: h-control-negative
+    prediction: >
+      The simple bandwidth formula (crossover_rate = 400 / bandwidth_TB_s) achieves
+      ≤78% accuracy (≤14/18 correct) across the full 18-regime test matrix (3 models ×
+      3 hardware × 2 rates). All 4+ failures involve either qwen3-32b (where the formula
+      predicts TP=4 at rates 200-500 on H100 and A100-SXM, but TP=8 actually wins due
+      to model-size-shifted crossover) or L40S qwen3-14b (where the formula predicts
+      TP=4 at rate=500 but TP=8 wins due to no crossover). The formula is blind to model
+      size — it uses only hardware bandwidth.
+    mechanism: >
+      The formula crossover_rate ≈ 400/BW was derived from 8-14B model observations
+      (RP-27). It captures the hardware bandwidth dimension but misses the model-size
+      dimension. Larger models (32B) have 2.3x more weight bytes, increasing per-step
+      weight loading time and shifting the memory-bound → compute-bound transition to
+      higher batch sizes (i.e., higher rates). The formula assumes a fixed model-size
+      factor of ~400, but the true factor scales with model parameters.
+    diagnostic: >
+      If the formula achieves >78% accuracy: check whether qwen3-32b crossover points
+      happen to align with the formula prediction at the tested rates. The non-monotonicity
+      at H100 rate=450 means the crossover band is fuzzy — the formula might get lucky.
+    code_changes:
+      - file: "search_blis_iter8.py"
+        intent: >
+          Add a 'formula-predict' strategy mode. When --strategy formula-predict is used:
+          (1) look up hardware bandwidth from HW_BANDWIDTH dict (H100: 3.35, A100-SXM: 2.039,
+          L40S: 0.864), (2) compute crossover = 400 / bandwidth, (3) predict TP=4/2inst if
+          rate > crossover else TP=8/1inst, (4) apply max-profile secondary params (mr=512,
+          mt=8192, pf=4096), (5) run one BLIS eval to get the actual score, (6) compare the
+          predicted TP winner against lean bracket's winner for the same regime, (7) output
+          prediction accuracy and score delta. The strategy should also output the formula's
+          crossover rate prediction for analysis.
+        rationale: >
+          The formula-predict strategy isolates the RP-27 formula as the sole TP selection
+          mechanism, enabling direct measurement of its accuracy across the expanded
+          (model × hardware × rate) matrix. Running one BLIS eval per prediction provides
+          the score delta — how much fitness is lost when the formula is wrong.
+
+  - type: h-ablation
+    prediction: >
+      Micro-eval (lean bracket with --num-requests 100 instead of 1000) selects TP=8
+      on all 4 tested high-rate regimes (H100 qwen3-14b rate=500, A100-SXM qwen3-14b
+      rate=500, H100 llama-3.1-8b rate=500, H100 qwen3-32b rate=500), where the
+      1000-request lean bracket correctly selects TP=4. The micro-eval misidentification
+      rate is 4/4 (100%) on high-rate TP=4-winner regimes. Micro-eval at regimes where
+      TP=8 is the 1000-request winner will correctly select TP=8 (trivially correct).
+    mechanism: >
+      At 100 requests with rate=500, all requests arrive within 0.2s and complete within
+      ~0.5s — insufficient time for queue saturation effects to differentiate TP=4/2inst
+      from TP=8/1inst. The queuing advantage of 2 instances manifests only under sustained
+      load: TP=8's single instance builds a deeper queue under high arrival rate, degrading
+      P99 tail latency. With only 100 requests, the queue never grows large enough for
+      this effect to materialize, so TP=8's inherently lower per-step latency dominates
+      the fitness score. Validated in probes: at 500 requests on H100 qwen3-14b rate=500,
+      TP=8 still wins (0.162349 vs 0.150143), confirming that even 5x more requests than
+      the micro-eval budget is insufficient.
+    diagnostic: >
+      If micro-eval correctly identifies TP=4 on any regime: check whether that regime
+      has an unusually large TP=4 advantage that manifests even at short horizons (e.g.,
+      qwen3-32b H100 rate=500 has only 0.84% TP=4 advantage at 1000 req — if the gap
+      reverses at 100 req, the mechanism is confirmed). Also check whether the specific
+      workload seed (42) produces bursty arrivals that create transient saturation.
+    code_changes:
+      - file: "search_blis_iter8.py"
+        intent: >
+          No algorithmic changes needed. The micro-eval arm uses the existing lean bracket
+          with --num-requests 100 instead of 1000. The comparison against 1000-request
+          results is done externally by checking Phase 1 winner fields in the output JSON.
+        rationale: >
+          The experiment tests whether the lean bracket's TP winner identification is
+          sensitive to simulation horizon. No code change — just a parameter variation.
+
+  - type: h-robustness
+    prediction: >
+      Lean bracket achieves within 1% of global best on all 4 L40S regimes (qwen3-14b
+      rates 100/500, llama-3.1-8b rates 100/500) across 5 search seeds (20 total runs).
+      qwen3-14b: TP=8 wins on both rates (evals_to_best=2). llama-3.1-8b: TP=8 wins at
+      rate=100 (evals_to_best=2), TP=4 wins at rate=500 (evals_to_best=1). All 5 search
+      seeds per regime produce identical results (deterministic). This completes lean
+      bracket validation across all 3 hardware platforms.
+    mechanism: >
+      L40S has the lowest bandwidth (0.864 TB/s), making it the most memory-bound hardware.
+      For qwen3-14b, bandwidth-bound operation persists at all tested rates (TP=8 always
+      wins, consistent with RP-21 and RP-27). For llama-3.1-8b (smaller model, less weight
+      loading), the crossover to TP=4 occurs at ~400-500 req/s (RP-27: L40S llama crossover
+      ~450). Lean bracket handles both cases because it evaluates both TP candidates
+      empirically.
+    diagnostic: >
+      If lean bracket fails on L40S: (1) Check whether L40S's lower memory (48GB vs 80GB)
+      causes KV cache pressure that changes the optimal configuration at TP=4/2inst.
+      (2) Check whether L40S's low mfuDecode (0.08) creates extreme decode latency that
+      shifts the balance. (3) Verify global best scores — L40S scores are much lower than
+      H100/A100 (0.06-0.11 vs 0.13-0.18), so the 1% threshold is tighter in absolute terms.
+    code_changes:
+      - file: "search_blis_iter8.py"
+        intent: >
+          Add L40S entries to GLOBAL_BEST_TABLE: (qwen3-14b, L40S, 100, 1000): 0.082636,
+          (qwen3-14b, L40S, 500, 1000): 0.084795, (llama-3.1-8b, L40S, 100, 1000): 0.104264,
+          (llama-3.1-8b, L40S, 500, 1000): 0.109668. Also add qwen3-32b L40S entries:
+          (qwen3-32b, L40S, 100, 1000): 0.063243, (qwen3-32b, L40S, 500, 1000): 0.064436.
+        rationale: >
+          Complete GLOBAL_BEST_TABLE coverage for L40S enables within-1% threshold checking
+          for the robustness arm and future iterations.

@@ -1,0 +1,27 @@
+[
+  {
+    "eval": 40,
+    "hypervolume": 49802700624.973595,
+    "pareto_size": 18
+  },
+  {
+    "eval": 80,
+    "hypervolume": 52272787478.08827,
+    "pareto_size": 19
+  },
+  {
+    "eval": 120,
+    "hypervolume": 55019009614.93551,
+    "pareto_size": 18
+  },
+  {
+    "eval": 160,
+    "hypervolume": 55293726395.49823,
+    "pareto_size": 23
+  },
+  {
+    "eval": 200,
+    "hypervolume": 55645515181.62328,
+    "pareto_size": 23
+  }
+]

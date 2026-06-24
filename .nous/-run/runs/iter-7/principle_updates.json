@@ -1,0 +1,58 @@
+[
+  {
+    "id": "RP-28",
+    "statement": "Lean bracket (TP={4,8} max-profile only, budget=2, no Phase 2) achieves within 1% of global best across all tested regimes (H100/A100-SXM, qwen3-14b, rates 100-500, 1000 requests). This is a 50x reduction from standard bracket K=1 (100 evals), completing in ~0.5-1.0s vs ~10s. evals_to_best=1 when TP=4 wins (position 1 in lean order), evals_to_best=2 when TP=8 wins (position 2). The search is fully deterministic: all search seeds produce byte-identical results per blis_seed.",
+    "confidence": "high",
+    "regime": "H100 and A100-SXM hardware, qwen3-14b model, rates 100-500 req/s, 1000 requests, fitness weights throughput:0.4,p99_ttft:0.3,p99_e2e:0.3",
+    "evidence": ["iteration-7-h-main", "iteration-7-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 7,
+    "mechanism": "TP=1 and TP=2 are structurally excluded because bandwidth-per-GPU at TP<4 is insufficient for competitive per-token latency — the gap is 11-38% below the winner across all tested rates and hardware. Phase 2 is unnecessary because max-profile Phase 1 already achieves within 1% (Phase 2 maximum improvement across all iterations: 0.71%). Restricting to TP={4,8} captures the rate-dependent winner transition: TP=8 wins at low rates, TP=4 wins at high rates.",
+    "applicability_bounds": "Validated on H100 and A100-SXM with qwen3-14b. TP=4 evaluated first (max GPU utilization: TP=4/2inst), TP=8 second (TP=8/1inst). Requires max-profile (mr=512, mt=8192, pf=4096). Not validated on L40S or models larger than 14B params. The 1% tolerance is specific to the fitness function used (throughput:0.4,p99_ttft:0.3,p99_e2e:0.3).",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-29",
+    "statement": "Lean bracket with min-profile (mr=32, mt=2048, pf=0) is catastrophically suboptimal: 56.8% below max-profile lean bracket on H100 qwen rate=500. Min-profile in the lean bracket context inverts the TP4 vs TP8 ranking (TP4=0.077, TP8=0.063) but still cannot find TP=2/4inst (excluded) which would have scored 0.082 with full TP candidates. The max-profile is the mechanism enabling lean bracket correctness.",
+    "confidence": "high",
+    "regime": "H100, qwen3-14b, rate=500, 1000 requests, lean bracket (TP=4,8 only)",
+    "evidence": ["iteration-7-h-control-negative"],
+    "contradicts": [],
+    "extraction_iteration": 7,
+    "mechanism": "Min-profile (mr=32) creates a capacity-limited regime where 32 concurrent slots per instance limits throughput regardless of bandwidth. In this regime, instance count advantage would favor TP=2/4inst (4×32=128 capacity) over TP=4/2inst (2×32=64), but lean bracket's TP=2 exclusion means TP4 still 'wins' within the lean candidates at 0.077 — 57% below the max-profile result. The compute-saturated max-profile regime is the necessary condition for lean bracket to correctly identify the bandwidth-dominant TP winner.",
+    "applicability_bounds": "Validates the max-profile requirement for lean bracket. Extends RP-17 to the lean bracket context. The specific scores (TP4=0.077, TP8=0.063 with min-profile) are H100/qwen/rate=500-specific.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-30",
+    "statement": "Mini Phase 2 (10 TPE trials) finds routing improvements on 5/5 seeds at the A100-SXM qwen rate=200 crossover regime, exceeding the predicted 3/5. Seeds 44-46 discover round-robin or weighted routing (0.33-0.71% improvement over least-loaded). Seeds 42-43 show marginal improvement (0.002-0.012%). All 5/5 remain within 1% of global best (0.135440). Phase 1 alone is also within threshold (0.134488 > threshold 0.134086), so evals_to_best=1 in all cases.",
+    "confidence": "high",
+    "regime": "A100-SXM, qwen3-14b, rate=200, 1000 requests, lean bracket + mini Phase 2 (budget=12)",
+    "evidence": ["iteration-7-h-ablation"],
+    "contradicts": [],
+    "extraction_iteration": 7,
+    "mechanism": "At rate=200 (A100-SXM crossover), TP=4/2inst and TP=8/1inst score identically in Phase 1 (0.1345 each), confirming the crossover point. Phase 2 explores routing options for the TP=4/2inst winner. The 3-option routing space (round-robin, least-loaded, weighted) is efficiently explored in 10 trials: TPE's random exploration phase covers the routing dimension early. The 5/5 improvement rate (vs 3/5 predicted) suggests routing discovery is more consistent than expected in the mini-budget regime.",
+    "applicability_bounds": "Specific to the A100-SXM rate=200 crossover regime where routing sensitivity is highest. Phase 2 adds 0.002-0.71% improvement — within 1% tolerance but not meaningless for seeds 44-46. On single-instance regimes (TP=8/1inst winners), Phase 2 routing trials are degenerate. Mini Phase 2 budget of 10 is sufficient for routing discovery at this specific regime.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-20",
+    "statement": "Lean bracket (TP={4,8} max-profile, budget=2) is robust to BLIS workload variation across seeds on H100 qwen3-14b rate=500: 25/25 (blis_seed × search_seed) combinations achieve evals_to_best=1 and pass the 1% threshold. TP=4/2inst wins on all 25 combinations. Fitness scores vary by workload seed (range 0.178-0.188), with seeds 43, 45, 46 exceeding the seed=42 reference (0.179282) by up to 5.1%. Search seeds within each blis_seed produce identical results.",
+    "confidence": "high",
+    "regime": "H100, qwen3-14b, rate=500, 1000 requests, 5 blis_seeds (42-46) × 5 search_seeds (42-46)",
+    "evidence": ["iteration-7-h-robustness", "iteration-6-h-robustness", "iteration-3-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 7,
+    "mechanism": "Lean bracket is deterministic (no RNG source: fixed max-profile, fixed TP evaluation order, no Phase 2). The only source of variation is the workload seed, which affects request arrival patterns and token lengths. Different workload realizations produce fitness scores in a 0.178-0.188 range, all well above the 1% threshold. The consistent TP=4 winner across all workload seeds confirms TP=4's structural bandwidth advantage at rate=500 is not fragile to workload variation.",
+    "applicability_bounds": "Extends RP-20 (A100-SXM robustness) to H100 with lean bracket. The per-seed fitness variation (0.178-0.188) means the single GLOBAL_BEST_TABLE reference (0.179282 for seed=42) is approximately correct but not exact for other seeds. For rigorous robustness analysis, per-seed global bests should be computed independently.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  }
+]

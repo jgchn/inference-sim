@@ -1,0 +1,11 @@
+{
+  "gate_type": "findings",
+  "summary": "Iteration 4 tested NSGA-II vs random search on a reduced parameter space (900 configs) and compared against the full space. The main convergence advantage of NSGA-II was confirmed (47-eval gap to 95% HV), but the critical surprise was that the reduced space itself was flawed: block_size=32 (excluded as 'non-differentiating') actually doubles effective KV token capacity at high TP, causing full-space NSGA-II to exceed the reduced-space exhaustive Pareto front by 10.4%.",
+  "key_points": [
+    "Robustness arm: Pareto density was 26.4% (238/900 non-dominated), slightly above the predicted 8-25% range, spanning all 4 GPU tiers with genuine within-tier tradeoffs confirmed.",
+    "Main arm (partially confirmed): NSGA-II reached 95% of exhaustive HV at eval=117 vs random at eval=164 (47-eval gap). At eval=80: NSGA-II=91.2% (predicted \u226593%), random=88.6% (predicted \u226488%). Final NSGA-II HV=97.8% of exhaustive at 200 evals.",
+    "Ablation arm (REFUTED): Full-space NSGA-II achieved HV=5.85e10, exceeding the reduced-space exhaustive front (5.30e10) by 10.4%. Root cause: block_size_in_tokens=32 eliminates preemptions at tp=8 (107\u21920 preemptions, ttft_p99 2323ms\u219225ms) because total KV capacity = blocks \u00d7 block_size (96k vs 48k tokens at kv=3000).",
+    "Key lesson: block_size_in_tokens is a critical parameter for high-TP configurations and must remain in the search space. The earlier probing at tp=2 missed this regime-dependent interaction.",
+    "Control arm (confirmed): Random search reached 95% at eval=164 (predicted \u2265160), final HV=96.1% of exhaustive, validating it as appropriate baseline."
+  ]
+}

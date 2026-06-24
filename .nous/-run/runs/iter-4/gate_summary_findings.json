@@ -1,0 +1,11 @@
+{
+  "gate_type": "findings",
+  "summary": "Iteration 4 tested the Bracket K=1 search strategy on A100-SXM hardware with qwen3-14b (a tight 1.07% TP margin regime). Three of four arms confirmed predictions: Bracket reliably identifies TP=4/2-instance as the optimal hardware partition in exactly 3 evaluations across all 25 seed combinations. The one partial miss was overestimating how badly flat TPE would struggle at this tight margin.",
+  "key_points": [
+    "h-main CONFIRMED: Bracket K=1 achieves evals_to_best=3 deterministically on all 5 search seeds for A100-SXM qwen3-14b (blis_seed=42). Phase 1 scores exactly match predictions (TP4=0.13829 > TP8=0.13681). Phase 2 adds 0.38% improvement via round-robin routing in 4/5 seeds.",
+    "h-robustness CONFIRMED: Perfect 25/25 correct Phase 1 identification (TP4/2inst) across all blis_seed \u00d7 search_seed combinations, all with evals_to_best=3. This confirms Phase 1 is fully deterministic per blis_seed regardless of search_seed (RP-9).",
+    "h-ablation PARTIALLY CONFIRMED (magnitude error): Predicted flat TPE would mostly fail (\u22642/5 exact best, median evals_to_best >50) at the 1.07% margin. Actual: all 5/5 seeds pass the within-1% threshold, median evals_to_best=26. Bracket is still 8.7\u00d7 faster (3 vs 26 evals), but the failure regime predicted from L40S data does not transfer to A100-SXM.",
+    "h-control-negative CONFIRMED: At the wider 4.47% margin (blis_seed=46), flat TPE converges much faster \u2014 5/5 within-threshold, median evals_to_best=6. This proves margin width causally affects TPE convergence speed within the same hardware.",
+    "Key new insight: The TPE failure boundary from RP-22 ([2.1%, 5.1%] margin) is hardware/model-specific, not universal. A100-SXM qwen's fitness landscape has more above-threshold configurations than L40S llama, making TPE more robust even at tight margins. Cross-hardware generalization of failure bounds requires landscape density analysis, not just margin width."
+  ]
+}

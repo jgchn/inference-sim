@@ -1,0 +1,148 @@
+metadata:
+  iteration: 10
+  bundle_ref: "runs/iter-10/bundle.yaml"
+  description: "Workload-shape sensitivity of lean bracket. Tests lean bracket (TP={4,8}, max-profile, budget=2) across 4 workload presets x 2 rates on H100 and A100-SXM. Also tests model-aware formula failure on workload-shifted regimes."
+
+setup:
+  - cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && go build -o blis main.go"
+    description: "Build the system"
+  - cmd: "cp /Users/jchen/go/src/inference-sim/inference-sim/search_blis_iter8.py /tmp/search_blis_iter10.py"
+    description: "Copy iter8 script as base (search_blis_iter10.py already created in-place)"
+
+# ── Arm h-main: Lean bracket across 4 workload presets x 2 rates on H100 ──────────────────
+arms:
+  - arm_id: "h-main"
+    conditions:
+      - name: "h100-chatbot-rate100"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2 --hardware H100 --budget 2 --seeds 42,43,44,45,46 --rate 100 --num-requests 1000 --model qwen/qwen3-14b --workload chatbot --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-main/h100-chatbot-rate100.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-main/h100-chatbot-rate100.json"
+
+      - name: "h100-chatbot-rate500"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2 --hardware H100 --budget 2 --seeds 42,43,44,45,46 --rate 500 --num-requests 1000 --model qwen/qwen3-14b --workload chatbot --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-main/h100-chatbot-rate500.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-main/h100-chatbot-rate500.json"
+
+      - name: "h100-contentgen-rate100"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2 --hardware H100 --budget 2 --seeds 42,43,44,45,46 --rate 100 --num-requests 1000 --model qwen/qwen3-14b --workload contentgen --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-main/h100-contentgen-rate100.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-main/h100-contentgen-rate100.json"
+
+      - name: "h100-contentgen-rate500"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2 --hardware H100 --budget 2 --seeds 42,43,44,45,46 --rate 500 --num-requests 1000 --model qwen/qwen3-14b --workload contentgen --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-main/h100-contentgen-rate500.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-main/h100-contentgen-rate500.json"
+
+      - name: "h100-summarization-rate100"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2 --hardware H100 --budget 2 --seeds 42,43,44,45,46 --rate 100 --num-requests 1000 --model qwen/qwen3-14b --workload summarization --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-main/h100-summarization-rate100.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-main/h100-summarization-rate100.json"
+
+      - name: "h100-summarization-rate500"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2 --hardware H100 --budget 2 --seeds 42,43,44,45,46 --rate 500 --num-requests 1000 --model qwen/qwen3-14b --workload summarization --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-main/h100-summarization-rate500.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-main/h100-summarization-rate500.json"
+
+      - name: "h100-multidoc-rate100"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2 --hardware H100 --budget 2 --seeds 42,43,44,45,46 --rate 100 --num-requests 1000 --model qwen/qwen3-14b --workload multidoc --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-main/h100-multidoc-rate100.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-main/h100-multidoc-rate100.json"
+
+      - name: "h100-multidoc-rate500"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2 --hardware H100 --budget 2 --seeds 42,43,44,45,46 --rate 500 --num-requests 1000 --model qwen/qwen3-14b --workload multidoc --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-main/h100-multidoc-rate500.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-main/h100-multidoc-rate500.json"
+
+# ── Arm h-control-negative: Model-aware formula on workload presets ─────────────────────
+  - arm_id: "h-control-negative"
+    conditions:
+      - name: "h100-chatbot-rate100-predict"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy model-aware-predict --hardware H100 --rate 100 --num-requests 1000 --model qwen/qwen3-14b --workload chatbot --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/h100-chatbot-rate100.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/h100-chatbot-rate100.json"
+
+      - name: "h100-chatbot-rate500-predict"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy model-aware-predict --hardware H100 --rate 500 --num-requests 1000 --model qwen/qwen3-14b --workload chatbot --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/h100-chatbot-rate500.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/h100-chatbot-rate500.json"
+
+      - name: "h100-contentgen-rate100-predict"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy model-aware-predict --hardware H100 --rate 100 --num-requests 1000 --model qwen/qwen3-14b --workload contentgen --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/h100-contentgen-rate100.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/h100-contentgen-rate100.json"
+
+      - name: "h100-contentgen-rate500-predict"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy model-aware-predict --hardware H100 --rate 500 --num-requests 1000 --model qwen/qwen3-14b --workload contentgen --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/h100-contentgen-rate500.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/h100-contentgen-rate500.json"
+
+      - name: "h100-summarization-rate100-predict"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy model-aware-predict --hardware H100 --rate 100 --num-requests 1000 --model qwen/qwen3-14b --workload summarization --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/h100-summarization-rate100.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/h100-summarization-rate100.json"
+
+      - name: "h100-summarization-rate500-predict"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy model-aware-predict --hardware H100 --rate 500 --num-requests 1000 --model qwen/qwen3-14b --workload summarization --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/h100-summarization-rate500.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/h100-summarization-rate500.json"
+
+      - name: "h100-multidoc-rate100-predict"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy model-aware-predict --hardware H100 --rate 100 --num-requests 1000 --model qwen/qwen3-14b --workload multidoc --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/h100-multidoc-rate100.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/h100-multidoc-rate100.json"
+
+      - name: "h100-multidoc-rate500-predict"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy model-aware-predict --hardware H100 --rate 500 --num-requests 1000 --model qwen/qwen3-14b --workload multidoc --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/h100-multidoc-rate500.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/h100-multidoc-rate500.json"
+
+      - name: "a100-chatbot-rate100-predict"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy model-aware-predict --hardware A100-SXM --rate 100 --num-requests 1000 --model qwen/qwen3-14b --workload chatbot --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/a100-chatbot-rate100.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/a100-chatbot-rate100.json"
+
+      - name: "a100-chatbot-rate500-predict"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy model-aware-predict --hardware A100-SXM --rate 500 --num-requests 1000 --model qwen/qwen3-14b --workload chatbot --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/a100-chatbot-rate500.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/a100-chatbot-rate500.json"
+
+      - name: "a100-contentgen-rate100-predict"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy model-aware-predict --hardware A100-SXM --rate 100 --num-requests 1000 --model qwen/qwen3-14b --workload contentgen --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/a100-contentgen-rate100.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/a100-contentgen-rate100.json"
+
+      - name: "a100-contentgen-rate500-predict"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy model-aware-predict --hardware A100-SXM --rate 500 --num-requests 1000 --model qwen/qwen3-14b --workload contentgen --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/a100-contentgen-rate500.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/a100-contentgen-rate500.json"
+
+      - name: "a100-summarization-rate100-predict"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy model-aware-predict --hardware A100-SXM --rate 100 --num-requests 1000 --model qwen/qwen3-14b --workload summarization --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/a100-summarization-rate100.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/a100-summarization-rate100.json"
+
+      - name: "a100-summarization-rate500-predict"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy model-aware-predict --hardware A100-SXM --rate 500 --num-requests 1000 --model qwen/qwen3-14b --workload summarization --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/a100-summarization-rate500.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/a100-summarization-rate500.json"
+
+      - name: "a100-multidoc-rate100-predict"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy model-aware-predict --hardware A100-SXM --rate 100 --num-requests 1000 --model qwen/qwen3-14b --workload multidoc --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/a100-multidoc-rate100.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/a100-multidoc-rate100.json"
+
+      - name: "a100-multidoc-rate500-predict"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy model-aware-predict --hardware A100-SXM --rate 500 --num-requests 1000 --model qwen/qwen3-14b --workload multidoc --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/a100-multidoc-rate500.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-control-negative/a100-multidoc-rate500.json"
+
+# ── Arm h-robustness: Lean bracket on A100-SXM workload presets ─────────────────────────
+  - arm_id: "h-robustness"
+    conditions:
+      - name: "a100-chatbot-rate100"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2 --hardware A100-SXM --budget 2 --seeds 42,43,44,45,46 --rate 100 --num-requests 1000 --model qwen/qwen3-14b --workload chatbot --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-robustness/a100-chatbot-rate100.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-robustness/a100-chatbot-rate100.json"
+
+      - name: "a100-chatbot-rate500"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2 --hardware A100-SXM --budget 2 --seeds 42,43,44,45,46 --rate 500 --num-requests 1000 --model qwen/qwen3-14b --workload chatbot --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-robustness/a100-chatbot-rate500.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-robustness/a100-chatbot-rate500.json"
+
+      - name: "a100-contentgen-rate100"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2 --hardware A100-SXM --budget 2 --seeds 42,43,44,45,46 --rate 100 --num-requests 1000 --model qwen/qwen3-14b --workload contentgen --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-robustness/a100-contentgen-rate100.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-robustness/a100-contentgen-rate100.json"
+
+      - name: "a100-contentgen-rate500"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2 --hardware A100-SXM --budget 2 --seeds 42,43,44,45,46 --rate 500 --num-requests 1000 --model qwen/qwen3-14b --workload contentgen --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-robustness/a100-contentgen-rate500.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-robustness/a100-contentgen-rate500.json"
+
+      - name: "a100-summarization-rate100"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2 --hardware A100-SXM --budget 2 --seeds 42,43,44,45,46 --rate 100 --num-requests 1000 --model qwen/qwen3-14b --workload summarization --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-robustness/a100-summarization-rate100.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-robustness/a100-summarization-rate100.json"
+
+      - name: "a100-summarization-rate500"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2 --hardware A100-SXM --budget 2 --seeds 42,43,44,45,46 --rate 500 --num-requests 1000 --model qwen/qwen3-14b --workload summarization --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-robustness/a100-summarization-rate500.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-robustness/a100-summarization-rate500.json"
+
+      - name: "a100-multidoc-rate100"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2 --hardware A100-SXM --budget 2 --seeds 42,43,44,45,46 --rate 100 --num-requests 1000 --model qwen/qwen3-14b --workload multidoc --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-robustness/a100-multidoc-rate100.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-robustness/a100-multidoc-rate100.json"
+
+      - name: "a100-multidoc-rate500"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter10.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2 --hardware A100-SXM --budget 2 --seeds 42,43,44,45,46 --rate 500 --num-requests 1000 --model qwen/qwen3-14b --workload multidoc --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-robustness/a100-multidoc-rate500.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-10/results/h-robustness/a100-multidoc-rate500.json"

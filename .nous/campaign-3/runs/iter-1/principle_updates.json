@@ -1,0 +1,44 @@
+[
+  {
+    "id": "RP-1",
+    "statement": "Multi-objective search algorithm comparison (NSGA-II vs random) requires a non-trivial Pareto frontier: when the workload rate is below saturation for most candidate configurations, the objective space collapses to a single dominant point and all search algorithms perform identically.",
+    "confidence": "high",
+    "regime": "BLIS with rate=20 req/s, model=qwen/qwen3-14b, hardware=H100, num_requests=100. Likely generalizes to any regime where >15% of the configuration space achieves near-identical optimal metrics.",
+    "evidence": ["iteration-1-h-main", "iteration-1-h-control-negative", "iteration-1-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 1,
+    "mechanism": "At rate=20 req/s with 8 H100 GPUs available, most configurations with TP>=2 and 2+ instances are unsaturated (completion time is dominated by token generation, not queueing). All unsaturated configs produce the same per-simulation metrics (rps=12.5002, ttft_p99=22.73ms) because BLIS's physics model yields identical latency profiles when queueing delay is zero. ~24% of randomly sampled configs hit this ceiling, so any method finds the optimum within its first few samples. NSGA-II's generation-over-generation HV was flat at 249720.535 from gen 0 through gen 10, confirming selection pressure never engaged.",
+    "applicability_bounds": "Applies when workload rate << saturation capacity for the majority of configurations in the search space. Does NOT apply when rate approaches or exceeds saturation — in that regime, TP/instance tradeoffs create genuine latency-throughput tension. To trigger meaningful multi-objective tradeoffs in BLIS, use rate >= saturation threshold for the baseline config (estimated rate=80-150 req/s for qwen/qwen3-14b on H100 at TP=2).",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-2",
+    "statement": "Before running a search algorithm comparison experiment on BLIS, validate objective diversity by running a small probe sample (10-20 configs) and verifying that the optimal metric values differ by >5x across configs. If all configs achieve similar metrics, the arrival rate is too low.",
+    "confidence": "high",
+    "regime": "Any BLIS multi-objective search experiment comparing search algorithms.",
+    "evidence": ["iteration-1-h-main"],
+    "contradicts": [],
+    "extraction_iteration": 1,
+    "mechanism": "The handoff snapshot noted the objective range as 'throughput 2.92-10.27 rps, TTFT P99 25.3-16,266ms' (measured via targeted worst/best configs), which correctly indicated diversity existed. However, the achievable optimum (rps=12.50) was above this estimated maximum, and a large fraction of the space reaches this ceiling. A probe sample measuring the fraction of configs at the optimum would have revealed the degenerate structure before committing 1500 evaluations to the comparison.",
+    "applicability_bounds": "Applies to all BLIS search experiments. The 5x diversity threshold is a heuristic; adjust based on experimental goals.",
+    "superseded_by": null,
+    "category": "process",
+    "status": "active"
+  },
+  {
+    "id": "RP-3",
+    "statement": "In BLIS at rate=20 req/s with qwen/qwen3-14b on H100, the saturation threshold is approximately TP=1, num_instances=1 (single GPU). Configs with TP*instances>=2 are typically unsaturated and produce identical metrics. The effective search space for latency-throughput tradeoffs requires a rate where even TP=2, num_instances=2 configs are partially saturated.",
+    "confidence": "medium",
+    "regime": "qwen/qwen3-14b, hardware=H100, num_requests=100, rate=20 req/s",
+    "evidence": ["iteration-1-h-control-negative"],
+    "contradicts": [],
+    "extraction_iteration": 1,
+    "mechanism": "Random search at 500 evals found 102/429 evaluated configs at the optimum (rps=12.5002, ttft_p99=22.73ms). The configs that did NOT reach this optimum were predominantly TP=1, num_instances=1 (single GPU, max 8 GPU capacity used). At rate=20 with 100 requests and ~52ms/request simulation, a single TP=1 instance saturates at ~19 req/s, causing queueing. Multi-GPU configs have headroom. Iteration 2 should set rate=80-150 req/s to push TP=4 configs toward saturation.",
+    "applicability_bounds": "Specific to qwen/qwen3-14b on H100 at rate=20. Other models (smaller or larger), hardware (A100, L40S), or higher rates will have different saturation thresholds.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  }
+]

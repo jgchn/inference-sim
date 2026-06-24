@@ -1,0 +1,41 @@
+{
+  "iteration": 4,
+  "bundle_ref": "runs/iter-4/bundle.yaml",
+  "arms": [
+    {
+      "arm_type": "h-main",
+      "predicted": "Lean Phase 1 (batch=128) correctly identifies TP=4/2 on H100 rate=5000 across all seeds. TPE Phase 2 reaches 95% of within-tier optimal (0.95 * 0.176474 = 0.1676) in <=20 evals across all 3 seeds.",
+      "observed": "Lean Phase 1 correctly identifies TP=4/2 on H100 rate=5000 for ALL 3 seeds (42, 123, 456). Phase 1 scores: TP=4/2 wins with margin 0.8-1.0% over TP=2/4. TPE Phase 2 reaches 95% in 2-3 evals (seed=42: 2, seed=123: 3, seed=456: 3). Final best scores: seed=42: 0.176474 (matches reference), seed=123: 0.178190 (exceeds reference), seed=456: 0.178597 (exceeds reference). Total evals per seed: 50.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "TPE convergence was dramatically faster than predicted (2-3 evals vs <=20 predicted). TPE effectively discovers batch=512 as the dominant Phase 2 lever within the first few startup trials. Final scores matched or exceeded reference (reference was measured at one specific secondary config; TPE found slightly better secondary configs for seeds 123/456)."
+    },
+    {
+      "arm_type": "h-control-negative",
+      "predicted": "Lean Phase 1 identifies TP=2/4 instead of correct TP=8/1 on H100 rate=500. Phase 2 within TP=2/4 cannot recover (deficit >=20% regardless of budget). Maximum achievable score within TP=2/4 is 0.1228.",
+      "observed": "Lean Phase 1 ALWAYS picks the wrong tier (never selects TP=8/1) but the wrong tier varies by seed: seed=42 picks TP=2/4 (TP=2/4=0.122819 vs TP=4/2=0.122622, margin 0.0002), seeds 123 and 456 pick TP=4/2 (TP=4/2 scores 0.127360, 0.125299 vs TP=2/4 scores 0.123562, 0.121017). Phase 2 results: seed=42: best=0.123127, deficit=24.2% (UNRECOVERABLE, TP=2/4 not batch-sensitive). seed=123: best=0.154561, deficit=4.8% (TP=4/2 IS batch-sensitive at rate=500). seed=456: best=0.148946, deficit=8.3%. Reference score was 0.162349 (TP=8/1 batch=512).",
+      "status": "PARTIALLY_CONFIRMED",
+      "error_type": "magnitude",
+      "diagnostic_note": "Direction confirmed: lean Phase 1 is ALWAYS wrong at H100 rate=500 (0/3 seeds correct). But the mechanism and deficit magnitude depend on WHICH wrong tier is selected. When TP=2/4 wins (seed=42), the deficit IS >=20% (24.2%) because TP=2/4 is unsaturated and shows zero batch sensitivity — exactly as predicted. When TP=4/2 wins (seeds 123,456), the deficit is only 4-8% because TP=4/2 IS partially saturated at 250 req/s/instance and Phase 2 can discover batch=512 to partially recover. The seed=42 vs seeds 123,456 split occurs because the TP=2/4 vs TP=4/2 margin at batch=128 is tiny (~0.0002 for seed=42) and seed variation flips it. Key insight: at rate=500 H100, the lean Phase 1 winner is NOT deterministic across seeds — it depends on the workload distribution's effect on the 0.2% score difference between TP=2/4 and TP=4/2."
+    },
+    {
+      "arm_type": "h-ablation",
+      "predicted": "LHS Phase 2 requires more evaluations than TPE to reach 95% of within-tier optimal in at least 2/3 seeds.",
+      "observed": "TPE Phase 2 evals_to_95pct: seed=42: 2, seed=123: 3, seed=456: 3. LHS Phase 2 evals_to_95pct: seed=42: 16, seed=123: 6, seed=456: 5. TPE is faster than LHS in ALL 3 seeds. Final best scores comparable: TPE=(0.176474, 0.178190, 0.178597), LHS=(0.176094, 0.178704, 0.178597). LHS seed=42 did not reach reference (0.176094 < 0.176474) within 46 evals.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "TPE advantage is strongest for seed=42 (TPE=2 vs LHS=16), moderate for seeds 123 and 456 (3 vs 5-6). TPE's surrogate model correctly learns the monotone batch->fitness relationship quickly: after 5 startup trials, it concentrates on batch=512 combinations. LHS samples uniformly across all 8 dimensions, only hitting batch=512 ~20% of the time (1/5 probability per sample), causing slower convergence. Final quality is similar (both reach near or above reference) but TPE gets there much faster."
+    },
+    {
+      "arm_type": "h-robustness",
+      "predicted": "Standard Phase 1 (batch=512) identifies correct optimal tier across ALL 6 conditions x 3 seeds (100% accuracy). Lean Phase 1 fails in >=2 conditions. Tier identification is deterministic across seeds for both strategies.",
+      "observed": "Standard Phase 1 (batch=512) results: H100 all 9 combos (rate=500,2000,5000 x seeds 42,123,456): 100% CORRECT. A100-SXM rate=500 all 3 seeds: CORRECT. A100-SXM rate=2000: seeds 42,123 CORRECT (TP=8/1 wins), seed=456 WRONG (TP=4/2=0.139261 > TP=8/1=0.137939, margin 1.0%). A100-SXM rate=5000: seeds 42,123 CORRECT, seed=456 borderline (TP=4/2=0.138126 vs TP=8/1=0.137957, gap 0.1%). Standard Phase 1 is 16/18 correct overall. Lean Phase 1 failures: H100 rate=500 (3/3 seeds wrong), A100-SXM rate=2000 (3/3 seeds wrong), A100-SXM rate=5000 (3/3 seeds wrong), A100-SXM rate=500 (2/3 seeds wrong). Lean Phase 1 fails in 4 of 6 conditions. Tier ranking IS deterministic within same seed+condition (verified: H100 rate=5000 phase1 scores identical between h-robustness and h-main for same seeds).",
+      "status": "PARTIALLY_CONFIRMED",
+      "error_type": "regime",
+      "diagnostic_note": "Standard Phase 1 universality fails at A100-SXM rate>=2000 when workload seed is 456. The TP=4/2 vs TP=8/1 competition on A100-SXM is a genuine tie zone (gap <1% at seed=456) — both tiers are near-optimal. The reference optima were measured at seed=42 only; seed=456 workload distribution shifts the balance toward TP=4/2. This is NOT a Phase 1 algorithm failure — it reflects genuine tie-zone ambiguity in the A100-SXM tier ranking. The prediction 'standard Phase 1 is universally correct' was based on single-seed probes; multi-seed data reveals the A100-SXM tier competition is seed-sensitive. Lean Phase 1 failures confirmed in 4/6 conditions as predicted (>=2)."
+    }
+  ],
+  "experiment_valid": true,
+  "discrepancy_analysis": "h-main fully confirmed with faster-than-expected TPE convergence (2-3 evals vs predicted <=20). h-control-negative partially confirmed: lean Phase 1 is always wrong at H100 rate=500, but the wrong tier varies by seed (TP=2/4 for seed=42 gives 24% unrecoverable deficit; TP=4/2 for seeds 123,456 gives only 4-8% deficit because TP=4/2 is batch-sensitive). h-ablation confirmed: TPE consistently faster than LHS (2-3x speedup). h-robustness partially confirmed: standard Phase 1 is 16/18 correct but fails on A100-SXM at seed=456 where TP=4/2 and TP=8/1 are within 0.1-1.0% (genuine tie zone). New finding: A100-SXM tier competition between TP=4/2 and TP=8/1 is seed-sensitive at rates >=2000, with the margin too small to reliably distinguish without seed averaging.",
+  "dominant_component_pct": 99.0
+}

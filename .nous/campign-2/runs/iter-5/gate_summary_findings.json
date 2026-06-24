@@ -1,0 +1,11 @@
+{
+  "gate_type": "findings",
+  "summary": "The main hypothesis \u2014 that reducing batch size from 512 to 128 while extending simulation length to nreq=2000 would produce equivalent Phase 1 tier rankings \u2014 is refuted (33% agreement vs predicted 89%). However, the underlying mechanisms are now well-characterized: nreq controls the TP=8/1 transient artifact (confirmed), while batch size independently controls the TP=4/2 vs TP=2/4 ranking via effective cluster capacity.",
+  "key_points": [
+    "MAIN (REFUTED): Lean Phase 1 (batch=128, nreq=2000) agreed with standard Phase 1 (batch=512) in only 6/18 conditions (33%), far below the 89% threshold. Root cause: at batch=128, TP=2/4 gets 4\u00d7128=512 effective batch capacity vs TP=4/2's 2\u00d7128=256, a genuine steady-state advantage \u2014 not a transient artifact.",
+    "CONTROL-NEGATIVE (CONFIRMED): At nreq=250, TP=8/1 wins 18/18 conditions with batch=512 (100% disagreement with nreq=2000 reference), strongly confirming the short-simulation transient artifact mechanism.",
+    "ROBUSTNESS (CONFIRMED): The TP=8/1 \u2192 TP=4/2 transition occurs at nreq=750 (within predicted 500-1000 range) with exactly the predicted 2% tie-zone margin, and TP=4/2 dominance grows monotonically beyond nreq=1000.",
+    "ABLATION (PARTIAL): nreq is dominant for TP=8/1 vs multi-instance boundary (confirmed), but batch size has a second independent effect determining WHICH multi-instance tier wins \u2014 the prediction overstated their equivalence at nreq=2000.",
+    "Key implication: The batch=512 requirement for Phase 1 tier selection cannot be relaxed. Batch size affects steady-state rankings (not just transients) because effective cluster capacity = instances \u00d7 per-instance batch limit, which gates throughput when queue pressure is moderate."
+  ]
+}

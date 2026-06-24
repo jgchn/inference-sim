@@ -1,0 +1,11 @@
+{
+  "gate_type": "findings",
+  "summary": "NSGA-II provides a real but smaller-than-predicted advantage over random search in the 4-objective BLIS space. The convergence speed prediction was off by one generation (95% HV at eval=120, not eval=80), and the Pareto solution count advantage at eval=80 was only 10.5% vs the predicted 30%. However, NSGA-II achieves +4.4% better final hypervolume and 2\u00d7 more Pareto-optimal solutions by eval=200, confirming a genuine quality advantage.",
+  "key_points": [
+    "Main hypothesis PARTIALLY CONFIRMED: NSGA-II reaches 95% of final HV at eval=120 (predicted eval=80); random reaches 95% on shared reference at eval=160 \u2014 a real 40-eval gap exists but is shifted later than predicted",
+    "Final quality advantage is real: NSGA-II HV = 5.81e+10 vs random HV = 5.56e+10 (+4.4%), with 46 vs 23 Pareto solutions at eval=200",
+    "3-objective robustness arm CONFIRMED: 100% of final HV reached at eval=40 (even easier than predicted 95%), with Pareto density of 65% confirming the problem is trivially easy without the kv_blocks objective",
+    "Adding kv_blocks as a 4th objective genuinely increases difficulty (Pareto density drops from 65% to 12-23%), but 200 evals is still sufficient for random search to cover most key configurations, limiting NSGA-II's speed advantage",
+    "Non-differentiating parameters (routing, block_size, gpu_mem) dilute NSGA-II's crossover effectiveness \u2014 the algorithm's advantage manifests more as final quality than early convergence speed"
+  ]
+}

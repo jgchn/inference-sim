@@ -1,0 +1,79 @@
+{
+  "config": {
+    "budget": 100,
+    "seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "blis_seed": 42,
+    "num_requests": 1000,
+    "rate": 100.0,
+    "model": "qwen/qwen3-14b",
+    "hardware": "A100-SXM",
+    "workload": "chatbot",
+    "global_best": 0.193078,
+    "phase1_k": 3,
+    "phase1_profiles": "strategic",
+    "tp_candidates": "all",
+    "skip_phase2": false
+  },
+  "runs": [
+    {
+      "strategy": "model-aware-predict",
+      "hardware": "A100-SXM",
+      "hw_bandwidth_TBs": 2.039,
+      "load_index": 6.866110838646395,
+      "load_index_threshold": 12.0,
+      "no_crossover_regime": false,
+      "crossover_rate": 196.174595389897,
+      "predicted_tp": 8,
+      "predicted_instances": 1,
+      "score": 0.193078,
+      "global_best": 0.193078,
+      "threshold": 0.19114722,
+      "formula_correct": true,
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_running": 512,
+        "max_tokens": 8192,
+        "prefill_threshold": 4096,
+        "block_size": 16,
+        "routing": "round-robin",
+        "admission": "always-admit",
+        "preemption": "fcfs"
+      },
+      "wall_time_s": 0.36834624999028165,
+      "evaluations": [
+        {
+          "eval_idx": 0,
+          "score": 0.193078,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 512,
+            "max_tokens": 8192,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.3680648339941399,
+          "best_so_far": 0.193078
+        }
+      ],
+      "wall_time_total_s": 0.36838520799938124,
+      "n_evaluations": 1,
+      "search_seed": 42,
+      "best_score": 0.193078,
+      "evals_to_best": 1
+    }
+  ],
+  "total_wall_time_s": 0.3688860830006888
+}

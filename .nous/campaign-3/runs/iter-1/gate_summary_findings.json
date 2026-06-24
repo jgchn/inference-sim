@@ -1,0 +1,10 @@
+{
+  "gate_type": "findings",
+  "summary": "All three hypotheses were refuted: NSGA-II, random search, and LHS all achieved identical hypervolume (249,720.535) because the workload regime (rate=20 req/s, 100 requests) produced a degenerate single-point Pareto frontier reachable by ~24% of configurations. The experiment was valid but tested in a regime where search algorithm comparison is meaningless.",
+  "key_points": [
+    "NSGA-II (558 evals) showed zero improvement over its initial random population \u2014 generation-by-generation hypervolume was flat at 249,720.535 across all 10 generations, matching random search's result from eval #1.",
+    "The root cause is a degenerate objective space: ~24% of the 429 unique configurations hit the identical optimal point (rps=12.5002, ttft_p99=22.73ms), meaning any method finds it almost immediately. Configs are binary \u2014 either saturated or all producing the same ceiling metrics.",
+    "The experiment is valid as a regime characterization but fails to test the core hypothesis about selection pressure vs. random exploration. A higher arrival rate (80-150 req/s) is needed to create genuine throughput-vs-latency tradeoffs where a multi-point Pareto frontier emerges.",
+    "Key learning: at low load (rate=20 req/s on H100 for Qwen3-14B), the system is capacity-unconstrained for most configurations with TP\u22652, making optimization unnecessary \u2014 any reasonable config suffices."
+  ]
+}

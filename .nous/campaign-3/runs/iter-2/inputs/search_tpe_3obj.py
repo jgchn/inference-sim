@@ -1,0 +1,280 @@
+"""
+Multi-objective TPE search over BLIS 3-objective space using Optuna.
+Arm: h-robustness
+
+550 sequential evaluations with Optuna TPESampler (multi-objective mode).
+Objectives (all minimize):
+  obj0 = -responses_per_sec
+  obj1 = ttft_p99_ms
+  obj2 = gpu_count = tp * num_instances
+
+Reference point: (0, 40000, 9)
+HV tracked every 50 evaluations.
+"""
+
+import json
+import logging
+import os
+import subprocess
+import sys
+import tempfile
+import time
+
+import optuna
+from optuna.samplers import TPESampler
+
+optuna.logging.set_verbosity(optuna.logging.WARNING)
+
+BLIS = "/Users/jchen/go/src/inference-sim/inference-sim/blis"
+OUT_DIR = "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-2/results/h-robustness"
+REF = (0.0, 40000.0, 9.0)
+
+TP_VALUES = [1, 2, 4, 8]
+SCHEDULER_VALUES = ["fcfs", "priority-fcfs", "sjf", "reverse-priority"]
+MAX_RUNNING_VALUES = [32, 64, 128, 256, 512]
+MAX_TOKENS_VALUES = [2048, 4096, 8192]
+PREFILL_THRESHOLD_VALUES = [0, 1024, 2048, 4096]
+BLOCK_SIZE_VALUES = [16, 32]
+ROUTING_POLICY_VALUES = ["round-robin", "least-loaded", "weighted"]
+ROUTING_SCORER_CONFIGS = [
+    "precise-prefix-cache:2,queue-depth:1,kv-utilization:1",
+    "queue-depth:1,kv-utilization:1",
+    "precise-prefix-cache:2,load-balance:1",
+    "load-balance:1,kv-utilization:1",
+]
+ADMISSION_POLICY_VALUES = ["always-admit", "tier-shed"]
+PREEMPTION_POLICY_VALUES = ["fcfs", "priority"]
+GPU_MEM_UTIL_VALUES = [0.85, 0.9, 0.95]
+
+
+def build_cmd(config, metrics_path):
+    cmd = [
+        BLIS, "run",
+        "--model", "qwen/qwen3-14b",
+        "--hardware", "H100",
+        "--latency-model", "trained-physics",
+        "--num-requests", "500",
+        "--rate", "50",
+        "--seed", "42",
+        "--tp", str(config["tp"]),
+        "--num-instances", str(config["num_instances"]),
+        "--scheduler", config["scheduler"],
+        "--max-num-running-reqs", str(config["max_num_running_reqs"]),
+        "--max-num-scheduled-tokens", str(config["max_num_scheduled_tokens"]),
+        "--long-prefill-token-threshold", str(config["long_prefill_token_threshold"]),
+        "--block-size-in-tokens", str(config["block_size_in_tokens"]),
+        "--preemption-policy", config["preemption_policy"],
+        "--gpu-memory-utilization", str(config["gpu_memory_utilization"]),
+        "--metrics-path", metrics_path,
+    ]
+    if config["num_instances"] > 1:
+        cmd += ["--routing-policy", config["routing_policy"]]
+        cmd += ["--admission-policy", config["admission_policy"]]
+        if config["routing_policy"] == "weighted" and config.get("routing_scorers"):
+            cmd += ["--routing-scorers", config["routing_scorers"]]
+    return cmd
+
+
+def evaluate(config):
+    fd, path = tempfile.mkstemp(suffix=".json", dir=os.environ.get("TMPDIR", "/tmp"))
+    os.close(fd)
+    try:
+        cmd = build_cmd(config, path)
+        result = subprocess.run(cmd, capture_output=True, timeout=60)
+        if result.returncode != 0:
+            return None
+        with open(path) as f:
+            m = json.load(f)
+        rps = float(m["responses_per_sec"])
+        ttft = float(m["ttft_p99_ms"])
+        gpu = config["tp"] * config["num_instances"]
+        return (-rps, ttft, float(gpu))
+    except Exception:
+        return None
+    finally:
+        try:
+            os.unlink(path)
+        except OSError:
+            pass
+
+
+# --- HV helpers ---
+
+def pareto_front_2d(points):
+    nd = []
+    for p in points:
+        dominated = False
+        to_remove = []
+        for i, q in enumerate(nd):
+            q_dom_p = (q[0] <= p[0] and q[1] <= p[1]) and (q[0] < p[0] or q[1] < p[1])
+            p_dom_q = (p[0] <= q[0] and p[1] <= q[1]) and (p[0] < q[0] or p[1] < q[1])
+            if q_dom_p:
+                dominated = True
+                break
+            if p_dom_q:
+                to_remove.append(i)
+        if not dominated:
+            nd = [q for i, q in enumerate(nd) if i not in set(to_remove)]
+            nd.append(p)
+    return nd
+
+
+def hv_2d(points_2d, ref2d):
+    nd = pareto_front_2d(points_2d)
+    if not nd:
+        return 0.0
+    nd.sort(key=lambda p: p[0])
+    hv = 0.0
+    for i, p in enumerate(nd):
+        if p[1] >= ref2d[1]:
+            continue
+        next_x = nd[i + 1][0] if i < len(nd) - 1 else ref2d[0]
+        width = next_x - p[0]
+        height = ref2d[1] - p[1]
+        if width > 0 and height > 0:
+            hv += width * height
+    return hv
+
+
+def pareto_front_3d(points):
+    nd = []
+    for p in points:
+        dominated = False
+        to_remove = []
+        for i, q in enumerate(nd):
+            q_dom_p = all(q[j] <= p[j] for j in range(3)) and any(q[j] < p[j] for j in range(3))
+            p_dom_q = all(p[j] <= q[j] for j in range(3)) and any(p[j] < q[j] for j in range(3))
+            if q_dom_p:
+                dominated = True
+                break
+            if p_dom_q:
+                to_remove.append(i)
+        if not dominated:
+            nd = [q for i, q in enumerate(nd) if i not in set(to_remove)]
+            nd.append(p)
+    return nd
+
+
+def hv_3d(points_3d, ref=REF):
+    valid = [p for p in points_3d if p[0] < ref[0] and p[1] < ref[1] and p[2] < ref[2]]
+    if not valid:
+        return 0.0
+    nd = pareto_front_3d(valid)
+    if not nd:
+        return 0.0
+    nd.sort(key=lambda p: p[0])
+    hv = 0.0
+    for i in range(len(nd)):
+        slab = (nd[i + 1][0] if i < len(nd) - 1 else ref[0]) - nd[i][0]
+        if slab <= 0:
+            continue
+        proj = [(p[1], p[2]) for p in nd[: i + 1]]
+        hv += slab * hv_2d(proj, (ref[1], ref[2]))
+    return hv
+
+
+def main():
+    n_evals = 550
+    checkpoint_every = 50
+    t0 = time.time()
+
+    print(f"TPE search: {n_evals} evaluations", flush=True)
+
+    all_objectives = []
+    all_results_log = []
+    convergence = []
+
+    def objective(trial):
+        tp = trial.suggest_categorical("tp", TP_VALUES)
+        max_inst = 8 // tp
+        # Represent num_instances as categorical relative to max
+        num_instances = trial.suggest_int("num_instances", 1, max_inst)
+
+        scheduler = trial.suggest_categorical("scheduler", SCHEDULER_VALUES)
+        max_running = trial.suggest_categorical("max_num_running_reqs", MAX_RUNNING_VALUES)
+        max_tokens = trial.suggest_categorical("max_num_scheduled_tokens", MAX_TOKENS_VALUES)
+
+        # Prefill threshold: sample from all values, then repair
+        prefill_raw = trial.suggest_categorical("long_prefill_token_threshold", PREFILL_THRESHOLD_VALUES)
+        prefill_threshold = prefill_raw if (prefill_raw == 0 or prefill_raw < max_tokens) else 0
+
+        block_size = trial.suggest_categorical("block_size_in_tokens", BLOCK_SIZE_VALUES)
+        preemption = trial.suggest_categorical("preemption_policy", PREEMPTION_POLICY_VALUES)
+        gpu_mem_util = trial.suggest_categorical("gpu_memory_utilization", GPU_MEM_UTIL_VALUES)
+
+        if num_instances == 1:
+            routing_policy = "round-robin"
+            admission_policy = "always-admit"
+            routing_scorers = None
+        else:
+            routing_policy = trial.suggest_categorical("routing_policy", ROUTING_POLICY_VALUES)
+            admission_policy = trial.suggest_categorical("admission_policy", ADMISSION_POLICY_VALUES)
+            if routing_policy == "weighted":
+                routing_scorers = trial.suggest_categorical("routing_scorers", ROUTING_SCORER_CONFIGS)
+            else:
+                routing_scorers = None
+
+        config = {
+            "tp": tp,
+            "num_instances": num_instances,
+            "scheduler": scheduler,
+            "max_num_running_reqs": max_running,
+            "max_num_scheduled_tokens": max_tokens,
+            "long_prefill_token_threshold": prefill_threshold,
+            "block_size_in_tokens": block_size,
+            "routing_policy": routing_policy,
+            "routing_scorers": routing_scorers,
+            "admission_policy": admission_policy,
+            "preemption_policy": preemption,
+            "gpu_memory_utilization": gpu_mem_util,
+        }
+
+        obj = evaluate(config)
+        if obj is None:
+            obj = (REF[0], REF[1], REF[2])  # failed eval
+
+        eval_num = len(all_objectives) + 1
+        all_objectives.append(obj)
+        all_results_log.append({
+            "config": config, "objectives": list(obj),
+            "metrics": {"responses_per_sec": -obj[0], "ttft_p99_ms": obj[1]},
+            "eval_num": eval_num,
+        })
+
+        if eval_num % checkpoint_every == 0 or eval_num == n_evals:
+            hv = hv_3d(all_objectives)
+            convergence.append({"eval": eval_num, "hv": hv})
+            print(f"  eval={eval_num:3d}  hv={hv:.1f}  elapsed={time.time()-t0:.1f}s", flush=True)
+
+        return obj
+
+    sampler = TPESampler(n_startup_trials=50, seed=789, multivariate=True)
+    study = optuna.create_study(
+        directions=["minimize", "minimize", "minimize"],
+        sampler=sampler,
+    )
+    study.optimize(objective, n_trials=n_evals)
+
+    pareto_objs = pareto_front_3d(all_objectives)
+    pareto_obj_set = {tuple(p) for p in pareto_objs}
+    seen = set()
+    pareto_out = []
+    for r in all_results_log:
+        key = tuple(r["objectives"])
+        if key in pareto_obj_set and key not in seen:
+            seen.add(key)
+            pareto_out.append(r)
+
+    os.makedirs(OUT_DIR, exist_ok=True)
+    with open(os.path.join(OUT_DIR, "pareto_front.json"), "w") as f:
+        json.dump(pareto_out, f, indent=2)
+    with open(os.path.join(OUT_DIR, "convergence.json"), "w") as f:
+        json.dump(convergence, f, indent=2)
+
+    print(f"\nDone. Pareto front size: {len(pareto_out)}")
+    print(f"Final HV: {convergence[-1]['hv'] if convergence else 0:.1f}")
+    print(f"Total time: {time.time()-t0:.1f}s")
+
+
+if __name__ == "__main__":
+    main()

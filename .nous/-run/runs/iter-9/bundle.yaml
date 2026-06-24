@@ -1,0 +1,115 @@
+metadata:
+  iteration: 9
+  family: "70b-generalization-model-aware-formula"
+  research_question: "Does lean bracket (TP={4,8}, max-profile, budget=2) generalize to 70B models where TP=1 is infeasible and TP=2 is catastrophically bad? And does a model-size-aware crossover formula (load_index = params/BW, threshold=12) eliminate the remaining TP prediction failures of the bandwidth-only formula?"
+
+arms:
+  - type: h-main
+    prediction: >
+      Lean bracket achieves within 1% of global best on all 6 regimes
+      (3 hardware × 2 rates) for llama-3.1-70b. TP=8 wins on ALL regimes with
+      evals_to_best=2 everywhere (TP=8 at position 2 in lean order).
+      All 5 search seeds produce identical results per regime (deterministic).
+      Expected scores at seed=42: H100 r100=0.088793, H100 r500=0.091801,
+      A100-SXM r100=0.063273, A100-SXM r500=0.063991, L40S r100=0.034041,
+      L40S r500=0.034137.
+    mechanism: >
+      At 70B parameters, per-step latency is dominated by weight transfer time
+      (sim/latency/roofline.go:291-351). TP=8 distributes 140GB of bf16 weights
+      across all 8 GPUs, while TP=4 uses only 4 GPUs per instance. The 2×
+      bandwidth advantage of TP=8 creates a per-step latency gap so large that
+      2 instances at TP=4 cannot overcome it through queuing benefits at any
+      practical arrival rate. The load_index (params/BW) exceeds 20.9 on all
+      hardware, far above the empirical crossover boundary (~10). Probes confirm:
+      TP=8 wins by 9-20% across all tested regimes and rates (100-2000).
+    diagnostic: >
+      If TP=4 wins on any regime: check whether the 70B model's KV cache at TP=4
+      (2 instances × larger KV per GPU) creates a memory-bound regime that favors
+      more instances. Check the e2e_p99 breakdown — if TTFT dominates, TP=4's
+      lower prefill latency may matter more than TP=8's decode advantage.
+
+  - type: h-control-negative
+    prediction: >
+      The model-aware formula (load_index threshold=12) achieves 24/24 (100%)
+      accuracy on the 4-model × 3-hardware × 2-rate test grid. The old formula
+      (400/BW, model-size-blind) achieves 18/24 (75%). All 6 failures of the old
+      formula occur at rate=500 on regimes where the actual winner is TP=8 but
+      the formula predicts TP=4: llama-3.1-70b on H100/A100-SXM/L40S (3 new),
+      qwen3-14b on L40S, qwen3-32b on A100-SXM, qwen3-32b on L40S (3 known).
+      The model-aware formula corrects all 6 by detecting load_index > 12 and
+      predicting TP=8 directly.
+    mechanism: >
+      The 400/BW formula treats all models identically — it predicts a crossover
+      rate based solely on hardware bandwidth. This works when the per-step
+      latency gap between TP=4 and TP=8 is small enough for queuing effects to
+      overcome (load_index < ~10). But at load_index > 12, the weight transfer
+      time advantage of TP=8 becomes so large that no practical arrival rate
+      generates enough queue pressure to favor TP=4. The load_index threshold
+      captures this regime change. The boundary lies between 9.6 (32B/H100,
+      crossover exists at ~350) and 15.7 (32B/A100-SXM, no crossover).
+    diagnostic: >
+      If model-aware formula fails: check whether the load_index threshold of 12
+      is too aggressive — a regime with load_index between 10 and 15 might have
+      a crossover at a rate we haven't tested. Also check if 70B introduces new
+      physics (e.g., TP communication overhead scaling superlinearly with model
+      size, sim/latency/trained_physics_model.go:263-284).
+    code_changes:
+      - file: "search_blis_iter9.py"
+        intent: >
+          Add MODEL_PARAMS dict mapping model short names to parameter counts:
+          llama-3.1-8b=8, qwen3-14b=14, qwen3-32b=32, llama-3.1-70b=70.
+          Add run_model_aware_predict() function that computes
+          load_index = model_params / hw_bandwidth, predicts TP=8 if
+          load_index > 12, otherwise falls back to 400/BW crossover formula.
+          Runs one BLIS eval with predicted config and max-profile secondaries.
+          Returns result dict with load_index, threshold_used, and formula_correct.
+          Wire up 'model-aware-predict' in argparse strategy choices.
+        rationale: >
+          Tests whether a simple model-size parameter eliminates all remaining
+          formula failures without requiring model-specific tuning.
+
+  - type: h-ablation
+    prediction: >
+      Default-profile lean bracket (mr=256, mt=4096, pf=1024) selects TP=8 on all
+      6 regimes for 70B (6/6 correct TP winner). Scores will be 15-21% lower than
+      max-profile (based on probe: default=0.076004 vs max=0.091801 on H100 r500),
+      but the TP winner is unchanged because the 70B per-step latency gap is so
+      large it survives batch size reduction.
+    mechanism: >
+      For smaller models (8-14B), default-profile masks the rate-dependent TP
+      effect because restricted batch sizes prevent queue saturation that would
+      favor TP=4/2inst (established in iter-5, RP-13). But for 70B, TP=8's
+      advantage is NOT queue-based — it comes from raw per-step latency (weight
+      transfer time). This advantage is independent of batch size, so restricting
+      max_running from 512 to 256 reduces absolute throughput but preserves the
+      TP=8 > TP=4 ranking. Min-profile (mr=32) does invert the ranking
+      (probed: TP4=0.023917, TP8=0.021701), but default-profile is far enough
+      from the inversion boundary.
+    diagnostic: >
+      If default-profile selects TP=4 on any regime: the TP=8 advantage at 70B
+      is narrower than expected at that hardware/rate. Check the TP4 vs TP8
+      margin with default-profile — if it's <2%, the default-profile may be
+      near the inversion boundary. Compare against max-profile margin on the
+      same regime.
+
+  - type: h-robustness
+    prediction: >
+      Lean bracket (max-profile) achieves within 1% of BLIS-seed-specific best
+      on all 50 combinations (2 regimes × 5 blis seeds × 5 search seeds) for 70B.
+      TP=8 wins on all 50 combinations. All 5 search seeds produce identical
+      results per blis_seed (lean bracket determinism). Minimum TP=8 margin across
+      all blis seeds is >2% (based on probes: H100 min margin=2.5% at seed=45,
+      L40S expected min margin >15%).
+    mechanism: >
+      BLIS seed controls request arrival times and token counts, not the latency
+      model physics. The 70B weight transfer advantage of TP=8 is structural
+      (hardware bandwidth / model size), not workload-dependent. Different BLIS
+      seeds create different queue dynamics and P99 tails, but cannot change which
+      TP level has lower per-step latency. The margins may vary by seed
+      (probed: 2.5-10.3% on H100), but TP=8 always wins.
+    diagnostic: >
+      If any blis_seed shows TP=4 winning: that seed creates a specific workload
+      pattern where 2-instance queue distribution overcomes the per-step latency
+      gap. Check the throughput and P99 breakdowns for that seed — likely an
+      extreme case where many concurrent requests create scheduling delays at
+      TP=8/1inst that don't occur at TP=4/2inst.

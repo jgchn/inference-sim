@@ -1,0 +1,75 @@
+{
+  "config": {
+    "budget": 100,
+    "seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "blis_seed": 42,
+    "num_requests": 1000,
+    "rate": 500.0,
+    "model": "qwen/qwen3-14b",
+    "hardware": "L40S",
+    "global_best": 0.084795,
+    "phase1_k": 3,
+    "phase1_profiles": "strategic",
+    "tp_candidates": "all",
+    "skip_phase2": false
+  },
+  "runs": [
+    {
+      "strategy": "formula-predict",
+      "hardware": "L40S",
+      "hw_bandwidth_TBs": 0.864,
+      "crossover_rate": 462.962962962963,
+      "predicted_tp": 4,
+      "predicted_instances": 2,
+      "score": 0.080647,
+      "global_best": 0.084795,
+      "threshold": 0.08394705,
+      "formula_correct": false,
+      "config": {
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_running": 512,
+        "max_tokens": 8192,
+        "prefill_threshold": 4096,
+        "block_size": 16,
+        "routing": "least-loaded",
+        "admission": "always-admit",
+        "preemption": "fcfs"
+      },
+      "wall_time_s": 0.24824729199463036,
+      "evaluations": [
+        {
+          "eval_idx": 0,
+          "score": 0.080647,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 512,
+            "max_tokens": 8192,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.24792304199945647,
+          "best_so_far": 0.080647
+        }
+      ],
+      "wall_time_total_s": 0.24826345799374394,
+      "n_evaluations": 1,
+      "search_seed": 42,
+      "best_score": 0.080647,
+      "evals_to_best": 2
+    }
+  ],
+  "total_wall_time_s": 0.24881291699421126
+}

@@ -1,0 +1,60 @@
+metadata:
+  iteration: 10
+  bundle_ref: "runs/iter-10/bundle.yaml"
+
+setup:
+  - cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-10-455a8670 && go build -o blis main.go"
+  - cmd: "mkdir -p /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/results/h-robustness /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/results/h-main /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/results/h-ablation /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/results/h-control-negative"
+
+arms:
+  - arm_id: "h-robustness"
+    conditions:
+      - name: "qwen-r50-exhaustive"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/inputs/search_exhaustive_r50.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/results/h-robustness/all_results_qwen_r50.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/inputs/blis_common.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/inputs/search_exhaustive_r50.py"
+      - name: "llama-r50-exhaustive"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/inputs/search_exhaustive_llama_r50.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/results/h-robustness/all_results_llama_r50.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/inputs/blis_common.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/inputs/search_exhaustive_llama_r50.py"
+
+  - arm_id: "h-main"
+    conditions:
+      - name: "crossover-yield-all-conditions"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/inputs/crossover_yield_analysis.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/results/h-main/crossover_yield_comparison.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/inputs/blis_common.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/inputs/crossover_yield_analysis.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/results/h-robustness/all_results_qwen_r50.json"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/results/h-robustness/all_results_llama_r50.json"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-9/results/h-robustness/all_results_qwen_r100.json"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-9/results/h-robustness/all_results_llama_r100.json"
+
+  - arm_id: "h-ablation"
+    conditions:
+      - name: "algorithm-comparison-qwen-r50"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/inputs/search_algorithms_r50.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/results/h-ablation/convergence_qwen_r50.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/inputs/blis_common.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/inputs/search_algorithms_r50.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/results/h-robustness/all_results_qwen_r50.json"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/results/h-robustness/all_results_llama_r50.json"
+
+  - arm_id: "h-control-negative"
+    conditions:
+      - name: "null-model-all-conditions"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/inputs/null_model_validation.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/results/h-control-negative/null_model_results.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/inputs/blis_common.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/inputs/null_model_validation.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/results/h-robustness/all_results_qwen_r50.json"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-10/results/h-robustness/all_results_llama_r50.json"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-9/results/h-robustness/all_results_qwen_r100.json"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-9/results/h-robustness/all_results_llama_r100.json"

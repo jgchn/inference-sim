@@ -1,0 +1,72 @@
+[
+  {
+    "id": "RP-28",
+    "statement": "Lean bracket (TP={4,8}, max-profile only, budget=2, no Phase 2) achieves within 1% of global best across all tested regimes including qwen3-32b (H100/A100-SXM) and L40S (qwen3-14b/llama-3.1-8b). This extends validation to 3 models (qwen3-14b, llama-3.1-8b, qwen3-32b) and all 3 hardware platforms (H100, A100-SXM, L40S). Total: 45/45 runs at global best across iter-7 and iter-8 combined.",
+    "confidence": "high",
+    "regime": "H100/A100-SXM/L40S, models up to 32B parameters, rates 100-500 req/s, 1000 requests, fitness-weights throughput:0.4,p99_ttft:0.3,p99_e2e:0.3",
+    "evidence": ["iteration-8-h-main", "iteration-8-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 8,
+    "mechanism": "Lean bracket evaluates TP=4/2inst and TP=8/1inst empirically with max-profile secondary params, picking whichever scores higher. This empirical comparison is inherently model-agnostic — it adapts to whatever the actual crossover is (whether ~130 for 14B or ~350 for 32B on H100). qwen3-32b's larger weight size shifts the crossover higher, but lean bracket detects this without any modification. On A100-SXM and L40S, 32B model's extreme weight-loading time pushes crossover beyond practical rates — TP=8 dominates universally and lean bracket correctly identifies this (evals_to_best=2).",
+    "applicability_bounds": "Applies when max-profile (mr=512, mt=8192, pf=4096) is used. Fails catastrophically with min-profile (RP-29). Requires >=1000 requests for reliable TP winner identification at high rates (validated by h-ablation: 100-req micro-eval fails 4/4 times). Models up to 32B validated; models >32B (e.g., 70B) untested.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-27",
+    "statement": "The rate-dependent TP winner transition crossover rate scales inversely with memory bandwidth (crossover_rate ~= 400/BW). This formula is model-size-blind and fails for 32B models: predicted crossover on H100 is ~119 req/s, but actual crossover for qwen3-32b is ~350 req/s. The formula achieves 83.3% accuracy (15/18) on a 3-model x 3-hardware x 2-rate test matrix. All 3 failures involve TP=4 prediction where TP=8 dominates due to 32B weight loading (A100-SXM) or insufficient bandwidth for any crossover (L40S). A correct formula requires a model-size term: crossover_rate ~= (C * model_params_B) / (bandwidth_TB_s), where C is a hardware-independent constant. For 8B: ~119/H100, for 14B: ~130/H100, for 32B: ~350/H100, suggesting C scales approximately with model size.",
+    "confidence": "medium",
+    "regime": "Hardware bandwidth 0.864-3.35 TB/s; model size 8B-32B; rates 100-500 req/s. Formula works for 8-14B models but fails for 32B.",
+    "evidence": ["iteration-8-h-control-negative"],
+    "contradicts": [],
+    "extraction_iteration": 8,
+    "mechanism": "The 400/BW formula captures the hardware bandwidth dimension of the TP crossover but misses the model-size dimension. Larger models have more weight bytes per step, increasing per-step weight loading time relative to compute time. This shifts the crossover from memory-bound (TP=8 bandwidth pooling wins) to compute-bound (TP=4 instance count wins) to higher batch sizes (higher rates). For 32B: 64GB weights at TP=1 vs 8GB at TP=8; the bandwidth pooling advantage of TP=8 persists to higher rates because each step loads 2.3x more weight bytes than for 14B. The formula using constant 400 implicitly assumes ~14B model size. A correct model-size-aware formula: crossover_rate ~= (400 * model_B / 14B) / BW_TB_s.",
+    "applicability_bounds": "Formula works for 8-14B models across all tested hardware. Fails for 32B on A100-SXM (no crossover exists) and L40S (no crossover). Works for 32B on H100 at rates 100 and 500 by coincidence (both sides of true ~350 crossover happen to agree with formula). Do NOT use formula for models >~20B; use lean bracket (2 BLIS evals) instead for reliable TP selection.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-31",
+    "statement": "The minimum simulation horizon for reliable TP winner identification in lean bracket is >=1000 requests at high arrival rates (rate>=500 req/s). With <=100 requests at rate=500, lean bracket selects TP=8 instead of TP=4 on 4/4 tested high-rate regimes (H100 qwen3-14b, A100-SXM qwen3-14b, H100 llama-3.1-8b, H100 qwen3-32b). The TP=8 win margins at 100-req are 16-38%, compared to TP=4 win margins of 0.8-1.5% at 1000-req — the signal completely inverts at short horizons.",
+    "confidence": "high",
+    "regime": "High arrival rates (rate>=500 req/s), all tested hardware (H100, A100-SXM), multiple models (qwen3-14b, llama-3.1-8b, qwen3-32b), lean bracket strategy",
+    "evidence": ["iteration-8-h-ablation"],
+    "contradicts": [],
+    "extraction_iteration": 8,
+    "mechanism": "At 100 requests with rate=500, all 100 requests arrive within 0.2s. With 1-2 instances and high max_running, the burst is absorbed before any queue builds. In this regime, TP=8/1inst's lower per-step latency (single-GPU memory bandwidth pooled across 8 GPUs at reduced model size) dominates fitness score. The queuing advantage of TP=4/2inst (2 instances handling parallel requests) requires SUSTAINED load: the instance queue must reach steady-state depth, which takes hundreds of completed requests at high rates. At 1000 requests and rate=500, the simulation runs for ~2s of simulated time, giving 400+ requests to saturate the system before the measurement horizon ends. The minimum horizon is likely somewhere between 500-1000 requests for high-rate regimes. The 100-req micro-eval not only fails but fails by a wide margin in the wrong direction.",
+    "applicability_bounds": "This applies to multi-instance configurations (TP=4/2inst vs TP=8/1inst) at high rates (>=500 req/s). At low rates (rate=100), even 100 requests may be sufficient since TP=8 is the correct winner and has a large margin. The 1000-request standard is conservative but safe for all tested regimes.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-9",
+    "statement": "Phase 1 TP identification in hierarchical search is deterministic given a fixed BLIS seed: all search seeds select the same TP winner because they evaluate the same BLIS configs at the same seed. Extended in iter-8: determinism confirmed for qwen3-32b on H100 and A100-SXM (a third model, 2.3x larger than qwen3-14b), and for L40S with both models (qwen3-14b and llama-3.1-8b). 45/45 (regime x seed) combinations across iter-7 and iter-8 show identical per-regime results across all 5 search seeds.",
+    "confidence": "high",
+    "regime": "All tested hardware (H100, A100-SXM, L40S), all tested models (qwen3-14b, llama-3.1-8b, qwen3-32b), lean bracket strategy",
+    "evidence": ["iteration-8-h-main", "iteration-8-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 8,
+    "mechanism": "Lean bracket uses only the max-profile (max_running=512, max_tokens=8192, prefill_threshold=4096) which is deterministic given blis_seed. The search_seed parameter controls TPE/random sampling in Phase 2, which is bypassed (skip_phase2=True). Therefore all search seeds produce identical Phase 1 results for the same blis_seed. Since the default blis_seed=42 is used across all runs, all seeds are byte-identical.",
+    "applicability_bounds": "Applies to lean bracket (skip_phase2=True, bracket K=1). Phase 2 TPE results would vary by search_seed. This determinism is a property of the Phase 1 evaluation being BLIS-seed-fixed and profile-deterministic.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-21",
+    "statement": "The TP winner in bracket K=1 Phase 1 is model-dependent on low-bandwidth hardware (L40S, 0.864 TB/s): qwen3-14b->TP=8/1inst at both rates 100 and 500, llama-3.1-8b->TP=8/1inst at rate=100 and TP=4/2inst at rate=500. Extended in iter-8: L40S validation confirmed for both models across 4 regimes. Also confirmed for qwen3-32b: TP=8 wins at both rates 100 and 500 (established in GLOBAL_BEST_TABLE but not directly tested as lean bracket robustness arm). Lean bracket correctly identifies model-dependent and rate-dependent winners on L40S without any algorithm modification.",
+    "confidence": "high",
+    "regime": "L40S hardware (0.864 TB/s), models up to 32B, rates 100-500 req/s",
+    "evidence": ["iteration-8-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 8,
+    "mechanism": "L40S has the lowest bandwidth (0.864 TB/s) of tested hardware. For qwen3-14b (28GB weights), TP=8 bandwidth pooling advantage persists at all practical rates — no crossover exists. For llama-3.1-8b (smaller model, less weight loading per step), the crossover to compute-bound regime occurs at ~450-500 req/s — just at the edge of the tested rate range. TP=4/2inst wins at rate=500 because queue saturation effects from high arrival rates give the 2-instance configuration a fitness advantage that outweighs TP=8's per-step latency reduction.",
+    "applicability_bounds": "L40S-specific due to low bandwidth. On higher-bandwidth hardware (H100, A100-SXM), both 14B and 8B models tend toward TP=4 dominance at rate=500. The model-dependent winner pattern is unique to hardware where bandwidth constraints dominate even for lighter models.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  }
+]

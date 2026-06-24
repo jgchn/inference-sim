@@ -1,0 +1,25 @@
+metadata:
+  iteration: 7
+  family: "model-portability"
+  research_question: "Does NSGA-II's convergence speed advantage over random search transfer to a different model architecture (Llama-3.1-8B vs Qwen3-14B), and does the magnitude scale with Pareto density as predicted by the KV stress interaction mechanism?"
+
+arms:
+  - type: h-robustness
+    prediction: "Pareto density for Llama-3.1-8B at rate=50 will be higher than Qwen3-14B's 4.5% at the same rate (predicted range: 6-12%). The smaller model's lower KV demand per token (32 layers vs 40, same head_dim=128 and num_kv_heads=8) shifts the KV stress threshold lower, causing fewer configs to be dominated by the block_size×kv interaction. Exhaustive HV will differ from Qwen's 5.857e10 due to higher throughput ceiling (31.67 rps vs ~26 rps for best config)."
+    mechanism: "Llama-3.1-8B requires 80% of Qwen3-14B's KV bytes per token (32/40 layers ratio). At kv_blocks=3000,bs=16 for tp=8: Llama shows 79 preemptions and ttft=883ms vs Qwen's 107 preemptions and ttft=2323ms. The WEAKER stress interaction means fewer configs are binary-dominated (stressed configs are only moderately worse, not catastrophically worse), expanding the Pareto set."
+    diagnostic: "If density is LOWER than 4.5%: the smaller model may create a DIFFERENT kind of dominance (e.g., higher throughput ceiling eliminates mid-range configs from the Pareto front). Check whether the throughput spread (best/worst rps ratio) is larger for Llama, which could concentrate the frontier on high-GPU configs."
+
+  - type: h-main
+    prediction: "NSGA-II on Llama-3.1-8B reaches 95% of exhaustive HV before random search (portability confirmed). The convergence gap will be smaller than Qwen3-14B's 91-eval gap at rate=50 — predicted range 40-70 evals — because higher Pareto density gives random search more Pareto-optimal configs to discover per sample, reducing its disadvantage. NSGA-II's final HV will be >= 97% of exhaustive."
+    mechanism: "NSGA-II's crossover still exploits the residual tp×kv×block_size gene structure that exists for Llama (block_size=32 at kv=3000 eliminates preemptions, creating exploitable binary structure). But because the interaction is WEAKER (40x TTFT improvement for Llama vs 92x for Qwen at the same config), random search can achieve higher HV per eval (intermediate-stress configs contribute meaningful HV rather than being completely dominated). The crossover advantage persists but its relative benefit shrinks."
+    diagnostic: "If gap >= 91 evals (same or larger than Qwen): the landscape structure for Llama may have a DIFFERENT source of exploitable structure beyond the block_size interaction — check whether tp×instance count creates stronger binary dominance for Llama (since Llama's higher per-GPU throughput might make GPU allocation the binding decision, not KV capacity). If gap < 30 evals: random may be near-equivalent at this density, suggesting a density threshold around 10-12% where NSGA-II's advantage becomes negligible."
+
+  - type: h-control-negative
+    prediction: "Random search on Llama-3.1-8B reaches 95% of exhaustive HV within 200 evals. With predicted density 6-12%, random expects 12-24 Pareto-optimal hits in 200 evals, providing sufficient frontier coverage. Final HV will be >= 95% of exhaustive, higher than Qwen3-14B's random performance at rate=50 (which achieved ~91.9% at budget=100 per RP-9, and plateaued at ~94% at budget=200 per iter-5)."
+    mechanism: "Higher Pareto density means more Pareto-optimal configs per random sample. At density 6-12%, random with 200 evals samples ~11% of the space and statistically captures 12-24 Pareto-optimal configs — sufficient for >95% HV coverage because marginal Pareto configs contribute diminishing HV."
+    diagnostic: "If random fails to reach 95%: density prediction is wrong (lower than expected) OR the Pareto front has a highly concentrated geometry where a few extreme configs contribute most of the HV (random misses them). Check the HV contribution distribution — if top-3 configs contribute >50% of HV, the front is 'peaked' and random struggles despite high density."
+
+  - type: h-ablation
+    prediction: "Re-running NSGA-II and random on Qwen3-14B at rate=50 in the same session reproduces iter-5's convergence gap within 10 evals (91 ± 10). This validates that the Llama vs Qwen comparison is not confounded by infrastructure differences between iterations. Qwen exhaustive HV reference: 5.857e10."
+    mechanism: "BLIS is deterministic (INV-6: same seed produces byte-identical output). The same parameter space, same rate, same model, and same seed will produce identical per-config metrics. Any difference from iter-5 would indicate an infrastructure bug (different binary, changed model config, etc.), not a real algorithm effect."
+    diagnostic: "If gap differs by >15 evals from iter-5: check whether the BLIS binary has changed since iter-5 (git log), whether model_configs/qwen3-14b/config.json has changed, or whether the NSGA-II RNG seed produces different initial populations due to numpy version differences."

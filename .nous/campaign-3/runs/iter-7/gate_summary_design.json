@@ -1,0 +1,9 @@
+{
+  "gate_type": "design",
+  "summary": "We are testing whether NSGA-II's previously demonstrated convergence advantage over random search (91-eval gap on Qwen3-14B) transfers to a different model architecture (Llama-3.1-8B), and whether the magnitude of the advantage scales predictably with Pareto front density as explained by the KV stress interaction mechanism.",
+  "key_points": [
+    "Four arms: (1) h-robustness characterizes Llama-3.1-8B's Pareto density via exhaustive enumeration (predicted 6-12% vs Qwen's 4.5%, driven by weaker KV stress from 32 vs 40 layers), (2) h-main runs NSGA-II on Llama expecting a smaller convergence gap of 40-70 evals (vs Qwen's 91) because higher density reduces random search's disadvantage, (3) h-control-negative confirms random search on Llama reaches 95% exhaustive HV within 200 evals, (4) h-ablation reproduces the Qwen3-14B rate=50 result in the same session to rule out infrastructure confounds.",
+    "Confirmation criteria: Llama Pareto density lands in 6-12%, NSGA-II convergence gap shrinks to 40-70 evals (portability confirmed but with predicted scaling), random search exceeds 95% HV at 200 evals, and Qwen ablation reproduces iter-5 gap within \u00b110 evals of 91.",
+    "Refutation signals: If Llama density is LOWER than 4.5% (different dominance structure from high throughput ceiling), if convergence gap is \u226591 evals (portability holds but scaling prediction wrong \u2014 possibly tp\u00d7instance allocation is the binding structure for smaller models), or if gap <30 evals (NSGA-II advantage becomes negligible at high density, suggesting a ~10-12% threshold)."
+  ]
+}

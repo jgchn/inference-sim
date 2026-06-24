@@ -1,0 +1,41 @@
+{
+  "iteration": 10,
+  "bundle_ref": "runs/iter-10/bundle.yaml",
+  "arms": [
+    {
+      "arm_type": "h-robustness",
+      "predicted": "Both Qwen and Llama exhaustive sweeps at rate=50 complete successfully with 1800 valid configs each. Pareto density for Qwen ~4.5%, Llama ~5.3%. Qwen will show higher KV-axis NDR than Llama at rate=50 (reflecting Qwen's greater KV stress at lower load).",
+      "observed": "Both sweeps: 1800/1800 successful. Qwen density=4.50% (81 configs), Llama density=5.33% (96 configs) — exact match to RP-1. Per-axis kv_blocks NDR: Qwen=0.7476, Llama=0.7691 — Llama has HIGHER kv NDR than Qwen, opposite of prediction. Both models show 100% block_size=32 in Pareto front at rate=50. Overall NDR: Qwen=0.3587, Llama=0.3434. Crossover yield: Qwen=75.61%, Llama=78.62% (both high). Yield advantage: Qwen=16.80x, Llama=14.74x (both far above 5x threshold). Pareto entropy: Qwen=0.660, Llama=0.666 (similar, not high — concentrated on block_size=32). Closure ratio: Qwen=0.2109, Llama=0.2500.",
+      "status": "PARTIALLY_CONFIRMED",
+      "error_type": "direction",
+      "diagnostic_note": "Densities matched predictions exactly. But Llama has higher (not lower) kv_blocks NDR than Qwen at rate=50. Both models show 100% block_size=32 dominance in Pareto front — same concentration pattern as rate=100. The predicted stress differential between models is not present at the NDR level. Both models produce crossover yield ~75-79% (much higher than the <3x yield_advantage predicted for Llama), driven by block_size=32 concentration."
+    },
+    {
+      "arm_type": "h-main",
+      "predicted": "Zero sign mismatches: yield_advantage > 5 predicts positive gap, yield_advantage < 3 predicts non-positive gap. Llama rate=50 will have yield_advantage < 3. Qwen rate=50 yield_advantage > 5.",
+      "observed": "Conditions and yield advantages: qwen_r50 ya=16.80x (gap=+4.6 iter-7: correct), llama_r50 ya=14.74x (gap=-22.9 iter-7: SIGN MISMATCH — ya>5 but gap<0), qwen_r100 ya=9.73x (gap=+62.3: correct), llama_r100 ya=11.03x (gap=+40.3: correct). 1/4 sign mismatches. Pareto entropy is near-identical: Qwen r50=0.660, Llama r50=0.666 — no differentiation. Llama r50 yield advantage (14.74x) is the HIGHEST among all conditions, opposite of the prediction of <3x. All four conditions have yield_advantage > 9x, disqualifying yield_advantage as a gap-direction predictor.",
+      "status": "REFUTED",
+      "error_type": "direction",
+      "diagnostic_note": "The mechanism is wrong: Llama rate=50 has the HIGHEST crossover yield (78.62%) and yield advantage (14.74x) of all conditions, contradicting the prediction of <3x. The explanation was that Llama's Pareto front would be 'scattered' at rate=50 — instead both models show 100% block_size=32 concentration at rate=50 (even more concentrated than at rate=100 where Qwen had 93.5%). The crossover yield is dominated by block_size=32 concentration, which is equally strong at rate=50 and rate=100 for both models. Yield advantage does NOT differentiate gap direction across load regimes."
+    },
+    {
+      "arm_type": "h-ablation",
+      "predicted": "Qwen rate=50 gap > 0 (NSGA-II wins), Llama rate=50 gap <= 0 (random wins or tie), consistent with iter-7 methodology.",
+      "observed": "Using pop_size=40, n_gens=4, budget=200, seed=42/43: Qwen r50 gap=+55.4 (NSGA-II wins at eval=95.1 vs random at eval=150.5). Llama r50 gap=+38.6 (NSGA-II wins at eval=79.3 vs random at eval=117.8). Both NSGA-II gaps are POSITIVE — Qwen confirmed, Llama refuted. This contradicts iter-7's Llama gap of -22.9. The Qwen gap (+55.4) is also much larger than iter-7's +4.6.",
+      "status": "PARTIALLY_CONFIRMED",
+      "error_type": "regime",
+      "diagnostic_note": "Qwen prediction confirmed. Llama prediction refuted: with pop=40, NSGA-II wins for Llama at rate=50 (+38.6), contradicting iter-7's -22.9 result. The gap sign is methodology-dependent: iter-7 likely used pop=20 (or smaller), which reduces NSGA-II diversity and reverses the gap direction. With pop=40, both models at rate=50 show universal NSGA-II advantage, consistent with the high crossover yield (14-17x advantage). The large Qwen gap (+55.4 vs iter-7's +4.6) is also consistent with the larger pop_size providing better genetic diversity. This suggests RP-11 (Llama shows negative gap at rate=50) was a pop_size artifact rather than a structural phenomenon."
+    },
+    {
+      "arm_type": "h-control-negative",
+      "predicted": "Null model crossover yield ≈ pareto_density (within 2x). Observed yield 5-10x higher than null.",
+      "observed": "Null yield (100 trials, 5000 samples each): qwen_r50=21.39%±0.79%, llama_r50=21.93%±0.89%, qwen_r100=22.87%±0.83%, llama_r100=22.24%±0.84%. All null yields are ~3-5x density (density ranges 4.5-6.9%), NOT within 2x. Observed/null ratios: qwen_r50=3.50x, llama_r50=3.60x, qwen_r100=2.95x, llama_r100=2.91x. Null yield is remarkably uniform across conditions (~21-23%), regardless of density, model, or rate. Observed yield (65-79%) IS higher than null yield by ~3x, confirming structural meaningfulness.",
+      "status": "PARTIALLY_CONFIRMED",
+      "error_type": "magnitude",
+      "diagnostic_note": "Null yield is NOT approximately equal to density — it is ~3-5x density across all conditions. The uniform null yield (~21-23%) indicates the crossover operator itself has intrinsic topological bias: when two random configs are crossed, offspring tend to cluster around parameter values that appear frequently (tp=1/2 more common than 4/8 due to instance range constraints, block_size split 50/50, kv uniformly distributed). This baseline must be accounted for in future yield analyses. The observed yield IS structurally meaningful (3x above null), but the signal is weaker than predicted (3x not 5-10x). The control validates that Pareto spatial structure contributes to yield, but the contribution is smaller relative to the topological baseline."
+    }
+  ],
+  "experiment_valid": true,
+  "discrepancy_analysis": "The primary hypothesis (crossover yield advantage predicts NSGA-II gap sign) is REFUTED. The key failure: Llama rate=50 has the HIGHEST yield advantage (14.74x) of any condition, yet was predicted to have the lowest (<3x) to explain its negative gap. The actual Pareto front at rate=50 for both models is 100% concentrated on block_size=32 — even more extreme than rate=100 (93.5%). This makes crossover yield uniformly high across all conditions, destroying its predictive power. The h-ablation results reveal the bigger finding: with pop_size=40, NSGA-II wins for BOTH models at rate=50 (Qwen +55.4, Llama +38.6), suggesting iter-7's Llama negative gap (-22.9) was a pop_size artifact, not a structural phenomenon. The anomaly motivating this experiment was algorithmic, not structural. The null model control reveals that crossover operator topological bias inflates baseline yields to ~21-23% (3-5x density), making the net structural contribution ~3x rather than the predicted 5-10x.",
+  "dominant_component_pct": null
+}

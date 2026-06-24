@@ -1,0 +1,11 @@
+{
+  "gate_type": "design",
+  "summary": "Iteration 8 tests whether the lean bracket search algorithm (evaluate TP=4 and TP=8 with max-profile params, pick the winner) generalizes beyond 8-14B models to qwen3-32b, and whether the simple bandwidth-based TP crossover formula (400/BW) breaks at larger model sizes. It also validates lean bracket on L40S hardware and tests whether short simulations (100 requests) give misleading TP recommendations.",
+  "key_points": [
+    "H-MAIN: Lean bracket should achieve within 1% of global best on all 5 qwen3-32b regimes (H100 rates 100/300/500, A100-SXM rates 100/500) with evals_to_best\u22642, requiring zero algorithm modifications despite the model-size-shifted TP crossover (~350 req/s on H100 vs ~130 for 14B models).",
+    "H-CONTROL-NEGATIVE: The RP-27 bandwidth formula (crossover = 400/BW) should achieve \u226478% accuracy (\u226414/18 correct) across the full 18-regime matrix (3 models \u00d7 3 hardware \u00d7 2 rates), failing specifically on qwen3-32b regimes where it ignores model-size effects on the crossover point.",
+    "H-ABLATION: Micro-eval (100 requests instead of 1000) should incorrectly select TP=8 on all 4 tested high-rate regimes where TP=4 is actually optimal at 1000 requests, demonstrating that short simulations cannot capture queuing saturation effects that differentiate multi-instance deployments.",
+    "H-ROBUSTNESS: Lean bracket should achieve within 1% of global best on all 4 L40S regimes (qwen3-14b and llama-3.1-8b at rates 100/500), completing validation across all 3 hardware platforms (H100, A100-SXM, L40S) with deterministic results across 5 search seeds.",
+    "Confirmation criteria: H-MAIN passes if all 5 qwen3-32b regimes are within 1% of reference scores (e.g., 0.132535 for H100/rate=100). H-CONTROL-NEGATIVE passes if formula accuracy \u226478%. H-ABLATION passes if micro-eval misidentifies TP winner on 4/4 high-rate regimes. H-ROBUSTNESS passes if all 20 L40S runs (4 regimes \u00d7 5 seeds) are within 1% of reference."
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "gate_type": "design",
+  "summary": "This iteration tests whether a fast 'extremes-first' Phase 1 strategy (4 evaluations at max-instance per TP level) can identify the optimal parallelism tier as accurately as the full 15-evaluation sequential scan from iteration 2, and whether pairing it with Bayesian (TPE) Phase 2 optimization accelerates convergence on secondary knobs like batch size. The design also tests hardware portability (H100 vs A100-SXM where different TP levels win).",
+  "key_points": [
+    "Four arms: (1) h-main tests extremes-first + TPE at rate=5000/H100 where batch size drives 26% score variance; (2) h-control-negative at rate=50 where secondary knobs have zero effect, confirming Phase 2 adds nothing; (3) h-ablation replaces TPE with LHS to isolate whether Bayesian surrogate modeling beats uniform sampling; (4) h-robustness runs identical algorithm on A100-SXM where optimal tier is TP=8/1 (not TP=4/2 as on H100).",
+    "Confirmation criteria: extremes-first reaches 95% of optimal score by eval ~8-13 vs sequential's ~20+; TPE beats LHS by 3-10 evals to 95% within-tier optimum; rate=50 arm shows zero Phase 2 improvement; A100-SXM arm correctly identifies TP=8/1 without hardware-specific tuning.",
+    "Key risk: the A100-SXM TP=8/1 vs TP=4/2 gap is only 0.3% (0.1372 vs 0.1368), which may be within noise across seeds \u2014 the diagnostic acknowledges this and suggests either increasing rate to 3000 or accepting a tie. Also, TPE may need >10 trials to outperform LHS on a 5-option categorical (batch size), narrowing the measurable advantage window.",
+    "Implementation is a single new script (search_blis_iter3_c2.py) supporting all four strategies with CLI flags for hardware, rate, budget, and seeds, outputting convergence curves as JSON for direct comparison."
+  ]
+}

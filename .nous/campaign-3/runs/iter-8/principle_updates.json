@@ -1,0 +1,58 @@
+[
+  {
+    "id": "RP-10",
+    "statement": "In BLIS, Pareto density in the 6-parameter 4-objective space does NOT monotonically increase with arrival rate for all model architectures. For Qwen3-14B: density increases with rate (rate=50: 4.5%, rate=75: 6.06%). For Llama-3.1-8B: density DECREASES with rate (rate=50: 5.33%, rate=75: 4.83%). The rate-density relationship is model-architecture-dependent. Higher load can either expand or contract the Pareto frontier depending on whether the model's throughput ceiling allows load-intensive configs to maintain their dominance structure.",
+    "confidence": "high",
+    "regime": "6-parameter 4-objective space (tp, instances, scheduler, batch, kv_blocks, block_size) on H100 at rates 50-75 req/s",
+    "evidence": ["iteration-8-h-robustness"],
+    "contradicts": ["RP-10 prior version (claimed model-independent monotone increase)"],
+    "extraction_iteration": 8,
+    "mechanism": "For Qwen (slower throughput): rate=75 increases queueing pressure, opening new throughput-vs-cost tradeoff regions that expand the Pareto frontier. For Llama (faster throughput): rate=75 is not as stressful relative to Llama's capacity ceiling, so load-intensive configs (high TP, high instances) dominate more strictly, concentrating rather than expanding the frontier.",
+    "applicability_bounds": "Verified for Qwen3-14B and Llama-3.1-8B on H100 at rates 50 and 75. Rate=100 not yet measured for Llama at rate=75.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-11",
+    "statement": "NSGA-II's convergence speed advantage over random search is NOT determined primarily by Pareto density. It is primarily determined by model architecture (landscape structure). Qwen3-14B consistently shows positive gaps (NSGA-II faster: +4.6 at rate=50, +31.0 at rate=75) and Llama-3.1-8B consistently shows negative gaps (random faster: -22.9 at rate=50, -25.3 at rate=75), regardless of their density values. For Qwen, higher load INCREASES the NSGA-II advantage (sharper KV stress boundaries amplify exploitable gradient). For Llama, higher load maintains the random advantage regardless of density change.",
+    "confidence": "high",
+    "regime": "6-parameter 4-objective space (tp, instances, scheduler, batch, kv_blocks, block_size), rates 50-75 req/s, NSGA-II pop=40 gen=4 vs Random budget=200",
+    "evidence": ["iteration-7-h-main", "iteration-7-h-ablation", "iteration-8-h-main", "iteration-8-h-ablation"],
+    "contradicts": ["RP-11 prior version (claimed density controls gap magnitude monotonically)", "RP-12 (claimed ~5% breakeven density)"],
+    "extraction_iteration": 8,
+    "mechanism": "Model architecture determines landscape smoothness. Qwen's slower throughput creates sharper KV stress threshold effects (preemption cascades), giving NSGA-II's crossover operator a strong gradient to exploit via the tp×kv×block_size interaction. Llama's faster throughput creates a smoother landscape where uniform sampling is as effective. Higher load amplifies these structural differences rather than homogenizing them.",
+    "applicability_bounds": "Verified for NSGA-II (pop=40, 4 gens, single-offspring tournament) vs uniform random (budget=200). The specific implementation matters — absolute gap values are implementation-dependent (see RP-8 note on iter-5 vs iter-7 NSGA-II).",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-12",
+    "statement": "There is NO universal density breakeven (~5%) that determines whether NSGA-II or random search wins the convergence race. The breakeven is model-architecture-specific. Qwen3-14B has positive NSGA-II gap at BOTH 4.5% and 6.06% density (gap grows with density: +4.6→+31.0). Llama-3.1-8B has negative gap (random wins) at BOTH 5.33% and 4.83% density. The density value alone is insufficient to predict the gap sign without knowing the model architecture.",
+    "confidence": "high",
+    "regime": "6-parameter 4-objective space on H100, rates 50-75 req/s",
+    "evidence": ["iteration-7-h-main", "iteration-7-h-ablation", "iteration-8-h-main", "iteration-8-h-ablation"],
+    "contradicts": ["RP-12 prior version (claimed universal ~5% breakeven)"],
+    "extraction_iteration": 8,
+    "mechanism": "The breakeven concept assumed density was the causal driver. Since model architecture independently determines the gap sign, the breakeven is not a density threshold but a landscape-structure threshold that density only partially correlates with in some regimes.",
+    "applicability_bounds": "Applies when comparing algorithms in the same 6-parameter 4-objective BLIS space across different model architectures. May differ for other search spaces or algorithm configurations.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-14",
+    "statement": "The causal driver of NSGA-II vs random convergence gap in BLIS is landscape structure (gradient exploitability), not Pareto density. Models with sharp KV threshold effects (Qwen-class: slower throughput, more preemptions at moderate KV settings) create gradients that NSGA-II's crossover can exploit. Models with smoother landscapes (Llama-class: faster throughput, weaker threshold effects) produce random-wins outcomes. Pareto density and landscape structure are correlated within a single model (density changes track gradient changes), but NOT across models or rate regimes. A density measurement from model A does not predict the gap for model B at that density.",
+    "confidence": "medium",
+    "regime": "Multi-objective search on BLIS's 6-parameter space; verified for Qwen3-14B and Llama-3.1-8B on H100",
+    "evidence": ["iteration-8-h-main", "iteration-8-h-ablation"],
+    "contradicts": [],
+    "extraction_iteration": 8,
+    "mechanism": "NSGA-II's crossover exploits correlated fitness gradients — when tp×kv×block_size creates a smooth hill in objective space, crossover recombines high-fitness alleles along the gradient faster than random sampling. Models where KV stress creates sharper threshold effects (large performance cliff at the preemption onset) have steeper gradients that make crossover more effective per eval. Llama's faster per-token time means the KV stress threshold is at a lower KV-blocks value, reducing the effective gradient span in the search space.",
+    "applicability_bounds": "Applies to models on the same hardware class. Should be verified at rate=100 for both models and potentially with other model architectures to confirm the landscape-structure hypothesis is not confounded by other factors.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  }
+]

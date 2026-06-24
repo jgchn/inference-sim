@@ -1,0 +1,41 @@
+{
+  "iteration": 9,
+  "bundle_ref": "runs/iter-9/bundle.yaml",
+  "arms": [
+    {
+      "arm_type": "h-robustness",
+      "predicted": "Qwen NDR > Llama NDR at rate=100. kv_blocks axis has highest per-axis NDR for Qwen. Pareto density 5-8% for both models.",
+      "observed": "Qwen overall NDR=35.60%, Llama overall NDR=35.75% — nearly IDENTICAL (Qwen slightly lower). Qwen density=6.89%, Llama density=5.89% (both within predicted range). Per-axis NDR for BOTH models: kv_blocks is the highest (Qwen=0.707, Llama=0.727), followed by max_num_running_reqs (Qwen=0.518, Llama=0.501), block_size (Qwen=0.276, Llama=0.257), scheduler (Qwen=0.217, Llama=0.232). tp and num_instances axes have NDR=0.0 for both models (no dominance relationships on these axes alone, because changing TP or instances creates throughput/GPU-count tradeoffs). Llama kv_blocks NDR (0.727) is actually HIGHER than Qwen (0.707), suggesting Llama is equally or more KV-stressed at rate=100.",
+      "status": "PARTIALLY_CONFIRMED",
+      "error_type": "direction",
+      "diagnostic_note": "Prediction that Qwen NDR > Llama NDR was refuted — they are nearly identical. The kv_blocks-as-top-axis prediction was confirmed for BOTH models (not just Qwen). The near-identical overall NDR between models is a significant finding: overall NDR is NOT a differentiator for gap sign across models, consistent with RP-12's finding that density alone doesn't predict gap direction. The NDR=0 for tp and num_instances axes is noteworthy: changing TP while keeping instances (or vice versa) always creates resource-performance tradeoffs, never clean dominance, because GPU count is a direct objective. Only parameter axes that can create 'free improvements' (same GPU cost, better performance) generate NDR > 0."
+    },
+    {
+      "arm_type": "h-main",
+      "predicted": "Qwen3-14B at rate=100 shows positive NSGA-II convergence gap >= +31.0 evals.",
+      "observed": "NSGA-II reaches 95% exhaustive HV at eval=107.6, random at eval=169.9. Gap=+62.3 evals (NSGA-II faster by 62 evals). Exhaustive HV=65271098183.25, density=6.89%, 124 Pareto-optimal configs out of 1800.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "Gap of +62.3 exceeds prediction of >=+31 (itself the rate=75 gap). Consistent with mechanism: higher load sharpens KV cliff (122x TTFT ratio at rate=100 vs ~90x at rate=75), creating stronger directional gradient for NSGA-II's crossover. The Qwen-positive-gap pattern holds and strengthens with load."
+    },
+    {
+      "arm_type": "h-ablation",
+      "predicted": "Llama-3.1-8B at rate=100 shows NEGATIVE NSGA-II convergence gap (random wins), comparable to -25.3 from rate=75.",
+      "observed": "NSGA-II reaches 95% exhaustive HV at eval=104.2, random at eval=144.5. Gap=+40.3 evals (NSGA-II faster by 40 evals). Exhaustive HV=89286115582.93, density=5.89%, 106 Pareto-optimal configs out of 1800. NSGA-II WINS for Llama at rate=100 — the Llama-random-wins pattern from iter-7/iter-8 has REVERSED.",
+      "status": "REFUTED",
+      "error_type": "direction",
+      "diagnostic_note": "The diagnostic predicted this outcome: 'If gap > 0 (NSGA-II wins for Llama at rate=100): the rate=100 load may push Llama into a KV-stressed regime severe enough to create exploitable cliff structure.' The evidence is confirmed: Llama kv_blocks NDR=0.727 at rate=100 (higher than Qwen's 0.707 and Llama's own lower-rate NDR). Llama preemptions at rate=100 are substantial (90 at tp=2,i=2,kv=3000 per baseline validation). The Llama-random-wins pattern is NOT universal; it has a rate breakpoint between 75 and 100 req/s. At rate=100, Llama enters a KV-stressed regime and NSGA-II exploits this landscape structure. RP-11 is invalidated at rate=100."
+    },
+    {
+      "arm_type": "h-control-negative",
+      "predicted": "Removing KV cliff (kv=10000 fixed, 3 objectives) eliminates NSGA-II advantage for Qwen — gap approximately 0 or negative.",
+      "observed": "NSGA-II reaches 95% exhaustive HV at eval=19.6, random at eval=48.6. Gap=+29.0 evals (NSGA-II still faster). Cliff-free space: 300 configs, 32 Pareto-optimal (density=10.67%), 3-objective reference point (0, 50000, 9). NSGA-II advantage PERSISTS even after removing the KV cliff.",
+      "status": "REFUTED",
+      "error_type": "direction",
+      "diagnostic_note": "The diagnostic predicted: 'If gap is strongly positive: the KV cliff is NOT the only exploitable structure. Investigate whether tp×instances interaction creates its own gradient.' This is exactly what happened. With kv=10000 fixed (all configs have 0 preemptions), the cliff-free landscape still has exploitable axes: max_num_running_reqs (NDR ~0.50 in full space, likely similar here), scheduler (NDR ~0.22), and block_size (NDR ~0.27 in full space, though likely reduced at kv=10000). These non-KV-cliff axes collectively provide enough structural gradient for NSGA-II's crossover to exploit, yielding a +29 eval advantage. Note the cliff-free density (10.67%) is HIGHER than the full space (6.89%), which should FAVOR random search, yet NSGA-II still wins. This confirms multiple exploitable structural axes beyond KV."
+    }
+  ],
+  "experiment_valid": true,
+  "discrepancy_analysis": "Three of four arms were refuted. The primary mechanism hypothesis (RP-14: KV threshold effects cause NSGA-II advantage) is partially refuted. Key findings: (1) Overall NDR is not a differentiator between Qwen and Llama — both have nearly identical NDR (~35.6-35.75%), contradicting the prediction that Qwen would have higher NDR. (2) The Llama-random-wins pattern (RP-11) breaks at rate=100 — Llama now shows a +40.3 NSGA-II advantage, the opposite of the prediction. This indicates a rate-dependent breakpoint between 75 and 100 req/s where Llama transitions from 'smooth landscape' to 'KV-stressed landscape.' (3) Removing the KV cliff (h-control-negative) does NOT eliminate NSGA-II's advantage — a +29 gap persists, demonstrating that BLIS's configuration landscape has multiple exploitable structural axes (batch size, scheduler, block_size) beyond just the KV threshold. The confirmed finding is that the kv_blocks axis has the highest per-axis NDR for BOTH models (0.707-0.727), confirming that KV cliff IS the primary individual axis contributor — but it is not the sole driver of NSGA-II advantage. The broader principle emerging: NSGA-II has a universal structural advantage in BLIS at high load (rate=100), driven by multiple high-NDR axes, not exclusively by KV threshold effects.",
+  "dominant_component_pct": null
+}

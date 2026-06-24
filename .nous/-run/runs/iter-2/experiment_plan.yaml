@@ -1,0 +1,58 @@
+metadata:
+  iteration: 2
+  bundle_ref: "runs/iter-2/bundle.yaml"
+  description: "L40S hardware generalization and BLIS seed robustness for bracket K=1 hierarchical search"
+
+setup:
+  - cmd: "go build -o blis main.go"
+    description: "Build BLIS binary"
+  - cmd: "git apply /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-2/patches/h-main.patch"
+    description: "Apply patch: add llama model config and search_blis_iter7.py with L40S entries + --blis-seeds flag"
+
+arms:
+  - arm_id: "h-main"
+    conditions:
+      - name: "l40s_bracket_k1"
+        cmd: >
+          python3 search_blis_iter7.py --strategy adaptive-hierarchical --phase1-k 1
+          --phase1-profiles bracket --hardware L40S
+          --budget 100 --seeds 42,43,44,45,46 --blis-seeds 42
+          --rate 500 --num-requests 1000 --model meta-llama/llama-3.1-8b-instruct
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-2/results/h-main/l40s_bracket_k1.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-2/results/h-main/l40s_bracket_k1.json"
+        description: "Bracket K=1 on L40S hard llama, blis_seed=42, 5 search seeds. Prediction: 5/5 Phase 1 correct (TP=4/2inst), evals_to_best=3."
+
+  - arm_id: "h-robustness"
+    conditions:
+      - name: "h100_seed_robustness"
+        cmd: >
+          python3 search_blis_iter7.py --strategy adaptive-hierarchical --phase1-k 1
+          --phase1-profiles bracket --hardware H100
+          --budget 100 --seeds 42,43,44,45,46 --blis-seeds 42,43,44,45,46
+          --rate 500 --num-requests 1000 --model meta-llama/llama-3.1-8b-instruct
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-2/results/h-robustness/h100_seed_robustness.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-2/results/h-robustness/h100_seed_robustness.json"
+        description: "Bracket K=1 on H100 hard llama, blis_seeds 42-46, 5 search seeds each. Prediction: 25/25 correct, evals_to_best=3."
+
+  - arm_id: "h-control-negative"
+    conditions:
+      - name: "l40s_min_only"
+        cmd: >
+          python3 search_blis_iter7.py --strategy adaptive-hierarchical --phase1-k 1
+          --phase1-profiles bracket-min-only --hardware L40S
+          --budget 100 --seeds 42,43,44,45,46 --blis-seeds 42
+          --rate 500 --num-requests 1000 --model meta-llama/llama-3.1-8b-instruct
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-2/results/h-control-negative/l40s_min_only.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-2/results/h-control-negative/l40s_min_only.json"
+        description: "Bracket-min-only on L40S hard llama, blis_seed=42, 5 search seeds. Prediction: 5/5 wrong TP (TP=2/4inst), never finds threshold."
+
+  - arm_id: "h-ablation"
+    conditions:
+      - name: "l40s_flat_tpe"
+        cmd: >
+          python3 search_blis_iter7.py --strategy tpe --hardware L40S
+          --budget 100 --seeds 42,43,44,45,46 --blis-seeds 42
+          --rate 500 --num-requests 1000 --model meta-llama/llama-3.1-8b-instruct
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-2/results/h-ablation/l40s_flat_tpe.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-2/results/h-ablation/l40s_flat_tpe.json"
+        description: "Flat TPE on L40S hard llama, blis_seed=42, 5 search seeds. Prediction: higher median evals_to_best than bracket K=1."

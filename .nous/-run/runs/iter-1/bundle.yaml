@@ -1,0 +1,82 @@
+metadata:
+  iteration: 1
+  family: "config-search-efficiency"
+  research_question: "Does Bayesian optimization (TPE) find near-optimal BLIS configurations significantly faster than random search across a 86,400-configuration space?"
+
+arm_selection_rationale: >
+  h-main tests the core claim that informed search (TPE) outperforms uninformed search (random).
+  h-control-negative verifies the mechanism by testing on a trivially small space where random search
+  should match TPE (no room for informed sampling to help). h-robustness checks whether the advantage
+  holds at a different arrival rate (high load), since the fitness landscape may change shape under
+  saturation. h-ablation is skipped because TPE is a single algorithm without separable components
+  to ablate in this iteration.
+
+arms:
+  - type: h-main
+    prediction: >
+      TPE-based Bayesian optimization will find a configuration with higher fitness score than the
+      best random-search configuration at the same evaluation budget (200 evaluations), consistently
+      across 5 independent runs with different random seeds. The gap should be largest at low budgets
+      (100 evaluations) and shrink at high budgets (1000 evaluations) as random search eventually
+      covers more of the space.
+    mechanism: >
+      TPE builds a probabilistic model of which parameter regions produce high fitness scores, then
+      concentrates sampling in those regions. The BLIS search space has strong structure — TP is the
+      dominant knob (TP=8 consistently outperforms TP=1 at fixed GPU count), and routing/admission
+      parameters are irrelevant for single-instance configurations. TPE should discover these
+      structures quickly and exploit them, while random search wastes evaluations on redundant
+      routing/admission variations for single-instance configs.
+    diagnostic: >
+      If TPE does not outperform random search: (1) check whether the fitness landscape is too flat
+      (many configurations have similar scores) by plotting the score distribution from random search,
+      (2) check whether Optuna's TPE is exploring vs exploiting by examining its sampling history,
+      (3) check whether the constraint handling (TP × instances ≤ 8) is correct — broken constraints
+      could cause TPE to waste evaluations on infeasible configs.
+    code_changes:
+      - file: "search_blis.py"
+        intent: >
+          Create a Python script that implements three search strategies (random, TPE via Optuna,
+          and Latin Hypercube) for the BLIS configuration space. The script should: (1) define the
+          10-dimensional search space with the TP × instances ≤ 8 constraint, (2) run BLIS via
+          subprocess for each sampled configuration, (3) parse the fitness score from stdout,
+          (4) track the best score found vs number of evaluations, (5) support multiple independent
+          runs with different seeds, (6) output results as JSON with per-evaluation scores and
+          wall-clock times.
+        rationale: >
+          This is the core experimental artifact. The search script must correctly handle the
+          conditional search space (routing/admission only matter for multi-instance) and parse
+          BLIS output reliably. Using subprocess rather than importing BLIS ensures we test the
+          real CLI interface.
+
+  - type: h-control-negative
+    prediction: >
+      When restricted to only the TP and num-instances knobs (2 parameters, ~15 valid combinations),
+      TPE will NOT outperform random search at any budget, because the space is small enough for
+      random sampling to cover it effectively. Both methods should find the same optimum within
+      20 evaluations.
+    mechanism: >
+      TPE's advantage comes from modeling structure in high-dimensional spaces. In a 2D space with
+      only 15 feasible points, random search has a >50% chance of hitting the optimum within 15
+      samples. There is no structure for TPE to exploit that random search cannot find by exhaustion.
+    diagnostic: >
+      If TPE still outperforms random search in the reduced space: check whether the search space
+      definition correctly restricts to only TP and instances (other parameters should be fixed at
+      defaults). If so, the result suggests TPE has overhead from its modeling that is not justified
+      at small scale.
+
+  - type: h-robustness
+    prediction: >
+      The TPE advantage over random search (measured as fitness gap at 200 evaluations) will persist
+      when the arrival rate is increased from 50 to 200 req/s, though the absolute fitness scores
+      will change (higher load should reduce throughput and increase latency for undersized configs).
+      The fitness landscape under high load should have sharper gradients, potentially making TPE's
+      advantage even larger.
+    mechanism: >
+      At higher arrival rates, undersized configurations (low TP, small batch) will saturate and
+      show dramatically worse latency, creating a steeper fitness landscape. This should make the
+      good regions of the space more distinct, which TPE can exploit more effectively. Random search
+      would waste more evaluations on obviously poor saturated configs.
+    diagnostic: >
+      If the advantage disappears under high load: check whether most configurations simply fail
+      (timeout, queue overflow) at rate=200, which would make the landscape binary (works/doesn't)
+      rather than gradient-rich. If so, the rate is too high — try rate=100 as an intermediate.

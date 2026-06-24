@@ -1,0 +1,58 @@
+[
+  {
+    "id": "RP-C2-11",
+    "statement": "UPDATED: Standard Phase 1 (batch=512) correctly identifies optimal parallelism tier on H100 across all rates (100% accuracy, 9/9 conditions × seeds). On A100-SXM, standard Phase 1 is correct at rate=500 (3/3 seeds) but enters a tie zone at rates >=2000 where TP=4/2 and TP=8/1 are within 0.1-1.0% of each other — the winner depends on workload seed. The prior characterization 'A100-SXM always picks TP=8/1' was based on seed=42 only.",
+    "confidence": "high",
+    "regime": "qwen3-14b, H100/A100-SXM, rates 500-5000",
+    "evidence": ["iteration-4-h-robustness"],
+    "contradicts": ["prior RP-C2-11 which said A100-SXM consistently picks TP=8/1"],
+    "extraction_iteration": 4,
+    "mechanism": "On A100-SXM, TP=4/2 (2 instances) and TP=8/1 (1 instance) have near-identical composite fitness at rates >=2000 because the memory bandwidth difference between TP=4 and TP=8 on A100-SXM is smaller than on H100. The TP=4/2 vs TP=8/1 gap is <1.5% at these rates, making the winner sensitive to workload seed variation. On H100, the gap is much larger (>2%) at rates >=2000, so TP=4/2 dominates consistently.",
+    "applicability_bounds": "Applies to qwen3-14b. When TP tier gap is <2%, treat as tie zone and use seed-averaged scoring for reliable identification.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-C2-13",
+    "statement": "Lean Phase 1 (batch=128) fails to identify the correct tier on H100 at rate=500 (0/3 seeds correct) and on A100-SXM at rates >=2000 (0/3 seeds correct). On H100 at rate=500, the wrong tier varies by seed: TP=2/4 (seed=42, margin 0.0002) or TP=4/2 (seeds 123,456, margin 0.003-0.004). When the wrong tier is TP=2/4 (unsaturated), Phase 2 cannot recover (deficit 24%). When the wrong tier is TP=4/2 (partially saturated), Phase 2 partially recovers but deficit remains 4-8%.",
+    "confidence": "high",
+    "regime": "qwen3-14b, H100/A100-SXM, rates 500-5000",
+    "evidence": ["iteration-4-h-control-negative", "iteration-4-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 4,
+    "mechanism": "At rate=500 on H100, TP=4/2 (2 instances) is partially saturated at batch=128 (250 req/s per instance). TP=2/4 (4 instances) is completely unsaturated at batch=128 (125 req/s per instance). TP=8/1 (1 instance) is saturated at batch=128 but its TRUE score (batch=512) is much higher. Lean Phase 1 sees TP=2/4 ≈ TP=4/2 (both around 0.122-0.127) while TP=8/1 appears weaker (0.119-0.121). The TP=2/4 vs TP=4/2 winner depends on the 0.1-0.4% workload variation. On A100-SXM at rates >=2000, all tiers are partially saturated but the batch-sensitivity of TP=4/2 makes it appear stronger than TP=8/1 at batch=128, inverting the standard Phase 1 ranking.",
+    "applicability_bounds": "Lean Phase 1 (batch=128) is safe ONLY on H100 at rates >=2000 (confirmed correct in 6/6 conditions). Unsafe for: H100 rate=500, A100-SXM all rates tested (500, 2000, 5000).",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-C2-14",
+    "statement": "TPE Phase 2 (Optuna TPE, n_startup=5) converges to 95% of within-tier optimal in 2-3 evals on H100 rate=5000 when Phase 2 headroom is 25%+ (batch=128 starting point, batch=512 optimum). This is dramatically faster than LHS Phase 2 which requires 5-16 evals for the same 95% threshold.",
+    "confidence": "high",
+    "regime": "qwen3-14b, H100, rate=5000, Phase 2 budget=46, Phase 2 headroom=25%",
+    "evidence": ["iteration-4-h-main", "iteration-4-h-ablation"],
+    "contradicts": ["RP-C2-12 which said TPE and LHS are indistinguishable when improvement window is <=1%"],
+    "extraction_iteration": 4,
+    "mechanism": "When Phase 2 headroom is large (25%), the dominant dimension (batch: 5 ordered values, 4x range) creates a strong monotone signal that TPE's Tree Parzen Estimator captures quickly. After 5 startup trials, TPE's density model assigns high probability to batch=512 combinations and converges in 2-3 directed trials. LHS samples uniformly across all 8 dimensions, hitting batch=512 with probability only 1/5 per sample. TPE's advantage here is not about LHS being bad — it's about the signal-to-noise ratio being very high (batch effect is 25x larger than any other dimension's effect).",
+    "applicability_bounds": "TPE advantage requires: (1) Phase 2 headroom >=20%, (2) at least one clearly dominant dimension (batch in this case). When headroom is <=1% (as in iter-3), TPE and LHS are indistinguishable (RP-C2-12 still applies for small-headroom cases).",
+    "superseded_by": null,
+    "category": "algorithmic",
+    "status": "active"
+  },
+  {
+    "id": "RP-C2-5",
+    "statement": "UPDATED: Phase 1 MUST use batch=512 for correct tier ranking. Lean Phase 1 (batch=128) is safe ONLY on H100 at rates >=2000 (6/6 conditions correct across 3 seeds). It fails on H100 rate=500 (0/3 seeds correct, deficit 4-24%) and A100-SXM at all tested rates (<=2/3 seeds correct in best case, deficit varies). The batch=512 requirement is hardware-rate specific: tiers that are unsaturated at batch=128 but saturated at batch=512 appear artificially weaker, inverting the ranking.",
+    "confidence": "high",
+    "regime": "qwen3-14b, H100/A100-SXM, rates 500-5000",
+    "evidence": ["iteration-4-h-robustness", "iteration-4-h-control-negative", "iteration-1 through iter-3"],
+    "contradicts": [],
+    "extraction_iteration": 4,
+    "mechanism": "Standard Phase 1 (batch=512) provides sufficient batch capacity for each tier to reach its throughput ceiling, allowing composite fitness to reflect true tier capability. Lean Phase 1 (batch=128) artificially throttles single-instance configs (TP=8/1, TP=4/2 at high load) while leaving multi-instance configs (TP=2/4, TP=1/8) unaffected (they're inherently unsaturated at lower per-instance load). This creates a false impression that multi-instance configs are competitive with single-instance configs at rates where the latter are truly superior.",
+    "applicability_bounds": "Batch=512 requirement is definitive for all conditions tested. An 'adaptive batch' Phase 1 that detects saturation could theoretically relax this, but remains untested.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  }
+]

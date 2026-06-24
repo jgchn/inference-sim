@@ -1,0 +1,2141 @@
+{
+  "arm": "h-control-negative",
+  "condition": "lean-tpe H100 rate=500",
+  "reference_score": 0.162349,
+  "reference_tier": [
+    8,
+    1
+  ],
+  "seeds": {
+    "42": {
+      "phase1_scores": {
+        "TP=1/8": 0.088719,
+        "TP=2/4": 0.122819,
+        "TP=4/2": 0.122622,
+        "TP=8/1": 0.119729
+      },
+      "phase1_winner": [
+        2,
+        4
+      ],
+      "phase1_winner_score": 0.122819,
+      "phase1_correct": false,
+      "phase2_convergence": [
+        {
+          "eval_idx": 0,
+          "score": 0.121798,
+          "best_so_far": 0.121798,
+          "config": {
+            "scheduler": "priority-fcfs",
+            "max_running": 256,
+            "max_tokens": 8192,
+            "prefill_threshold": 0,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 1,
+          "score": 0.12213,
+          "best_so_far": 0.12213,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 1024,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 2,
+          "score": 0.097728,
+          "best_so_far": 0.12213,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 64,
+            "max_tokens": 4096,
+            "prefill_threshold": 0,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 3,
+          "score": 0.097728,
+          "best_so_far": 0.12213,
+          "config": {
+            "scheduler": "priority-fcfs",
+            "max_running": 64,
+            "max_tokens": 8192,
+            "prefill_threshold": 1024,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 4,
+          "score": 0.074614,
+          "best_so_far": 0.12213,
+          "config": {
+            "scheduler": "priority-fcfs",
+            "max_running": 32,
+            "max_tokens": 4096,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 5,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 6,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 7,
+          "score": 0.12204,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 128,
+            "max_tokens": 2048,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 8,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 9,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 10,
+          "score": 0.073642,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 32,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 11,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 12,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 13,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 14,
+          "score": 0.12204,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 128,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 15,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 512,
+            "max_tokens": 8192,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 16,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 17,
+          "score": 0.12213,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 1024,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 18,
+          "score": 0.121715,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 19,
+          "score": 0.097728,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 64,
+            "max_tokens": 8192,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "least-loaded",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 20,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 128,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 21,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 22,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 23,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 24,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 25,
+          "score": 0.072089,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 32,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 26,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 27,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "priority-fcfs",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 28,
+          "score": 0.121785,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 512,
+            "max_tokens": 4096,
+            "prefill_threshold": 1024,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 29,
+          "score": 0.122819,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "priority-fcfs",
+            "max_running": 256,
+            "max_tokens": 8192,
+            "prefill_threshold": 0,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 30,
+          "score": 0.097056,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 64,
+            "max_tokens": 8192,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 31,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 32,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 33,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 34,
+          "score": 0.12213,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 1024,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 35,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 36,
+          "score": 0.074312,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "priority-fcfs",
+            "max_running": 32,
+            "max_tokens": 4096,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "least-loaded",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 37,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 128,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 38,
+          "score": 0.096434,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 64,
+            "max_tokens": 2048,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 39,
+          "score": 0.121672,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 512,
+            "max_tokens": 8192,
+            "prefill_threshold": 1024,
+            "block_size": 16,
+            "routing": "least-loaded",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 40,
+          "score": 0.074614,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 32,
+            "max_tokens": 4096,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 41,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 42,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 43,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 44,
+          "score": 0.123127,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 45,
+          "score": 0.12204,
+          "best_so_far": 0.123127,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        }
+      ],
+      "phase2_best_score": 0.123127,
+      "best_score": 0.123127,
+      "deficit_pct": 24.159064730919187,
+      "total_evals": 50
+    },
+    "123": {
+      "phase1_scores": {
+        "TP=1/8": 0.08978,
+        "TP=2/4": 0.123562,
+        "TP=4/2": 0.12736,
+        "TP=8/1": 0.120452
+      },
+      "phase1_winner": [
+        4,
+        2
+      ],
+      "phase1_winner_score": 0.12736,
+      "phase1_correct": false,
+      "phase2_convergence": [
+        {
+          "eval_idx": 0,
+          "score": 0.128125,
+          "best_so_far": 0.128125,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 128,
+            "max_tokens": 8192,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 1,
+          "score": 0.072722,
+          "best_so_far": 0.128125,
+          "config": {
+            "scheduler": "priority-fcfs",
+            "max_running": 32,
+            "max_tokens": 8192,
+            "prefill_threshold": 1024,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 2,
+          "score": 0.152013,
+          "best_so_far": 0.152013,
+          "config": {
+            "scheduler": "priority-fcfs",
+            "max_running": 512,
+            "max_tokens": 4096,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 3,
+          "score": 0.069708,
+          "best_so_far": 0.152013,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 32,
+            "max_tokens": 2048,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 4,
+          "score": 0.151292,
+          "best_so_far": 0.152013,
+          "config": {
+            "scheduler": "priority-fcfs",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 1024,
+            "block_size": 16,
+            "routing": "least-loaded",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 5,
+          "score": 0.152013,
+          "best_so_far": 0.152013,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 512,
+            "max_tokens": 4096,
+            "prefill_threshold": 2048,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 6,
+          "score": 0.099488,
+          "best_so_far": 0.152013,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 64,
+            "max_tokens": 4096,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 7,
+          "score": 0.152535,
+          "best_so_far": 0.152535,
+          "config": {
+            "scheduler": "priority-fcfs",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 8,
+          "score": 0.15345,
+          "best_so_far": 0.15345,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 0,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 9,
+          "score": 0.15345,
+          "best_so_far": 0.15345,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 0,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 10,
+          "score": 0.149973,
+          "best_so_far": 0.15345,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 11,
+          "score": 0.15345,
+          "best_so_far": 0.15345,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 0,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 12,
+          "score": 0.15345,
+          "best_so_far": 0.15345,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 0,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 13,
+          "score": 0.15345,
+          "best_so_far": 0.15345,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 0,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 14,
+          "score": 0.127157,
+          "best_so_far": 0.15345,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 128,
+            "max_tokens": 4096,
+            "prefill_threshold": 0,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 15,
+          "score": 0.102347,
+          "best_so_far": 0.15345,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 64,
+            "max_tokens": 8192,
+            "prefill_threshold": 0,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 16,
+          "score": 0.154561,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 0,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 17,
+          "score": 0.154561,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 18,
+          "score": 0.154186,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 19,
+          "score": 0.069708,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 32,
+            "max_tokens": 8192,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 20,
+          "score": 0.103183,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 64,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 21,
+          "score": 0.154186,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 22,
+          "score": 0.154186,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 23,
+          "score": 0.154186,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 24,
+          "score": 0.154186,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 25,
+          "score": 0.126902,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 128,
+            "max_tokens": 2048,
+            "prefill_threshold": 1024,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 26,
+          "score": 0.154561,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 27,
+          "score": 0.154561,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 28,
+          "score": 0.154561,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 2048,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 29,
+          "score": 0.125151,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 128,
+            "max_tokens": 8192,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 30,
+          "score": 0.099488,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 64,
+            "max_tokens": 4096,
+            "prefill_threshold": 1024,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 31,
+          "score": 0.154561,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 32,
+          "score": 0.154561,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 33,
+          "score": 0.069708,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 32,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 34,
+          "score": 0.152013,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "priority-fcfs",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 35,
+          "score": 0.154561,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 512,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 36,
+          "score": 0.072722,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "priority-fcfs",
+            "max_running": 32,
+            "max_tokens": 8192,
+            "prefill_threshold": 1024,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 37,
+          "score": 0.154561,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 512,
+            "max_tokens": 4096,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 38,
+          "score": 0.154561,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 39,
+          "score": 0.152013,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 40,
+          "score": 0.125151,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "priority-fcfs",
+            "max_running": 128,
+            "max_tokens": 4096,
+            "prefill_threshold": 2048,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 41,
+          "score": 0.154561,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 2048,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 42,
+          "score": 0.154561,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 2048,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 43,
+          "score": 0.154561,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 2048,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 44,
+          "score": 0.154561,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 2048,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 45,
+          "score": 0.15436,
+          "best_so_far": 0.154561,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 512,
+            "max_tokens": 4096,
+            "prefill_threshold": 1024,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        }
+      ],
+      "phase2_best_score": 0.154561,
+      "best_score": 0.154561,
+      "deficit_pct": 4.797072972423599,
+      "total_evals": 50
+    },
+    "456": {
+      "phase1_scores": {
+        "TP=1/8": 0.084043,
+        "TP=2/4": 0.121017,
+        "TP=4/2": 0.125299,
+        "TP=8/1": 0.121075
+      },
+      "phase1_winner": [
+        4,
+        2
+      ],
+      "phase1_winner_score": 0.125299,
+      "phase1_correct": false,
+      "phase2_convergence": [
+        {
+          "eval_idx": 0,
+          "score": 0.124533,
+          "best_so_far": 0.124533,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 128,
+            "max_tokens": 4096,
+            "prefill_threshold": 2048,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 1,
+          "score": 0.128929,
+          "best_so_far": 0.128929,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 128,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 2,
+          "score": 0.148138,
+          "best_so_far": 0.148138,
+          "config": {
+            "scheduler": "priority-fcfs",
+            "max_running": 512,
+            "max_tokens": 4096,
+            "prefill_threshold": 2048,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 3,
+          "score": 0.148327,
+          "best_so_far": 0.148327,
+          "config": {
+            "scheduler": "priority-fcfs",
+            "max_running": 256,
+            "max_tokens": 8192,
+            "prefill_threshold": 2048,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 4,
+          "score": 0.147834,
+          "best_so_far": 0.148327,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 5,
+          "score": 0.147313,
+          "best_so_far": 0.148327,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 8192,
+            "prefill_threshold": 1024,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 6,
+          "score": 0.100992,
+          "best_so_far": 0.148327,
+          "config": {
+            "scheduler": "priority-fcfs",
+            "max_running": 64,
+            "max_tokens": 8192,
+            "prefill_threshold": 0,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 7,
+          "score": 0.071172,
+          "best_so_far": 0.148327,
+          "config": {
+            "scheduler": "priority-fcfs",
+            "max_running": 32,
+            "max_tokens": 8192,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 8,
+          "score": 0.148327,
+          "best_so_far": 0.148327,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 8192,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 9,
+          "score": 0.102677,
+          "best_so_far": 0.148327,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 64,
+            "max_tokens": 8192,
+            "prefill_threshold": 1024,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 10,
+          "score": 0.071172,
+          "best_so_far": 0.148327,
+          "config": {
+            "scheduler": "priority-fcfs",
+            "max_running": 32,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 11,
+          "score": 0.148327,
+          "best_so_far": 0.148327,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 8192,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 12,
+          "score": 0.148327,
+          "best_so_far": 0.148327,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 8192,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 13,
+          "score": 0.148327,
+          "best_so_far": 0.148327,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 8192,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 14,
+          "score": 0.148327,
+          "best_so_far": 0.148327,
+          "config": {
+            "scheduler": "priority-fcfs",
+            "max_running": 512,
+            "max_tokens": 8192,
+            "prefill_threshold": 2048,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 15,
+          "score": 0.148946,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 16,
+          "score": 0.148946,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 17,
+          "score": 0.148946,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 18,
+          "score": 0.106352,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 64,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 19,
+          "score": 0.12773,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 128,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 20,
+          "score": 0.072756,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 32,
+            "max_tokens": 4096,
+            "prefill_threshold": 1024,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 21,
+          "score": 0.148946,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 22,
+          "score": 0.148946,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 23,
+          "score": 0.148946,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 24,
+          "score": 0.148946,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 25,
+          "score": 0.148946,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 512,
+            "max_tokens": 4096,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 26,
+          "score": 0.148946,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 27,
+          "score": 0.148946,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 28,
+          "score": 0.148946,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 29,
+          "score": 0.125299,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 128,
+            "max_tokens": 4096,
+            "prefill_threshold": 1024,
+            "block_size": 16,
+            "routing": "least-loaded",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 30,
+          "score": 0.100992,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "reverse-priority",
+            "max_running": 64,
+            "max_tokens": 2048,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 31,
+          "score": 0.148946,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 32,
+          "score": 0.148946,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 33,
+          "score": 0.12773,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 128,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 34,
+          "score": 0.148946,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 512,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 35,
+          "score": 0.148946,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 36,
+          "score": 0.147187,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 37,
+          "score": 0.148138,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 0,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 38,
+          "score": 0.071131,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 32,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "priority"
+          }
+        },
+        {
+          "eval_idx": 39,
+          "score": 0.147772,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 1024,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 40,
+          "score": 0.148946,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 41,
+          "score": 0.148946,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 42,
+          "score": 0.148946,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 43,
+          "score": 0.148946,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 44,
+          "score": 0.148035,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "priority-fcfs",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        },
+        {
+          "eval_idx": 45,
+          "score": 0.148946,
+          "best_so_far": 0.148946,
+          "config": {
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          }
+        }
+      ],
+      "phase2_best_score": 0.148946,
+      "best_score": 0.148946,
+      "deficit_pct": 8.255671423907755,
+      "total_evals": 50
+    }
+  }
+}

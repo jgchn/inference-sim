@@ -1,0 +1,9 @@
+{
+  "gate_type": "continue",
+  "summary": "Iteration 1 found that at a load of 20 req/s, the BLIS objective space collapses to a single optimal point reachable by roughly 1-in-4 random configurations, making all three search algorithms (NSGA-II, random, Latin Hypercube) statistically identical \u2014 all achieved hypervolume=249,720.535 and found the optimum (rps=12.5, ttft_p99=22.7ms) within their first few evaluations. The core hypothesis that NSGA-II outperforms random was refuted, but only because the test workload was too easy, not because NSGA-II is ineffective.",
+  "key_points": [
+    "Root cause of all three refutations: rate=20 req/s under-loads the simulated cluster so thoroughly that ~24% of the entire configuration space achieves the identical global optimum; there is no throughput/latency tradeoff curve to navigate, only a binary split between saturated and unsaturated configs.",
+    "NSGA-II's selection pressure mechanism is intact and working correctly (discrete crossover generated valid offspring without excessive constraint violations), but it cannot help when the optimal point is found by random chance on evaluation #1 \u2014 50 initial random samples are virtually guaranteed to contain at least one optimal config.",
+    "Next iteration must increase arrival rate to ~80\u2013150 req/s to create genuine queueing competition where throughput and P99 latency trade off continuously; this will produce a multi-point Pareto frontier and a meaningful gradient in objective space that NSGA-II's selection pressure can exploit."
+  ]
+}

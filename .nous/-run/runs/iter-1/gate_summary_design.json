@@ -1,0 +1,11 @@
+{
+  "gate_type": "design",
+  "summary": "We are testing whether Bayesian optimization (TPE) finds near-optimal BLIS simulator configurations significantly faster than random search across an 86,400-point configuration space defined by 10 knobs (TP, replicas, scheduler, batch size, etc.). Three experiment arms will run BLIS evaluations via its CLI, comparing best-fitness-found curves at budgets of 100, 200, and 1000 evaluations across 5 seeds each.",
+  "key_points": [
+    "h-main: TPE vs random search over the full 10-dimensional space. Prediction is TPE finds higher fitness at 200 evals, with the gap largest at 100 evals and shrinking by 1000 evals. Confirmation requires TPE to consistently beat random across 5 independent seeds; refutation if the fitness distribution is too flat (many configs score similarly) or the constraint TP\u00d7instances\u22648 is mishandled.",
+    "h-control-negative: Restricts the space to only TP and num-instances (~15 feasible combos). Prediction is TPE provides NO advantage here because random search can near-exhaustively cover the space within 20 evaluations. This validates that TPE's benefit comes from modeling structure in high-dimensional spaces, not from an implementation artifact.",
+    "h-robustness: Repeats h-main at arrival rate 200 req/s (vs default 50 req/s). Prediction is TPE's advantage persists or grows because high load creates a steeper fitness landscape with more clearly separated good/bad regions. If most configs simply fail at rate=200 (binary landscape), a fallback to rate=100 is planned.",
+    "Primary artifact is search_blis.py, which wraps BLIS via subprocess, enforces the TP\u00d7instances\u22648 constraint, implements random/TPE/LHS samplers, and outputs per-evaluation JSON with scores and wall-clock times. Correct constraint handling and reliable stdout parsing are key risks to verify before running.",
+    "Success metric: statistically significant fitness gap (across 5 seeds) between TPE and random at 200 evaluations for h-main, no significant gap for h-control-negative, and a persistent gap at high load for h-robustness. A flat score distribution from random search (low variance) would indicate the space lacks enough structure to justify informed search and would refute the hypothesis."
+  ]
+}

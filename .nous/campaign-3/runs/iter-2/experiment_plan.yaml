@@ -1,0 +1,30 @@
+metadata:
+  iteration: 2
+  bundle_ref: "runs/iter-2/bundle.yaml"
+  description: "3-objective Pareto search comparison: NSGA-II vs random vs TPE at rate=50, 550 evals each, objectives=(maximize rps, minimize ttft_p99, minimize gpu_count)"
+
+setup:
+  - cmd: "go build -o blis main.go"
+    description: "Build BLIS binary (binary already exists at ./blis)"
+
+arms:
+  - arm_id: "h-main"
+    conditions:
+      - name: "nsga2-550evals"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-2/inputs/search_nsga2_3obj.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-2/results/h-main/convergence.json"
+        description: "NSGA-II: population=50, 11 generations=550 total evals, 3D HV tracked every generation"
+
+  - arm_id: "h-control-negative"
+    conditions:
+      - name: "random-550evals"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-2/inputs/search_random_3obj.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-2/results/h-control-negative/convergence.json"
+        description: "Uniform random search: 550 evaluations, HV tracked every 50 evals"
+
+  - arm_id: "h-robustness"
+    conditions:
+      - name: "tpe-550evals"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-2/inputs/search_tpe_3obj.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-2/results/h-robustness/convergence.json"
+        description: "Optuna TPESampler multi-objective: 550 evals, n_startup=50, HV tracked every 50 evals"

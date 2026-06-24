@@ -1,0 +1,42 @@
+metadata:
+  iteration: 2
+  family: "search-algorithm-convergence"
+  research_question: "Does NSGA-II converge to the 3-objective Pareto frontier (maximize rps, minimize ttft_p99, minimize gpu_count) faster than random sampling, when GPU cost creates a genuine multi-dimensional tradeoff surface?"
+
+# Arm selection rationale:
+# - h-main: Tests whether NSGA-II's selection pressure provides convergence advantage in a 3-objective space
+# - h-control-negative: Random search baseline — if NSGA-II can't beat random's convergence rate,
+#   the frontier is too easily discoverable for selection pressure to matter
+# - h-robustness: TPE tests whether model-based methods (parameter-metric correlation exploitation)
+#   converge even faster than evolutionary methods, validating that the objective landscape has
+#   exploitable structure
+# - h-ablation omitted: the key variable is the search strategy (evolutionary vs random vs model-based),
+#   not internal NSGA-II components
+
+arms:
+  - type: h-main
+    prediction: "NSGA-II with population=50 and 11 generations (550 total evaluations) will reach 95% of its final 3D hypervolume within the first 200 evaluations (by generation 4), while random search at the same evaluation count will not reach 95% until approximately 300-400 evaluations. The convergence advantage emerges because selection pressure concentrates offspring near the cost-performance Pareto surface rather than sampling uniformly from the dominated interior."
+    mechanism: "In the 3-objective space (max rps, min ttft_p99, min gpu_count), the Pareto frontier spans multiple GPU tiers (1, 2, 4, 8 GPUs) with distinct optimal TP/instance configurations at each tier. NSGA-II's non-dominated sorting identifies frontier points in the initial population, then crossover between parents from different GPU tiers generates offspring that explore intermediate configurations (e.g., combining high-TP genes from an 8-GPU parent with cost-efficient batch settings from a 2-GPU parent). Crowding distance ensures diversity across the 3 objective dimensions, preventing collapse to a single tier. Over 4-5 generations, this fills in missing frontier points that random sampling would need many more evaluations to discover by chance."
+    diagnostic: "If NSGA-II does NOT converge faster than random: (1) Check if the Pareto frontier has fewer than 4 distinct points — too few means random finds them immediately. (2) Compute the fraction of configs that are non-dominated at each GPU tier — if >10% per tier, the frontier is 'fat' and easy to find. (3) Inspect generation-by-generation HV curves — flat curves from gen 0 means the initial population already saturates the frontier (same failure mode as iter 1, but now in 3D). (4) Check if discrete crossover between configs from different GPU tiers produces mostly infeasible offspring (TP*inst > 8), wasting evaluations."
+    code_changes:
+      - file: ".nous/campaign-3/runs/iter-2/inputs/search_nsga2_3obj.py"
+        intent: "Implement NSGA-II search over BLIS configuration space with 3 objectives (maximize responses_per_sec, minimize ttft_p99_ms, minimize gpu_count where gpu_count = tp * num_instances). Population 50, 11 generations, 550 total evals. Track cumulative hypervolume at every generation (50-eval interval). Use reference point (0, 40000, 9) for HV computation. Output: pareto_front.json (configs + metrics), convergence.json (HV at each generation)."
+        rationale: "Tests the core claim that evolutionary selection pressure accelerates Pareto frontier discovery in a 3-objective discrete space. The 3rd objective (gpu_count) guarantees a multi-point frontier that wasn't achievable with 2 objectives."
+
+  - type: h-control-negative
+    prediction: "Random search with 550 evaluations will eventually find the same Pareto frontier as NSGA-II (final HV within 2%), but will reach 95% of that HV only after 300-400 evaluations. Each Pareto-optimal tier (1, 2, 4, 8 GPUs) has approximately 1-3% of configs achieving optimal-for-tier metrics, so random needs ~100+ samples per tier to reliably find the best config at each cost level."
+    mechanism: "Uniform random sampling allocates evaluations proportionally to space volume, not proximity to the frontier. With ~294K total configs and the Pareto set occupying roughly 5% of the space (union across all tiers), random discovers frontier points at a constant rate of ~1 per 20 evaluations. Since the full frontier has 5+ distinct points spanning 4 GPU tiers, random needs ~100-200 evaluations to find all tiers represented, and additional evaluations to find the BEST config within each tier (only ~1% of same-tier configs achieve the tier-optimal metrics)."
+    diagnostic: "If random matches NSGA-II's convergence rate: the Pareto-optimal configs are more common than estimated (>5% of space), making any sampling method sufficient. Verify by counting non-dominated fraction in random sample. If random is MUCH slower than predicted: configs at certain GPU tiers may be rarer or harder to generate validly."
+    code_changes:
+      - file: ".nous/campaign-3/runs/iter-2/inputs/search_random_3obj.py"
+        intent: "Implement uniform random search with 550 constraint-valid configurations. Compute 3D hypervolume cumulatively every 50 evaluations. Same objectives, reference point, and output format as NSGA-II arm. Output: pareto_front.json, convergence.json."
+        rationale: "Establishes convergence baseline. The prediction is that random achieves the same FINAL HV but converges more slowly — the convergence curve shape is the primary comparison metric."
+
+  - type: h-robustness
+    prediction: "Tree-structured Parzen Estimator (TPE) with multi-objective extension will reach 95% of final hypervolume in fewer evaluations than both NSGA-II and random (within approximately 100-150 evaluations), because TPE exploits parameter-metric correlations (e.g., TP strongly predicts both rps and gpu_count) to quickly identify promising regions of the search space."
+    mechanism: "TPE models the conditional probability P(x|y) by fitting separate kernel density estimates to 'good' and 'bad' configurations (split by non-domination rank). After the first 20-30 evaluations, TPE learns that TP and num_instances are the dominant variables for all 3 objectives, and concentrates subsequent sampling on configurations where TP*instances spans multiple tiers while batch/scheduler are set to values correlated with high performance. This exploits the BLIS objective landscape's strong tree structure: TP determines the tier, then batch/scheduler determine within-tier quality. NSGA-II uses this structure only indirectly through selection; TPE models it explicitly."
+    diagnostic: "If TPE does NOT outperform NSGA-II: (1) The discrete parameter space may not provide enough signal for density estimation (too few unique values per parameter). (2) The objective landscape may lack exploitable correlation structure (all parameters contribute roughly equally). (3) Check TPE's acquisition function — if it concentrates on a single GPU tier without exploring others, it may miss parts of the Pareto frontier."
+    code_changes:
+      - file: ".nous/campaign-3/runs/iter-2/inputs/search_tpe_3obj.py"
+        intent: "Implement multi-objective TPE search over BLIS configuration space. 550 sequential evaluations with model updates. Track 3D hypervolume every 50 evaluations. Use Optuna's MOTPESampler or custom implementation with KDE-based acquisition. Same objectives, reference point, and output format as other arms."
+        rationale: "Tests whether model-based methods (which explicitly learn parameter-metric relationships) converge faster than evolutionary methods (which learn only through selection pressure). If TPE converges fastest, it validates that the objective landscape has strong, exploitable parameter correlations."

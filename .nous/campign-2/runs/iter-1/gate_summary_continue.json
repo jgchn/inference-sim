@@ -1,0 +1,11 @@
+{
+  "gate_type": "continue",
+  "summary": "Iteration 1 tested whether a hierarchical (tier-first) search strategy finds a better Pareto frontier than random search in 500 evaluations of BLIS. Both strategies achieved identical hypervolume (HV ratio = 1.000) because the Pareto problem was degenerate \u2014 TP=8/1-instance dominates every other configuration on both throughput AND latency simultaneously, collapsing the frontier to a single point rather than a genuine tradeoff curve.",
+  "key_points": [
+    "h-main REFUTED: Hierarchical and random search achieved identical hypervolume (7.75\u00d710\u2078) at rate=50. The assumed tradeoff between TP=4/2-inst (11,985 tok/s, 6,326ms) and TP=8/1-inst (14,232 tok/s, 4,719ms) is not a tradeoff \u2014 TP=8/1-inst wins on both objectives, leaving no Pareto frontier to discover.",
+    "Root cause is load regime: at rate=50, TP=8/1-inst is not yet saturated, so it simultaneously delivers the highest throughput and lowest latency. A genuine frontier likely only emerges at much higher request rates (estimated >100 req/s) where TP=8/1-inst begins to saturate and lower-TP multi-instance configs become latency-competitive.",
+    "h-robustness CONFIRMED: Phase 1 tier ranking ([8x1, 4x2, 4x1]) was perfectly stable across all 5 seeds, and the ~8% HV coefficient of variation across seeds reflects workload sampling noise only \u2014 the structural dominance ordering is invariant to seed.",
+    "Next iteration should test rate=100\u2013200 req/s to find the saturation regime where TP=8/1-inst latency degrades enough to create genuine throughput-latency tradeoffs. If a real Pareto frontier emerges there, the hierarchical strategy's confirmed structural stability (h-robustness) makes it a strong candidate to outperform random search in that regime.",
+    "Secondary knobs (scheduler, batch size, chunked prefill, etc.) produced negligible within-tier variation at both rate=5 and rate=50 relative to the TP/instance-count effect, suggesting the search space is effectively much lower-dimensional than the nominal 86,400-configuration count implies."
+  ]
+}

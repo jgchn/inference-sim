@@ -1,0 +1,10 @@
+{
+  "gate_type": "findings",
+  "summary": "Iteration 9 tested whether KV memory pressure uniquely drives NSGA-II's search advantage and whether model-specific patterns hold at high load (rate=100 req/s). Three of four predictions were refuted: the KV cliff is NOT the sole driver of NSGA-II advantage, the Llama-random-wins pattern reverses at high load, and both models have nearly identical landscape difficulty \u2014 fundamentally reshaping our understanding of when and why NSGA-II outperforms random search in BLIS.",
+  "key_points": [
+    "NSGA-II advantage is UNIVERSAL at rate=100: Qwen gap=+62.3 evals (confirmed, predicted \u2265+31), Llama gap=+40.3 evals (REFUTED \u2014 predicted negative based on rate=75 pattern of -25.3). The Llama-random-wins rule (RP-11) has a rate breakpoint between 75-100 req/s.",
+    "KV cliff is NOT the sole driver: Removing KV variation entirely (fixed kv=10000, zero preemptions) still yields a +29 eval NSGA-II advantage (predicted ~0 or negative). Multiple axes \u2014 max_num_running_reqs (NDR=0.50), block_size (NDR=0.27), scheduler (NDR=0.22) \u2014 provide enough structural gradient for NSGA-II crossover to exploit.",
+    "Model NDR is NOT a differentiator: Qwen NDR=35.60% vs Llama NDR=35.75% \u2014 nearly identical (predicted Qwen > Llama). The kv_blocks axis is highest-NDR for BOTH models (Qwen=0.707, Llama=0.727). Landscape difficulty metrics do not distinguish which model benefits more from directed search.",
+    "Emerging principle: NSGA-II has a universal structural advantage in BLIS at high load because multiple parameter axes create exploitable dominance relationships (free improvements at same GPU cost). The advantage strengthens with load as KV stress sharpens cliffs, but persists even without KV variation due to other high-NDR axes."
+  ]
+}

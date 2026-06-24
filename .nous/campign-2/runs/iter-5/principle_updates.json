@@ -1,0 +1,58 @@
+[
+  {
+    "id": "RP-C2-5",
+    "statement": "Phase 1 MUST use batch=512 for correct tier ranking, regardless of nreq. At nreq=2000, lean Phase 1 (batch=128) eliminates TP=8/1 and TP=1/8 from contention (never selects them), but systematically misranks TP=4/2 vs TP=2/4: in 12/18 conditions across rates and hardware, it selects TP=2/4 instead of TP=4/2. The mechanism is effective cluster batch capacity: at batch=128, TP=2/4 (4 instances × 128 = 512 effective) has 2× the concurrent capacity of TP=4/2 (2 instances × 128 = 256 effective), giving TP=2/4 an artificial advantage that persists in steady state. At batch=512, both configurations exceed steady-state queue demand (~75 rps × service time) and TP=4/2's per-GPU compute efficiency dominates. The prior characterization of 'safe on H100 at rates>=2000' was based on nreq=500 comparisons; at nreq=2000, lean fails even on H100 rate=2000 (0/3 seeds correct) and rate=5000 (0/3 seeds correct).",
+    "confidence": "high",
+    "regime": "qwen3-14b, H100 and A100-SXM, rates 500-5000, nreq=2000, seeds 42/123/456",
+    "evidence": ["iteration-5-h-main", "iteration-5-h-ablation"],
+    "contradicts": ["iteration-4-RP-C2-5-partial-update"],
+    "extraction_iteration": 5,
+    "mechanism": "Effective cluster batch capacity = num_instances × max_num_running_reqs. At batch=128: TP=2/4 has 4×128=512 effective capacity, TP=4/2 has 2×128=256. In steady-state queuing (rate >> capacity), this 2× advantage means TP=2/4 processes larger concurrent batches and achieves higher measured fitness. At batch=512, both 4×512=2048 and 2×512=1024 exceed the steady-state concurrent request pool (~75 rps × ~7s service = ~525 concurrent), so the capacity ceiling is not binding and true compute efficiency determines ranking.",
+    "applicability_bounds": "Applies when comparing tiers that share the same total GPU count (TP×instances = const). TP=4/2 and TP=2/4 both use 8 GPUs. The batch capacity effect is proportional to instance count ratio (4:2 = 2×). For configs with the same instance count or when batch size >> requests_in_flight, this effect disappears.",
+    "superseded_by": null,
+    "category": "configuration",
+    "status": "active"
+  },
+  {
+    "id": "RP-C2-15",
+    "statement": "nreq>=750 (with batch=512) is the minimum simulation duration for correct Phase 1 tier ranking on H100 rate=500. Below nreq=750, TP=8/1 is artificially favored due to transient simulation dynamics. The transition from TP=8/1-dominant to TP=4/2-dominant occurs precisely between nreq=500 (TP=8/1 wins by 8%) and nreq=750 (TP=4/2 wins by 2%). At nreq=1000, TP=4/2 leads by 5% and the ranking is stable.",
+    "confidence": "high",
+    "regime": "qwen3-14b, H100, rate=500, batch=512, seed=42",
+    "evidence": ["iteration-5-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 5,
+    "mechanism": "System capacity is ~75 rps. At rate=500, the arrival excess is ~425 req/s. nreq=500 provides only 1 second of arrivals, meaning only ~75 requests complete during the arrival window. The tail is dominated by drain dynamics where TP=8/1's faster per-token speed (ITL=10ms vs 21ms for TP=4/2) gives it an edge. By nreq=750 (~1.5s arrivals), enough queue has accumulated that TP=4/2's dual-instance throughput advantage (~150 concurrent capacity vs single instance) begins to dominate p99 TTFT metrics. By nreq=1000, the equilibrium is fully established.",
+    "applicability_bounds": "The exact transition threshold (nreq=750) is specific to H100 rate=500. For higher rates or larger models, the threshold may differ. For rate=2000, the transition likely occurs at lower nreq (faster queue buildup). Batch size interacts: at batch=128, lean Phase 1 may show a different transition threshold (untested in h-robustness).",
+    "superseded_by": null,
+    "category": "configuration",
+    "status": "active"
+  },
+  {
+    "id": "RP-C2-7",
+    "statement": "UPDATED: TP=8/1's apparent optimality at low num_requests is a simulation duration artifact, not a rate-dependent property. At nreq=250 and nreq=500 (batch=512), TP=8/1 wins 100% of tested conditions regardless of rate (500-5000) or hardware (H100, A100-SXM). At nreq=750+, TP=4/2 wins. The prior observation of 'TP=8/1 optimal at rate=50' was also likely a short-simulation artifact.",
+    "confidence": "high",
+    "regime": "qwen3-14b, H100 and A100-SXM, rates 500-5000, batch=512, seeds 42/123/456",
+    "evidence": ["iteration-5-h-control-negative", "iteration-5-h-robustness"],
+    "contradicts": ["RP-C2-1 (to be verified: if rate=50 is UNDER capacity, TP=8/1 advantage may be real)"],
+    "extraction_iteration": 5,
+    "mechanism": "At low nreq, single-instance (TP=8/1) with batch=512 can process up to 512 concurrent tokens per step. During the transient queue-building phase, this larger batch capacity allows TP=8/1 to complete requests faster than multi-instance configurations, artificially inflating its throughput metric. Once queues reach equilibrium (nreq>=750 at rate=500), TP=4/2's dual-instance aggregate throughput (~150 capacity vs ~73 for TP=8/1) dominates.",
+    "applicability_bounds": "Valid for deeply oversaturated regimes (rate >> capacity ~75 rps). May not apply for rate < capacity (undersaturated regime) where TP=8/1's faster single-request processing might be genuinely optimal.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-C2-16",
+    "statement": "At nreq=2000, lean Phase 1 (batch=128) reliably distinguishes the 'multi-instance' regime from 'single-instance': it never selects TP=8/1 or TP=1/8 in any tested condition. However, it cannot precisely rank TP=4/2 vs TP=2/4, selecting TP=2/4 in 12/18 conditions where batch=512 would select TP=4/2. For use cases where TP=4/2 vs TP=2/4 precision is not critical (e.g., when Phase 2 can distinguish them), lean Phase 1 at nreq=2000 is a useful low-cost filter that eliminates the 2 clearly suboptimal tiers (TP=1/8, TP=8/1) while converging on the competitive 2-tier set {TP=4/2, TP=2/4}.",
+    "confidence": "high",
+    "regime": "qwen3-14b, H100 and A100-SXM, rates 500-5000, nreq=2000, seeds 42/123/456",
+    "evidence": ["iteration-5-h-main"],
+    "contradicts": [],
+    "extraction_iteration": 5,
+    "mechanism": "At nreq=2000, the simulation is long enough that TP=8/1's transient advantage dissipates and steady-state queuing dominates. Multi-instance configs uniformly outperform single-instance. But within multi-instance, the batch=128 capacity effect (effective_capacity = instances × max_batch) creates a systematic TP=2/4 bias. The competitive TP=4/2 vs TP=2/4 scores (within 2-5% at batch=128) indicate both tiers are genuinely competitive at batch=128 in steady state.",
+    "applicability_bounds": "Valid for the 4-tier extremes Phase 1 structure. If Phase 1 uses all instances (not just max-per-TP), the effective capacity calculation changes. The 2-tier {TP=4/2, TP=2/4} collapse may not hold for other models or hardware where TP=4/2 and TP=2/4 have larger inherent performance gaps.",
+    "superseded_by": null,
+    "category": "configuration",
+    "status": "active"
+  }
+]

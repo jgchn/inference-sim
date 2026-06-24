@@ -1,0 +1,33 @@
+{
+  "iteration": 1,
+  "bundle_ref": "runs/iter-1/bundle.yaml",
+  "arms": [
+    {
+      "arm_type": "h-main",
+      "predicted": "TPE-based Bayesian optimization will find a configuration with higher fitness score than random search at the same budget (200 evaluations), consistently across 5 seeds. The gap should be largest at low budgets and shrink at high budgets as random eventually covers the space.",
+      "observed": "At budget=50 (rate=50, H100, qwen3-14b, 200 reqs): TPE mean best=0.096881 (all 5/5 seeds found global best), random mean best=0.091955 (3/5 seeds found global best), LHS mean best=0.096866. TPE advantage over random at budget=50: +5.36%. Mean evals_to_best: TPE=18.8, random=36.2, LHS=19.0. At budget=100, all three strategies converge to the same global best (0.096881). Global best config: tp=8, num_instances=1, max_running=256. 500 evaluations complete in ~35s wall clock (well under 5-minute target). All runs produced via search_blis.py on H100, blis_seed=42.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "The gap shrinks faster than predicted — all strategies converge by budget=100, not 1000. This is consistent with RP-1 (TP=8 dominance) and RP-2 (global optimum found within 100 evals). LHS performs as well as TPE at budget=50, showing stratified coverage is also effective for this structured landscape."
+    },
+    {
+      "arm_type": "h-control-negative",
+      "predicted": "When restricted to only TP and num_instances (15 valid combinations), TPE will NOT outperform random search at any budget. Both methods should find the same optimum within 20 evaluations.",
+      "observed": "Restricted space (15 combos): TPE mean evals_to_best=6.2 (seeds: [2,11,11,1,6]), random mean evals_to_best=13.6 (seeds: [12,11,8,27,10]). TPE is 2.2x faster than random even in the 15-point space. Both strategies find the global best (0.096881) within budget=30 across all 5 seeds. Best config: tp=8/1inst with default secondary params.",
+      "status": "REFUTED",
+      "error_type": "direction",
+      "diagnostic_note": "The predicted mechanism (no structure to exploit in a 15-point space) was wrong. TP=8/1inst scores 13% higher than the median combo, creating a strongly unimodal landscape that TPE's model detects and exploits even at 15 feasible points. This matches RP-4 exactly. The prediction failed because it assumed a minimum space size for Bayesian advantage, but even a 2.2x speedup exists in a 15-point space with a dominant mode."
+    },
+    {
+      "arm_type": "h-robustness",
+      "predicted": "The TPE advantage over random search will persist at rate=200 (high load). The fitness landscape under high load should have sharper gradients, potentially making TPE's advantage even larger.",
+      "observed": "At rate=200 (H100, qwen3-14b, 200 reqs, budget=100): TPE mean evals_to_best=22.6 (seeds: [11,37,7,34,24]), random mean evals_to_best=39.4 (seeds: [6,19,7,82,83]). At budget=50: TPE mean best=0.117806 (all 5/5), random mean best=0.110236 (3/5). TPE advantage at budget=50: +6.87% vs +5.36% at rate=50. The advantage IS larger at high load, confirming the sharper-landscape hypothesis. Global best at rate=200 is 0.117806 (matches GLOBAL_BEST_TABLE entry).",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "The TPE advantage is larger at rate=200 (6.87%) than at rate=50 (5.36%), consistent with the sharper-landscape prediction. Under high load, undersized configs (low TP, small batch) saturate and show dramatically worse metrics, creating steeper fitness gradients that TPE exploits more effectively. Random wastes more evals on obviously saturated configs."
+    }
+  ],
+  "experiment_valid": true,
+  "discrepancy_analysis": "H-main and h-robustness predictions confirmed. H-control-negative was REFUTED: the prediction assumed a minimum space size for Bayesian advantage, but TP=8 creates a unimodal dominant peak that TPE exploits even in 15-point spaces. This is a known finding (RP-4) from prior exploration, confirming the active principle. The key unexpected result is LHS performing on par with TPE at budget=50 — this suggests the structured landscape is amenable to stratified sampling too, not just Bayesian modeling.",
+  "dominant_component_pct": 87
+}

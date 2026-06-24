@@ -1,0 +1,11 @@
+{
+  "gate_type": "design",
+  "summary": "Iteration 5 tests whether the bracket K=1 hierarchical search algorithm correctly adapts when the optimal tensor-parallelism (TP) winner shifts from TP=4 (at high arrival rates \u2265150 req/s) to TP=8 (at low arrival rates \u2264125 req/s) on H100 with qwen3-14b. This probes a critical rate-regime transition: at 100 req/s the system is under-saturated, so maximizing per-request compute bandwidth (TP=8, single instance) should beat splitting GPUs across two instances (TP=4, 2 instances).",
+  "key_points": [
+    "h-main: At rate=100 req/s, bracket K=1 Phase 1 should select TP=8/1inst as the winner on all 5 search seeds, requiring exactly 4 evaluations (evals_to_best=4). Predicted Phase 1 scores are TP1=0.109, TP2=0.136, TP4=0.156, TP8=0.165 \u2014 only TP=8 crosses the 1% threshold (0.163). Refuted if TP=4 wins Phase 1 on any seed, which would indicate queuing benefits or fitness-weight artifacts at low rates.",
+    "h-robustness: Across all 25 combinations (5 blis_seeds \u00d7 5 search_seeds), TP=8 should win Phase 1 unanimously with margins of 5.2\u20136.6% over TP=4. Per established RP-9, Phase 1 is deterministic per blis_seed (search_seed invariant). A single Phase 1 failure would suggest rate=100 is closer to the TP=4/TP=8 crossover than expected.",
+    "h-ablation: At rate=125 (the crossover point), evals_to_best should be 3 (not 4) on all 25 combinations because TP=4's Phase 1 score already exceeds the 1% acceptance threshold even though TP=8 may be the true winner on most seeds. This tests the 1% threshold's ability to absorb winner ambiguity at crossover points. Refuted if any seed shows evals_to_best > 3, meaning TP=4 fell below threshold.",
+    "h-control-negative: Flat TPE baseline at rate=100 should converge faster than at rate=500 (median evals_to_best < 20 vs. 26 on A100-SXM) because the monotonic TP landscape is easier for TPE's surrogate. Bracket K=1 (evals_to_best=4) should still dramatically outperform flat TPE.",
+    "Code changes are minimal: adding GLOBAL_BEST_TABLE entries for rate=100 and rate=125 regimes on H100, plus a small A100-SXM correction from iter-4. No algorithmic changes to the search method itself \u2014 this is purely a regime-transfer validation."
+  ]
+}

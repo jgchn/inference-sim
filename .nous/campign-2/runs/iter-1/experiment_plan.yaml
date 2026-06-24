@@ -1,0 +1,65 @@
+metadata:
+  iteration: 1
+  bundle_ref: "runs/iter-1/bundle.yaml"
+  description: >
+    Compare random vs hierarchical decomposition search for Pareto frontier
+    discovery (maximize tokens_per_sec, minimize e2e_p99_ms) in BLIS's
+    86,400-config space. Three arms: h-main (rate=50, both strategies),
+    h-control-negative (rate=5, both strategies), h-robustness (5 seeds,
+    hierarchical only). All commands run from the worktree at
+    /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-1-0f101936.
+
+setup:
+  - cmd: "go build -o blis main.go"
+    description: "Build BLIS binary"
+  - cmd: "python3 search_pareto.py --strategy both --budget 5 --rate 50 --seed 42 --output /tmp/smoke_test.json"
+    description: "Smoke-test search_pareto.py (small budget)"
+
+arms:
+  - arm_id: "h-main"
+    conditions:
+      - name: "both-strategies-rate50-seed42"
+        cmd: "python3 search_pareto.py --strategy both --budget 500 --rate 50 --seed 42 --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-1/results/h-main/both-rate50-seed42.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-1/results/h-main/both-rate50-seed42.json"
+        inputs: []
+        description: "500 random + 500 hierarchical evals at rate=50 req/s, seed=42"
+
+  - arm_id: "h-control-negative"
+    conditions:
+      - name: "both-strategies-rate5-seed42"
+        cmd: "python3 search_pareto.py --strategy both --budget 200 --rate 5 --seed 42 --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-1/results/h-control-negative/both-rate5-seed42.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-1/results/h-control-negative/both-rate5-seed42.json"
+        inputs: []
+        description: "200 random + 200 hierarchical evals at rate=5 req/s (unsaturated), seed=42"
+
+  - arm_id: "h-robustness"
+    conditions:
+      - name: "hierarchical-rate50-seed42"
+        cmd: "python3 search_pareto.py --strategy hierarchical --budget 100 --rate 50 --seed 42 --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-1/results/h-robustness/hier-rate50-seed42.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-1/results/h-robustness/hier-rate50-seed42.json"
+        inputs: []
+        description: "Hierarchical search, rate=50, seed=42"
+
+      - name: "hierarchical-rate50-seed123"
+        cmd: "python3 search_pareto.py --strategy hierarchical --budget 100 --rate 50 --seed 123 --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-1/results/h-robustness/hier-rate50-seed123.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-1/results/h-robustness/hier-rate50-seed123.json"
+        inputs: []
+        description: "Hierarchical search, rate=50, seed=123"
+
+      - name: "hierarchical-rate50-seed456"
+        cmd: "python3 search_pareto.py --strategy hierarchical --budget 100 --rate 50 --seed 456 --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-1/results/h-robustness/hier-rate50-seed456.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-1/results/h-robustness/hier-rate50-seed456.json"
+        inputs: []
+        description: "Hierarchical search, rate=50, seed=456"
+
+      - name: "hierarchical-rate50-seed789"
+        cmd: "python3 search_pareto.py --strategy hierarchical --budget 100 --rate 50 --seed 789 --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-1/results/h-robustness/hier-rate50-seed789.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-1/results/h-robustness/hier-rate50-seed789.json"
+        inputs: []
+        description: "Hierarchical search, rate=50, seed=789"
+
+      - name: "hierarchical-rate50-seed1024"
+        cmd: "python3 search_pareto.py --strategy hierarchical --budget 100 --rate 50 --seed 1024 --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-1/results/h-robustness/hier-rate50-seed1024.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-1/results/h-robustness/hier-rate50-seed1024.json"
+        inputs: []
+        description: "Hierarchical search, rate=50, seed=1024"

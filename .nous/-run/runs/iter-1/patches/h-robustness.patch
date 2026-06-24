@@ -1,0 +1,515 @@
+diff --git a/search_blis.py b/search_blis.py
+new file mode 100644
+index 00000000..b1f0ca66
+--- /dev/null
++++ b/search_blis.py
+@@ -0,0 +1,509 @@
++#!/usr/bin/env python3
++"""
++BLIS Configuration Search Script - Iteration 1
++Implements three search strategies (random, TPE via Optuna, LHS via scipy)
++for the BLIS 10-dimensional configuration space.
++
++Arms:
++  h-main: full 10D search, strategies=[random, tpe, lhs], budgets=[50, 100, 200]
++  h-control-negative: restricted to TP + num_instances only (2D, 15 combos)
++  h-robustness: full 10D search at rate=200 instead of rate=50
++
++Usage:
++  # h-main
++  python3 search_blis.py --strategy all --budget 200 --seeds 42,43,44,45,46 \
++      --rate 50 --num-requests 200 --hardware H100 \
++      --output /path/to/results/h-main/results.json
++
++  # h-control-negative
++  python3 search_blis.py --strategy random,tpe --budget 30 --seeds 42,43,44,45,46 \
++      --rate 50 --num-requests 200 --hardware H100 --restricted-space \
++      --output /path/to/results/h-control-negative/results.json
++
++  # h-robustness
++  python3 search_blis.py --strategy random,tpe --budget 200 --seeds 42,43,44,45,46 \
++      --rate 200 --num-requests 200 --hardware H100 \
++      --output /path/to/results/h-robustness/results.json
++"""
++
++import argparse
++import json
++import os
++import re
++import subprocess
++import sys
++import time
++from pathlib import Path
++
++import numpy as np
++import optuna
++from scipy.stats import qmc
++
++optuna.logging.set_verbosity(optuna.logging.WARNING)
++
++# ── Search space definition ────────────────────────────────────────────────
++
++TP_OPTIONS = [1, 2, 4, 8]
++VALID_TP_INSTANCES = [
++    (tp, ni)
++    for tp in TP_OPTIONS
++    for ni in range(1, 8 // tp + 1)
++]
++
++SCHEDULER_OPTIONS = ["fcfs", "priority-fcfs", "sjf", "reverse-priority"]
++MAX_RUNNING_OPTIONS = [32, 64, 128, 256, 512]
++MAX_TOKENS_OPTIONS = [2048, 4096, 8192]
++PREFILL_THRESHOLD_OPTIONS = [0, 1024, 2048, 4096]
++BLOCK_SIZE_OPTIONS = [16, 32]
++ROUTING_OPTIONS = ["round-robin", "least-loaded", "weighted"]
++ADMISSION_OPTIONS = ["always-admit", "tier-shed"]
++PREEMPTION_OPTIONS = ["fcfs", "priority"]
++
++# Full search space dimensions (for LHS)
++FULL_SPACE_DIMS = [
++    ("tp_ni_idx",          len(VALID_TP_INSTANCES)),
++    ("scheduler_idx",      len(SCHEDULER_OPTIONS)),
++    ("max_running_idx",    len(MAX_RUNNING_OPTIONS)),
++    ("max_tokens_idx",     len(MAX_TOKENS_OPTIONS)),
++    ("prefill_idx",        len(PREFILL_THRESHOLD_OPTIONS)),
++    ("block_idx",          len(BLOCK_SIZE_OPTIONS)),
++    ("routing_idx",        len(ROUTING_OPTIONS)),
++    ("admission_idx",      len(ADMISSION_OPTIONS)),
++    ("preemption_idx",     len(PREEMPTION_OPTIONS)),
++]
++
++# Restricted search space (TP + num_instances only)
++RESTRICTED_SPACE_DIMS = [
++    ("tp_ni_idx",          len(VALID_TP_INSTANCES)),
++]
++
++# Default secondary params for restricted space
++RESTRICTED_DEFAULT_CONFIG = {
++    "scheduler":          "fcfs",
++    "max_running":        256,
++    "max_tokens":         2048,
++    "prefill_threshold":  0,
++    "block_size":         16,
++    "routing":            "round-robin",
++    "admission":          "always-admit",
++    "preemption":         "fcfs",
++}
++
++# Global best scores keyed by (model_shortname, hardware, rate, num_requests).
++GLOBAL_BEST_TABLE = {
++    ("qwen3-14b",    "H100",    200, 200):   0.117806,
++    ("qwen3-14b",    "H100",    500, 1000):  0.179282,
++    ("llama-3.1-8b", "H100",    200, 200):   0.143598,
++    ("llama-3.1-8b", "H100",    500, 1000):  0.209195,
++    ("llama-3.1-8b", "A100-SXM", 200, 200):  0.120010,
++    ("llama-3.1-8b", "A100-SXM", 500, 1000): 0.172212,
++    ("qwen3-14b",    "A100-SXM", 200, 200):  0.093981,
++    ("qwen3-14b",    "A100-SXM", 500, 1000): 0.138290,
++    # L40S entries
++    ("llama-3.1-8b", "L40S",    500, 1000):  0.109668,
++    ("llama-3.1-8b", "L40S",    200, 200):   0.078308,
++}
++WITHIN_BEST_THRESHOLD = 0.99  # 1% tolerance
++
++MODEL = "qwen/qwen3-14b"
++BLIS_BASE: list[str] = []
++RESTRICTED_SPACE = False
++
++
++def model_shortname(model: str) -> str:
++    name = model.split("/")[-1]
++    for suffix in ["-instruct", "-chat", "-hf"]:
++        if name.endswith(suffix):
++            name = name[: -len(suffix)]
++    return name
++
++
++def indices_to_config(indices: list[int], restricted: bool = False) -> dict:
++    """Convert a list of category indices to a BLIS config dict."""
++    dims = RESTRICTED_SPACE_DIMS if restricted else FULL_SPACE_DIMS
++    idx_map = {name: indices[i] for i, (name, _) in enumerate(dims)}
++
++    tp, ni = VALID_TP_INSTANCES[idx_map["tp_ni_idx"]]
++    routing = "round-robin" if ni == 1 else "least-loaded"
++
++    if restricted:
++        return {
++            "tp": tp,
++            "num_instances": ni,
++            **RESTRICTED_DEFAULT_CONFIG,
++        }
++
++    return {
++        "tp": tp,
++        "num_instances": ni,
++        "scheduler":         SCHEDULER_OPTIONS[idx_map["scheduler_idx"]],
++        "max_running":       MAX_RUNNING_OPTIONS[idx_map["max_running_idx"]],
++        "max_tokens":        MAX_TOKENS_OPTIONS[idx_map["max_tokens_idx"]],
++        "prefill_threshold": PREFILL_THRESHOLD_OPTIONS[idx_map["prefill_idx"]],
++        "block_size":        BLOCK_SIZE_OPTIONS[idx_map["block_idx"]],
++        "routing":           ROUTING_OPTIONS[idx_map["routing_idx"]],
++        "admission":         ADMISSION_OPTIONS[idx_map["admission_idx"]],
++        "preemption":        PREEMPTION_OPTIONS[idx_map["preemption_idx"]],
++    }
++
++
++def build_blis_cmd(config: dict, num_requests: int, rate: float, seed: int,
++                   fitness_weights: str = "throughput:0.4,p99_ttft:0.3,p99_e2e:0.3") -> list[str]:
++    cmd = BLIS_BASE + [
++        "--model", MODEL,
++        "--num-requests", str(num_requests),
++        "--rate", str(rate),
++        "--seed", str(seed),
++        "--tp", str(config["tp"]),
++        "--num-instances", str(config["num_instances"]),
++        "--scheduler", config["scheduler"],
++        "--max-num-running-reqs", str(config["max_running"]),
++        "--max-num-scheduled-tokens", str(config["max_tokens"]),
++        "--long-prefill-token-threshold", str(config["prefill_threshold"]),
++        "--block-size-in-tokens", str(config["block_size"]),
++        "--routing-policy", config["routing"],
++        "--admission-policy", config["admission"],
++        "--preemption-policy", config["preemption"],
++        "--fitness-weights", fitness_weights,
++    ]
++    return cmd
++
++
++def parse_cluster_metrics(stdout: str) -> dict:
++    blocks = re.findall(r"=== Simulation Metrics ===\s*(\{.*?\})", stdout, re.DOTALL)
++    for block_str in blocks:
++        try:
++            data = json.loads(block_str)
++            if data.get("instance_id") == "cluster" or len(blocks) == 1:
++                return data
++        except json.JSONDecodeError:
++            continue
++    return {}
++
++
++def run_blis(config: dict, num_requests: int = 200, rate: float = 50.0,
++             seed: int = 42) -> dict | None:
++    cmd = build_blis_cmd(config, num_requests, rate, seed)
++    try:
++        t0 = time.perf_counter()
++        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120,
++                                cwd=Path(__file__).parent)
++        wall_time = time.perf_counter() - t0
++        if result.returncode != 0:
++            return None
++        stdout = result.stdout
++        metrics = parse_cluster_metrics(stdout)
++        score_match = re.search(r"Score:\s+([\d.]+)", stdout)
++        if not score_match:
++            return None
++        score = float(score_match.group(1))
++        return {"config": config, "score": score, "wall_time_s": wall_time, "metrics": metrics}
++    except subprocess.TimeoutExpired:
++        return None
++    except Exception:
++        return None
++
++
++# ── Config sampling utilities ──────────────────────────────────────────────
++
++def sample_random_config(rng: np.random.Generator, restricted: bool = False) -> dict:
++    dims = RESTRICTED_SPACE_DIMS if restricted else FULL_SPACE_DIMS
++    indices = [rng.integers(0, size) for _, size in dims]
++    return indices_to_config(indices, restricted)
++
++
++def compute_evals_to_best(evaluations: list[dict], global_best: float) -> int:
++    threshold = global_best * WITHIN_BEST_THRESHOLD
++    best_so_far = -1.0
++    for i, ev in enumerate(evaluations):
++        score = ev.get("score", 0.0)
++        if score > best_so_far:
++            best_so_far = score
++        if best_so_far >= threshold:
++            return i + 1
++    return len(evaluations) + 1
++
++
++def best_at_budget(evaluations: list[dict], budget: int) -> float:
++    scores = [e.get("score", 0.0) for e in evaluations[:budget]]
++    return max(scores) if scores else 0.0
++
++
++# ── Search strategies ──────────────────────────────────────────────────────
++
++def run_random_search(budget: int, search_seed: int, num_requests: int = 200,
++                      rate: float = 50.0, blis_seed: int = 42,
++                      restricted: bool = False) -> dict:
++    rng = np.random.default_rng(search_seed)
++    evaluations = []
++    best_score = -1.0
++    best_config = None
++
++    for i in range(budget):
++        config = sample_random_config(rng, restricted)
++        out = run_blis(config, num_requests=num_requests, rate=rate, seed=blis_seed)
++        if out is None:
++            continue
++        score = out["score"]
++        best_score = max(best_score, score)
++        if score == best_score:
++            best_config = config
++        evaluations.append({
++            "eval_idx": i,
++            "score": score,
++            "config": config,
++            "wall_time_s": out["wall_time_s"],
++            "best_so_far": best_score,
++        })
++
++    return {
++        "strategy": "random",
++        "search_seed": search_seed,
++        "blis_seed": blis_seed,
++        "budget": budget,
++        "best_score": best_score,
++        "best_config": best_config,
++        "evaluations": evaluations,
++    }
++
++
++def run_tpe_search(budget: int, search_seed: int, num_requests: int = 200,
++                   rate: float = 50.0, blis_seed: int = 42,
++                   restricted: bool = False) -> dict:
++    dims = RESTRICTED_SPACE_DIMS if restricted else FULL_SPACE_DIMS
++    evaluations = []
++    eval_counter = [0]
++    best_score_tracker = [-1.0]
++
++    def objective(trial: optuna.Trial) -> float:
++        indices = [trial.suggest_int(name, 0, size - 1) for name, size in dims]
++        config = indices_to_config(indices, restricted)
++        out = run_blis(config, num_requests=num_requests, rate=rate, seed=blis_seed)
++        if out is None:
++            return 0.0
++        score = out["score"]
++        best_score_tracker[0] = max(best_score_tracker[0], score)
++        evaluations.append({
++            "eval_idx": eval_counter[0],
++            "score": score,
++            "config": config,
++            "wall_time_s": out["wall_time_s"],
++            "best_so_far": best_score_tracker[0],
++        })
++        eval_counter[0] += 1
++        return score
++
++    sampler = optuna.samplers.TPESampler(seed=search_seed)
++    study = optuna.create_study(direction="maximize", sampler=sampler)
++    study.optimize(objective, n_trials=budget, show_progress_bar=False)
++
++    # Re-compute running best_so_far
++    running_max = -1.0
++    for ev in evaluations:
++        running_max = max(running_max, ev["score"])
++        ev["best_so_far"] = running_max
++
++    best_score = study.best_value if study.best_trial else 0.0
++    best_params = study.best_params if study.best_trial else {}
++    if "tp_ni_idx" in best_params:
++        best_indices = [best_params.get(name, 0) for name, _ in dims]
++        best_config = indices_to_config(best_indices, restricted)
++    else:
++        best_config = None
++
++    return {
++        "strategy": "tpe",
++        "search_seed": search_seed,
++        "blis_seed": blis_seed,
++        "budget": budget,
++        "best_score": best_score,
++        "best_config": best_config,
++        "evaluations": evaluations,
++    }
++
++
++def run_lhs_search(budget: int, search_seed: int, num_requests: int = 200,
++                   rate: float = 50.0, blis_seed: int = 42,
++                   restricted: bool = False) -> dict:
++    """Latin Hypercube Sampling — stratified coverage of the search space.
++
++    Generates budget samples with LHS, then evaluates them in order.
++    No online adaptation — purely for initial coverage comparison.
++    """
++    dims = RESTRICTED_SPACE_DIMS if restricted else FULL_SPACE_DIMS
++    n_dims = len(dims)
++
++    sampler = qmc.LatinHypercube(d=n_dims, seed=search_seed)
++    samples = sampler.random(n=budget)  # shape (budget, n_dims), values in [0,1)
++
++    evaluations = []
++    best_score = -1.0
++    best_config = None
++
++    for i in range(budget):
++        # Map [0, 1) samples to discrete indices
++        indices = []
++        for j, (name, size) in enumerate(dims):
++            idx = int(samples[i, j] * size)
++            idx = min(idx, size - 1)
++            indices.append(idx)
++
++        config = indices_to_config(indices, restricted)
++        out = run_blis(config, num_requests=num_requests, rate=rate, seed=blis_seed)
++        if out is None:
++            continue
++        score = out["score"]
++        best_score = max(best_score, score)
++        if score == best_score:
++            best_config = config
++        evaluations.append({
++            "eval_idx": i,
++            "score": score,
++            "config": config,
++            "wall_time_s": out["wall_time_s"],
++            "best_so_far": best_score,
++        })
++
++    return {
++        "strategy": "lhs",
++        "search_seed": search_seed,
++        "blis_seed": blis_seed,
++        "budget": budget,
++        "best_score": best_score,
++        "best_config": best_config,
++        "evaluations": evaluations,
++    }
++
++
++# ── Main ───────────────────────────────────────────────────────────────────
++
++def main():
++    parser = argparse.ArgumentParser(description="BLIS Configuration Search - Iteration 1")
++    parser.add_argument("--strategy", default="all",
++                        help="Comma-separated list or 'all' (random, tpe, lhs)")
++    parser.add_argument("--budget", type=int, default=200)
++    parser.add_argument("--seeds", default="42,43,44,45,46",
++                        help="Comma-separated search seeds")
++    parser.add_argument("--blis-seeds", default="42",
++                        help="Comma-separated BLIS seeds (workload seeds)")
++    parser.add_argument("--num-requests", type=int, default=200)
++    parser.add_argument("--rate", type=float, default=50.0)
++    parser.add_argument("--model", default="qwen/qwen3-14b")
++    parser.add_argument("--hardware", default="H100",
++                        help="GPU hardware type (H100, A100-SXM, A100-80, L40S)")
++    parser.add_argument("--restricted-space", action="store_true",
++                        help="Restrict search to TP + num_instances only (h-control-negative)")
++    parser.add_argument("--checkpoints", default="50,100,200",
++                        help="Budget checkpoints to record")
++    parser.add_argument("--output", required=True)
++    args = parser.parse_args()
++
++    global MODEL, BLIS_BASE, RESTRICTED_SPACE
++    MODEL = args.model
++    BLIS_BASE = ["./blis", "run", "--hardware", args.hardware, "--latency-model", "trained-physics"]
++    RESTRICTED_SPACE = args.restricted_space
++
++    if args.strategy == "all":
++        strategies = ["random", "tpe", "lhs"]
++    else:
++        strategies = [s.strip() for s in args.strategy.split(",")]
++
++    search_seeds = [int(s) for s in args.seeds.split(",")]
++    blis_seeds = [int(s) for s in args.blis_seeds.split(",")]
++    checkpoints = sorted(set(int(c) for c in args.checkpoints.split(",") if int(c) <= args.budget))
++    if args.budget not in checkpoints:
++        checkpoints.append(args.budget)
++
++    mshort = model_shortname(args.model)
++    global_best = GLOBAL_BEST_TABLE.get(
++        (mshort, args.hardware, int(args.rate), args.num_requests), None
++    )
++
++    all_results = {
++        "config": {
++            "budget": args.budget,
++            "search_seeds": search_seeds,
++            "blis_seeds": blis_seeds,
++            "num_requests": args.num_requests,
++            "rate": args.rate,
++            "model": args.model,
++            "hardware": args.hardware,
++            "restricted_space": args.restricted_space,
++            "global_best": global_best,
++        },
++        "runs": [],
++    }
++
++    os.makedirs(os.path.dirname(os.path.abspath(args.output)), exist_ok=True)
++    t_global_start = time.perf_counter()
++
++    for blis_seed in blis_seeds:
++        for strategy in strategies:
++            for search_seed in search_seeds:
++                print(f"[{strategy}] blis_seed={blis_seed} search_seed={search_seed} "
++                      f"budget={args.budget} rate={args.rate} "
++                      f"restricted={args.restricted_space}",
++                      flush=True)
++                t0 = time.perf_counter()
++
++                if strategy == "random":
++                    run = run_random_search(args.budget, search_seed, args.num_requests,
++                                            args.rate, blis_seed, args.restricted_space)
++                elif strategy == "tpe":
++                    run = run_tpe_search(args.budget, search_seed, args.num_requests,
++                                         args.rate, blis_seed, args.restricted_space)
++                elif strategy == "lhs":
++                    run = run_lhs_search(args.budget, search_seed, args.num_requests,
++                                         args.rate, blis_seed, args.restricted_space)
++                else:
++                    print(f"  Unknown strategy: {strategy}", flush=True)
++                    continue
++
++                wall = time.perf_counter() - t0
++                run["wall_time_total_s"] = wall
++                run["n_evaluations"] = len(run["evaluations"])
++
++                run["checkpoint_best"] = {
++                    str(c): best_at_budget(run["evaluations"], c)
++                    for c in checkpoints
++                }
++
++                if global_best is not None:
++                    run["evals_to_best"] = compute_evals_to_best(run["evaluations"], global_best)
++                    run["checkpoint_evals_to_best"] = {
++                        str(c): compute_evals_to_best(run["evaluations"][:c], global_best)
++                        for c in checkpoints
++                    }
++
++                print(f"  best={run['best_score']:.6f} "
++                      f"evals={run['n_evaluations']} "
++                      f"evals_to_best={run.get('evals_to_best', '?')} "
++                      f"wall={wall:.1f}s",
++                      flush=True)
++
++                all_results["runs"].append(run)
++
++                with open(args.output, "w") as f:
++                    json.dump(all_results, f, indent=2)
++
++    all_results["total_wall_time_s"] = time.perf_counter() - t_global_start
++
++    # Summary table
++    print("\n=== Summary ===")
++    print(f"{'Strategy':<10} {'BlisSeed':<10} {'SearchSeed':<12} "
++          f"{'Best':<12} {'Evals':<8} {'EvalsToBest':<14} {'Wall(s)':<10}")
++    for run in all_results["runs"]:
++        print(f"{run['strategy']:<10} {run['blis_seed']:<10} {run['search_seed']:<12} "
++              f"{run['best_score']:<12.6f} {run['n_evaluations']:<8} "
++              f"{str(run.get('evals_to_best', '?')):<14} "
++              f"{run['wall_time_total_s']:<10.1f}")
++
++    with open(args.output, "w") as f:
++        json.dump(all_results, f, indent=2)
++
++    print(f"\nResults written to: {args.output}")
++    return 0
++
++
++if __name__ == "__main__":
++    sys.exit(main())

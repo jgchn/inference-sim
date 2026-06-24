@@ -1,0 +1,72 @@
+[
+  {
+    "id": "RP-15",
+    "statement": "Bracket Phase 1 profiles (always evaluate max and min of each secondary parameter, max-first ordering) achieve 5/5 Phase 1 correctness on all tested regimes (H100 hard llama, A100 easy llama, A100 hard qwen, L40S hard llama) while reducing evals_to_best from 7 to 3 or 4. Extended in iter-3: bracket K=1 also achieves 5/5 Phase 1 correctness for qwen3-14b on L40S (different TP winner TP=8 vs llama's TP=4) and H100 (TP=4 winner), confirming model-agnostic Phase 1 identification across both models and all hardware configurations tested.",
+    "confidence": "high",
+    "regime": "BLIS bracket K=1 adaptive-hierarchical search, rate=500, 1000 requests, budget=100, hardware in {H100, A100-SXM, L40S}, model in {llama-3.1-8b, qwen3-14b}",
+    "evidence": ["iteration-2-h-main", "iteration-2-h-robustness", "iteration-2-h-ablation", "iteration-3-h-main", "iteration-3-h-robustness", "iteration-3-h-control-negative"],
+    "contradicts": [],
+    "extraction_iteration": 3,
+    "mechanism": "Bracket max profile (mr=512, mt=8192, pf=4096) creates a compute-saturated regime where TP-level hardware advantages fully express for any model. Phase 1 evaluates PHASE1_TP_CONFIGS=[TP1,TP2,TP4,TP8] in order and picks the maximum. The model-agnostic selection correctly handles different TP winners for different models: qwen3-14b on L40S (TP=8), qwen3-14b on H100 (TP=4), llama-3.1-8b on L40S (TP=4).",
+    "applicability_bounds": "Holds for 8-GPU single-node configurations. evals_to_best=3 when winner is TP=4 (3rd in evaluation order), or when a runner-up TP at the current blis_seed exceeds the GLOBAL_BEST_TABLE threshold before the winner TP is evaluated. evals_to_best=4 when winner is TP=8 (4th in order) and no runner-up exceeds threshold. Requires GLOBAL_BEST_TABLE entry for (model, hardware, rate, num_requests).",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-16",
+    "statement": "Bracket K=1 (max-only profile) is sufficient for Phase 1 TP identification and achieves evals_to_best of 3 or 4 depending on winner TP position in the evaluation order. Extended in iter-3: K=1 achieves 25/25 correctness for qwen3-14b on L40S hard (5 blis_seeds x 5 search seeds), including near-zero margin seeds (seed=43: 0.03%, seed=45: 0.11%). The min profile is universally redundant for Phase 1 correctness across all tested models and hardware.",
+    "confidence": "high",
+    "regime": "Same as RP-15",
+    "evidence": ["iteration-2-h-main", "iteration-2-h-robustness", "iteration-3-h-main", "iteration-3-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 3,
+    "mechanism": "The max secondary params profile creates the widest possible compute load, making TP-level differences maximally visible. Near-zero TP margins at some blis_seeds do not cause Phase 1 failures because: (1) Phase 1 is deterministic per blis_seed (RP-9), and (2) even a 0.03% difference between TP=8 and TP=4 is computed identically every time. At near-zero margin seeds, the runner-up TP often exceeds the seed=42 GLOBAL_BEST_TABLE threshold, resulting in evals_to_best=3 even though the winner TP=8 is at position 4 in PHASE1_TP_CONFIGS.",
+    "applicability_bounds": "evals_to_best is 3 or 4, not always 3: prior statement was incorrect for TP=8 winner scenarios. evals_to_best=4 occurs when TP=8 (position 4) wins and no earlier TP exceeds the threshold. evals_to_best=3 occurs when either TP=4 wins (position 3) or when a runner-up TP already exceeds the GLOBAL_BEST_TABLE threshold at the current blis_seed.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-9",
+    "statement": "Phase 1 TP identification in hierarchical search is deterministic given a fixed BLIS seed: all 5 search algorithm seeds select the same TP winner because they evaluate the same BLIS configs at the same seed. Phase 1 failure is therefore total — if Phase 1 fails, it fails on 100% of search seeds. This principle is now validated at the full experimental scale: 25/25 (blis_seed x search_seed) combinations across all 5 blis_seeds for qwen3-14b on L40S all confirm identical Phase 1 results per blis_seed, even for near-zero margin seeds. Extended to model-dependent TP winners: the determinism holds even when the TP winner (TP=8) differs from prior tested models (TP=4 for llama).",
+    "confidence": "high",
+    "regime": "Bracket Phase 1 with any fixed blis_seed",
+    "evidence": ["iteration-2-h-robustness", "iteration-3-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 3,
+    "mechanism": "Phase 1 evaluates fixed configurations (all TP levels at max-profile secondary params) with a fixed BLIS seed. BLIS is deterministic (INV-6): same seed produces byte-identical stdout. Therefore all search seeds produce identical Phase 1 scores and make the same TP selection. The only source of variability in Phase 1 is the blis_seed itself, which controls workload generation.",
+    "applicability_bounds": "Applies specifically to bracket Phase 1 profiles (no search-seed randomness). Random Phase 1 profiles do depend on search_seed (profile_rng seeded from search_seed). For bracket, Phase 1 correctness/failure is total across all search seeds per blis_seed.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-21",
+    "statement": "The TP winner in bracket K=1 Phase 1 is model-dependent on low-bandwidth hardware (L40S, 0.864 TB/s): qwen3-14b→TP=8/1inst, llama-3.1-8b→TP=4/2inst. On high-bandwidth hardware (H100, 3.35 TB/s), both models favor TP=4/2inst. Bracket K=1 identifies the correct model-dependent TP winner without any model-specific configuration changes — the algorithm is fully model-agnostic.",
+    "confidence": "high",
+    "regime": "BLIS bracket K=1, rate=500, 1000 requests, L40S and H100 hardware, qwen3-14b and llama-3.1-8b models",
+    "evidence": ["iteration-3-h-main", "iteration-3-h-control-negative", "iteration-2-h-main"],
+    "contradicts": [],
+    "extraction_iteration": 3,
+    "mechanism": "On L40S (0.864 TB/s), qwen3-14b's larger weight set (14B params vs llama's 8B) creates a stronger weight-loading bottleneck per request. TP=8's 8-way weight sharding reduces per-GPU weight loading time enough to outperform TP=4/2inst's multi-instance parallelism advantage on L40S. On H100 (3.35 TB/s, 3.9x higher), bandwidth is sufficient for both models at TP=4 — the multi-instance parallelism advantage of TP=4/2inst dominates. The Phase 1 max profile creates a compute-saturated regime where this hardware×model interaction fully expresses.",
+    "applicability_bounds": "Validated for qwen3-14b and llama-3.1-8b on L40S (48 GiB) and H100 (80 GiB). A100-SXM (2.039 TB/s) likely behaves like H100 (TP=4 wins for both models) but untested. A bandwidth threshold between 0.864 TB/s and 2.039 TB/s exists where the qwen TP winner transitions from TP=8 to TP=4.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-22",
+    "statement": "At TP margin widths of 5.1% (L40S qwen), flat TPE achieves 4/5 seeds reaching exact global best and 5/5 within-1% threshold at budget=100, with median evals_to_best=6. This is markedly better than the 2.1% margin regime (L40S llama: 1/5 success, median>100) but still slower than bracket K=1's deterministic evals_to_best=4. The TP margin threshold for reliable flat TPE convergence at budget=100 lies between 2.1% and 5.1%.",
+    "confidence": "high",
+    "regime": "BLIS flat TPE, rate=500, 1000 requests, L40S hardware, qwen3-14b model, budget=100",
+    "evidence": ["iteration-3-h-ablation", "iteration-2-h-ablation"],
+    "contradicts": [],
+    "extraction_iteration": 3,
+    "mechanism": "At 5.1% TP=8 margin on L40S qwen, the fitness landscape has a sharper TP-level gradient than at 2.1% for L40S llama. TPE's Bayesian model more reliably identifies TP=8 as the important parameter. However, TPE still exhibits seed-dependent behavior (evals_to_best ranging from 1 to 18), while bracket K=1 is deterministic at 4. The practical advantage of bracket is worst-case reliability: TPE has 1/5 seeds with evals_to_best=18 vs bracket's consistent 4.",
+    "applicability_bounds": "Specific to L40S qwen3-14b at rate=500/1000 requests. The TPE success improvement from 2.1% to 5.1% margin is consistent with RP-10. Bracket K=1 remains preferable to flat TPE regardless of margin width because its worst-case evals_to_best (4) is less than or equal to TPE's median (6).",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  }
+]

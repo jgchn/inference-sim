@@ -1,0 +1,1 @@
+All three monitor timeouts are stale notifications from watches that already fired. The experiment is complete and validation passed.

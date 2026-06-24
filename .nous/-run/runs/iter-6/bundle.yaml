@@ -1,0 +1,142 @@
+metadata:
+  iteration: 6
+  family: "search-algorithm-optimization"
+  research_question: "Does the rate-dependent TP winner transition (TP=8 at low rates, TP=4 at high rates) exist on A100-SXM, and does bracket K=1 hierarchical search correctly adapt without modification? How does the crossover rate relate to hardware memory bandwidth?"
+
+arm_selection_rationale: >
+  Four arms test bracket K=1's cross-hardware rate-adaptiveness on A100-SXM (extending
+  iter-5's H100-only validation). h-main validates TP=8 identification at rate=100.
+  h-robustness tests multi-seed stability with a different model (llama, wider 4.3% margin).
+  h-ablation tests the A100-SXM crossover point (rate=200, TP tied) where evals_to_best
+  should be 3 not 4. h-control-negative compares flat TPE convergence speed at rate=100
+  to validate that the monotonic TP landscape enables faster TPE convergence while bracket
+  K=1 still outperforms. L40S was excluded because qwen has no crossover there and llama's
+  crossover (~450) would require new global-best probing at multiple intermediate rates.
+
+arms:
+  - type: h-main
+    prediction: >
+      Bracket K=1 on A100-SXM qwen3-14b at rate=100 (1000 req, blis_seed=42) correctly
+      identifies TP=8/1inst as Phase 1 winner on all 5 search seeds, with evals_to_best=4
+      (TP=8 at position 4 in evaluation order). Phase 1 max-profile scores: TP1~0.0805,
+      TP2~0.1055, TP4~0.1275, TP8~0.1308. The 1% threshold (0.129447) is only exceeded
+      at eval 4 (TP=8). Phase 2 TPE within TP=8/1inst adds no improvement (single-instance
+      makes routing and block_size degenerate). Best score matches global best 0.130754.
+    mechanism: >
+      At rate=100 on A100-SXM (2.039 TB/s bandwidth), per-request compute dominates over
+      concurrency. TP=8/1inst pools all 8 GPUs' bandwidth and compute for each request,
+      yielding lower per-request latency than TP=4/2inst where each instance has half the
+      bandwidth. The max-profile (mr=512, mt=8192, pf=4096) ensures the compute-saturated
+      regime where this TP advantage fully expresses (RP-13: TP=8 dominance requires
+      max_running >= 256). The monotonic TP landscape (TP1 < TP2 < TP4 < TP8) means the
+      1% threshold is only crossed at eval 4 when TP=8 is evaluated. Phase 1 determinism
+      (RP-9) ensures all search seeds produce identical results per blis_seed.
+    diagnostic: >
+      If TP=4 wins Phase 1: check whether A100-SXM's 2.039 TB/s bandwidth is insufficient
+      for TP=8 to overcome the concurrency advantage at rate=100. If evals_to_best != 4:
+      verify the GLOBAL_BEST_TABLE entry (0.130754) is correct and that the 1% threshold
+      computation matches. If scores differ from probes: check search script's cwd is the
+      project root (blis requires relative model config paths).
+    code_changes:
+      - file: "search_blis_iter6.py"
+        intent: >
+          Add GLOBAL_BEST_TABLE entries for the new rate=100 regimes on A100-SXM:
+          ("qwen3-14b", "A100-SXM", 100, 1000): 0.130754 and
+          ("llama-3.1-8b", "A100-SXM", 100, 1000): 0.160845.
+          Also add H100 rate=100/125 entries from iter-5 probing:
+          ("qwen3-14b", "H100", 100, 1000): 0.164680,
+          ("qwen3-14b", "H100", 125, 1000): 0.162182,
+          ("llama-3.1-8b", "H100", 100, 1000): 0.182394.
+          Add A100-SXM crossover entry:
+          ("qwen3-14b", "A100-SXM", 200, 1000): 0.134935.
+          Update ("qwen3-14b", "A100-SXM", 500, 1000) from 0.138290 to 0.138820
+          per RP-23.
+        rationale: >
+          The search script computes evals_to_best by comparing running best_so_far
+          against global_best * 0.99. Without table entries for rate=100 regimes, the
+          script cannot compute convergence metrics. All values were determined by
+          probing max-profile configs at each TP level on the target hardware+rate.
+
+  - type: h-robustness
+    prediction: >
+      Bracket K=1 on A100-SXM llama-3.1-8b at rate=100 achieves 25/25 correct Phase 1
+      identification (TP=8/1inst) across 5 blis_seeds (42-46) x 5 search_seeds (42-46).
+      evals_to_best=4 on all 25 combinations. At blis_seed=42, TP=8 wins by 4.3%
+      (0.160845 vs 0.154241). Margins across blis_seeds range from approximately
+      2-5%, all well above the 1% threshold. RP-9 confirmed: within each blis_seed,
+      all 5 search seeds produce identical Phase 1 results.
+    mechanism: >
+      Llama-3.1-8b (8B params, GQA with 8 KV heads) has lower compute and memory
+      requirements per token than qwen3-14b (14B params), which means A100-SXM's
+      bandwidth is even more ample relative to the model's needs. This produces a
+      wider TP=8 margin (4.3% vs 2.5% for qwen) because the per-request latency
+      improvement from full bandwidth pooling is proportionally larger for a smaller
+      model. The multi-seed test validates that workload variation across blis_seeds
+      does not flip the TP winner when the margin is this wide.
+    diagnostic: >
+      If any seed flips to TP=4: compare the TP margin at that blis_seed. If margin
+      is <1%, the regime is near-crossover and the seed may have generated a workload
+      realization where concurrency pressure overcomes the TP=8 advantage. Check
+      request arrival patterns at that seed. If evals_to_best != 4: verify
+      GLOBAL_BEST_TABLE entry for llama on A100-SXM at rate=100 (0.160845).
+    code_changes:
+      - file: "search_blis_iter6.py"
+        intent: >
+          Same GLOBAL_BEST_TABLE updates as h-main (entries are shared across arms).
+          The llama A100-SXM rate=100 entry (0.160845) enables evals_to_best
+          computation for this arm.
+        rationale: >
+          Multi-seed experiments need correct global best to compute whether each
+          seed's best_so_far exceeds the 1% threshold.
+
+  - type: h-ablation
+    component: "crossover-rate"
+    prediction: >
+      Bracket K=1 on A100-SXM qwen3-14b at crossover rate=200 achieves evals_to_best=3
+      on all 5 search seeds. Phase 1 max-profile scores at rate=200: TP=4/2inst~0.1345,
+      TP=8/1inst~0.1345 (essentially tied, margin ~0.001%). Global best is 0.134935
+      (TP=4 with round-robin routing). 1% threshold = 0.133586. TP=4 at position 3
+      scores ~0.1345, exceeding threshold. evals_to_best=3 because TP=4 reaches
+      threshold before TP=8 is evaluated at position 4. Phase 1 winner is either TP=4
+      or TP=8 (tied within measurement precision).
+    mechanism: >
+      At rate=200, A100-SXM's 2.039 TB/s bandwidth is at the crossover point where
+      per-request throughput (favoring TP=8) and concurrency throughput (favoring
+      TP=4/2inst) are balanced. Both TP levels achieve nearly identical fitness because
+      the latency advantage of TP=8 exactly offsets the concurrency advantage of 2
+      instances at TP=4. The 1% threshold mechanism is what drives evals_to_best=3:
+      even though the Phase 1 winner is ambiguous, the global best (0.134935, discovered
+      with round-robin in Phase 2) sets a threshold that TP=4 at position 3 clears.
+      This mirrors the H100 rate=125 crossover from iter-5 (RP-25).
+    diagnostic: >
+      If evals_to_best != 3: verify the GLOBAL_BEST_TABLE entry for rate=200 (0.134935).
+      If TP=4 does not exceed the threshold at position 3, check whether the exact
+      Phase 1 score differs from the probe value (workload seed effects). If Phase 2
+      improves significantly beyond Phase 1: the crossover regime has secondary-param
+      sensitivity not seen in the probes — investigate which parameter changed.
+
+  - type: h-control-negative
+    prediction: >
+      Flat TPE on A100-SXM qwen3-14b at rate=100 with budget=100 finds the global best
+      (0.130754) on all 5 search seeds. Median evals_to_best is less than 15, substantially
+      faster than rate=500 on A100-SXM (median=26 from iter-4 RP-10). The monotonic TP
+      landscape at rate=100 (TP1 < TP2 < TP4 < TP8) provides clean signal for TPE's
+      surrogate model. However, bracket K=1 (evals_to_best=4 deterministically) still
+      outperforms flat TPE's median evals_to_best.
+    mechanism: >
+      At rate=100, the fitness landscape is monotonically increasing with TP degree
+      (probed: 0.0805 < 0.1055 < 0.1275 < 0.1308). This monotonicity means TPE's
+      surrogate can quickly learn that higher TP-index configs score better, directing
+      exploration toward TP=8. At rate=500, the non-monotonic landscape (TP=4 > TP=8)
+      creates a harder optimization surface requiring more samples. This parallels
+      iter-5's H100 finding where flat TPE achieved median=6 at rate=100 vs median=26
+      at rate=500. On A100-SXM the effect should be similar but with a narrower TP=8
+      margin (2.5% vs H100's 5.7%), which may increase TPE's evals_to_best slightly
+      compared to H100.
+    diagnostic: >
+      If TPE median evals_to_best >= 15: A100-SXM's narrower TP=8 margin (2.5% vs
+      H100's 5.7%) may be making TPE convergence harder than expected. Check per-seed
+      convergence trajectories. If any seed fails to find global best within budget=100:
+      the TP margin is insufficient for reliable flat TPE convergence (consistent with
+      RP-22 margin sensitivity). If TPE outperforms bracket K=1 (median < 4): this
+      would challenge bracket's optimality claim at low-rate regimes.

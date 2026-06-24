@@ -1,0 +1,11 @@
+{
+  "gate_type": "findings",
+  "summary": "The hierarchical search strategy's core advantage over random search is confirmed: it reaches 95% of optimal throughput in 14 evaluations vs. 64 for random (4.6x faster) at high load (rate=2000). Tier ranking (TP=4/2 as best) is perfectly stable across all seeds. Two secondary predictions were off in magnitude but not in direction.",
+  "key_points": [
+    "CONFIRMED (h-main): Hierarchical search converges 4.6x faster than random (14 vs 64 evals to 95% of optimal 41,233 tok/s), exceeding the 3x success threshold. The bundle underestimated qualifying configs (2.67% vs 0.017%), explaining why random needed 64 not 150+ evals.",
+    "PARTIALLY CONFIRMED (h-control-negative): At low load (rate=50), all strategies converge within 15 evals as predicted, but convergence difference was 5x (not <2x). Hierarchical's fixed TP ordering evaluates the dominant tier (TP=8/1) last, making it structurally slowest in easy regimes.",
+    "CONFIRMED (h-robustness): Phase 1 identifies TP=4/2 as optimal tier in 100% of seeds with 0% CV in convergence speed \u2014 the tier advantage is structural and deterministic, not luck-dependent.",
+    "SURPRISE: NSGA-II beat hierarchical at seed=42 (8 vs 14 evals) due to lucky random warmup sampling. This is stochastic (~19% probability per seed) and does not indicate systematic evolutionary advantage over the hierarchical approach.",
+    "DESIGN WEAKNESS IDENTIFIED: Hierarchical Phase 1's fixed evaluation order penalizes it when the optimal tier happens to be last in the ordering (e.g., TP=8/1 at low load). A randomized or adaptive Phase 1 ordering could address this."
+  ]
+}

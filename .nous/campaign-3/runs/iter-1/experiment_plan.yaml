@@ -1,0 +1,42 @@
+metadata:
+  iteration: 1
+  bundle_ref: "runs/iter-1/bundle.yaml"
+  description: "Multi-objective configuration search comparison: NSGA-II vs random vs LHS"
+
+setup:
+  - cmd: "go build -o blis main.go"
+    description: "Build the BLIS binary (already built, verify it exists)"
+
+  - cmd: "./blis run --model qwen/qwen3-14b --hardware H100 --latency-model trained-physics --num-requests 100 --rate 20 --tp 2 --num-instances 2 --scheduler fcfs --max-num-running-reqs 128 --max-num-scheduled-tokens 4096 --long-prefill-token-threshold 0 --block-size-in-tokens 16 --routing-policy least-loaded --admission-policy always-admit --preemption-policy fcfs --gpu-memory-utilization 0.9 --seed 42 --metrics-path ./baseline_validate.json"
+    description: "Validate baseline: expected rps=7.41, ttft_p99=33.2"
+
+arms:
+  - arm_id: "h-control-negative"
+    conditions:
+      - name: "random-500-seed12345"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-1/inputs/search_random.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-1/results/h-control-negative/summary.json"
+        description: "Uniform random search, 500 evaluations, seed=12345"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-1/inputs/search_common.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-1/inputs/search_random.py"
+
+  - arm_id: "h-main"
+    conditions:
+      - name: "nsga2-pop50-gen10-seed42000"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-1/inputs/search_nsga2.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-1/results/h-main/summary.json"
+        description: "NSGA-II evolutionary search, pop=50, gen=10, seed=42000"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-1/inputs/search_common.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-1/inputs/search_nsga2.py"
+
+  - arm_id: "h-robustness"
+    conditions:
+      - name: "lhs-500-seed99999"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-1/inputs/search_lhs.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-1/results/h-robustness/summary.json"
+        description: "Latin Hypercube Sampling, 500 evaluations, seed=99999"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-1/inputs/search_common.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-1/inputs/search_lhs.py"

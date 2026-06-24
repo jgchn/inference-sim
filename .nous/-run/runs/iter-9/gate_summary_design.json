@@ -1,0 +1,11 @@
+{
+  "gate_type": "design",
+  "summary": "We are testing whether our lean search bracket (TP={4,8}, max-profile, budget=2) generalizes to a 70B parameter model where TP=8 should dominate all hardware/rate regimes, and whether a model-size-aware crossover formula (load_index = params/BW, threshold=12) eliminates the remaining 6 TP prediction failures of the bandwidth-only formula across all 24 test conditions.",
+  "key_points": [
+    "Main hypothesis (h-main): Lean bracket finds global-best config (TP=8) in just 2 evals on all 6 regimes (3 hardware \u00d7 2 rates) for llama-3.1-70b, with expected scores ~0.089 (H100), ~0.064 (A100-SXM), ~0.034 (L40S). Confirmed if all 6 regimes select TP=8 within 1% of exhaustive best; refuted if TP=4 wins any regime.",
+    "Control-negative (h-control-negative): Model-aware formula (load_index=params/BW > 12 \u2192 predict TP=8) should achieve 24/24 accuracy across 4 models \u00d7 3 hardware \u00d7 2 rates, vs 18/24 for the old model-blind formula. Confirmed if all 6 previously-failing conditions are corrected; refuted if any load_index > 12 case still shows TP=4 winning.",
+    "Ablation (h-ablation): Default-profile lean bracket still selects TP=8 on all 6 70B regimes (correct TP winner) but with 15-21% lower absolute scores than max-profile, confirming that the 70B TP=8 advantage is structural (weight transfer), not queue-dependent. Refuted if default-profile picks TP=4 on any regime.",
+    "Robustness (h-robustness): TP=8 wins across all 50 combinations (2 regimes \u00d7 5 BLIS seeds \u00d7 5 search seeds) with minimum margin >2%, confirming workload-independence of the bandwidth-driven TP=8 advantage at 70B scale.",
+    "Key diagnostic: If any result shows TP=4 beating TP=8, investigate whether 70B KV-cache memory pressure at TP=4 (2 instances) or TP communication overhead scaling superlinearly invalidates the simple load_index model."
+  ]
+}

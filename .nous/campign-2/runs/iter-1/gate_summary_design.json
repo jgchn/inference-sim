@@ -1,0 +1,11 @@
+{
+  "gate_type": "design",
+  "summary": "We are testing whether a two-phase hierarchical search strategy (screen parallelism tiers first, then explore within top tiers) discovers the throughput-vs-tail-latency Pareto frontier more efficiently than uniform random search across BLIS's 86,400-configuration space, using 500 total evaluations per strategy.",
+  "key_points": [
+    "Main experiment: 500-eval budget split as 15-eval Phase 1 (one config per TP\u00d7instances tier to rank tiers by throughput) + 485-eval Phase 2 (Latin Hypercube sampling within top-3 tiers). Compare hypervolume of discovered Pareto front against 500-eval random search at arrival rate=50.",
+    "Negative control: Repeat at low load (rate=5) where all tiers are unsaturated; prediction is hierarchical advantage vanishes because no tier is inherently dominated, validating that the mechanism is capacity-based tier separation.",
+    "Robustness check: Run across 5 random seeds (42, 123, 456, 789, 1024) to confirm the advantage is structural, not workload-artifact. Confirmation = hierarchical hypervolume ratio consistently exceeds random; refutation = random matches or beats hierarchical in >1 seed or at high load.",
+    "Key metric: hypervolume ratio (discovered front hypervolume / reference hypervolume). A new standalone script (search_pareto.py) implements both strategies and outputs JSON with all evaluated configs, Pareto-optimal sets, and hypervolume values.",
+    "Diagnostic plan if main hypothesis fails: inspect whether Phase 1 screening misidentifies top tiers (i.e., max-throughput defaults don't represent tier potential) or whether 485 evals across 3 tiers is too sparse for the within-tier Pareto surface."
+  ]
+}

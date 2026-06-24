@@ -1,0 +1,280 @@
+{
+  "principles": [
+    {
+      "id": "RP-C2-1",
+      "statement": "In BLIS at moderate request rates (rate=50, qwen3-14b/H100), the multi-objective Pareto problem (maximize throughput, minimize latency) is degenerate: the highest-TP configuration simultaneously achieves both maximum throughput and minimum latency. No genuine tradeoff exists between parallelism tiers at these rates.",
+      "confidence": "high",
+      "regime": "rate=50 req/s, qwen3-14b, H100, 200 requests, num_requests=200; likely generalizes to any rate below the saturation point of the dominant tier (TP=8/1-inst at rate=50 is far from saturation based on e2e_p99=4719ms << timeout).",
+      "evidence": [
+        "iteration-1-h-main"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 1,
+      "mechanism": "At rate=50 on H100, TP=8/1-inst processes all requests with short queuing delays (e2e_p99=4719ms, while TP=1/1-inst reaches 51400ms). With 8 GPUs dedicated to a single instance, both throughput (raw compute) and latency (time-per-step) scale proportionally with TP. Lower-TP multi-instance configs (e.g., TP=4/2-inst) have lower per-GPU parallelism AND need routing overhead. The key: at moderate load, TP=8/1-inst is BOTH the fastest server (highest tokens/step) AND the least loaded (handles requests most quickly), so it wins on all objectives simultaneously. Genuine tradeoffs emerge only at rates where TP=8/1-inst saturates.",
+      "applicability_bounds": "Holds when: (1) rate is below TP=8/1-inst saturation point, (2) single-node constraint forces max TP to 8. May NOT hold at very high rates (rate >> 100 req/s) where TP=8/1-inst approaches its throughput ceiling and per-request latency increases \u2014 at that point, lower-TP multi-instance configs may offer lower latency at reduced throughput, creating genuine Pareto tradeoffs.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-C2-2",
+      "statement": "Phase 1 tier ranking in BLIS (identifying dominant TP\u00d7instances parallelism configurations by throughput) is perfectly stable across workload seeds. The same top-3 tiers are identified regardless of whether seed is 42, 123, or 456.",
+      "confidence": "high",
+      "regime": "rate=2000, qwen3-14b/H100, Phase 1 with batch=512 max-throughput profile",
+      "evidence": [
+        "iteration-1-h-robustness",
+        "iteration-2-h-robustness"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 2,
+      "mechanism": "The top-3 tier ranking (TP=4/2 > TP=8/1 > TP=2/4) at rate=2000 is structurally determined by queue dynamics: TP=4/2 distributes 2000 req/s across 2 instances (1000 req/s each), reducing scheduling delay from 6794ms (single-instance TP=8) to 142ms. This queue-pressure advantage is independent of workload seed which only affects request length distribution, not the queueing fundamental.",
+      "applicability_bounds": "Confirmed at rate=2000. RP-C2-2 was originally established at rate=50; now confirmed also at rate=2000. The stability holds across seeds at both rates, suggesting it is a robust property of BLIS queue dynamics.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-C2-3",
+      "statement": "UPDATED (was: 'At low request rates (rate=5 req/s), BLIS secondary knobs have ZERO effect'). At low request rates (rate=50 req/s), BLIS secondary knobs have zero effect on THROUGHPUT within a fixed parallelism tier. However, secondary knobs (especially max-num-running-reqs/batch size) DO affect composite fitness scores via p99_ttft and p99_e2e latency components: batch=32 gives composite score 0.063 while batch=512 gives 0.132 (2x difference) at rate=50 on H100 TP=8/1.",
+      "confidence": "high",
+      "regime": "BLIS with qwen3-14b, H100, rate=50, composite fitness scoring (throughput:0.4,p99_ttft:0.3,p99_e2e:0.3)",
+      "evidence": [
+        "iteration-3-h-control-negative"
+      ],
+      "contradicts": [
+        "RP-C2-3"
+      ],
+      "extraction_iteration": 3,
+      "mechanism": "At rate=50 req/s, all requests complete regardless of batch size (throughput = arrival rate). However, max_running limits concurrent running requests. With max_running=32, requests queue in WaitQ even at low load (32 running + waiting queue for remaining). This adds scheduling delay to TTFT. With max_running=512, all available requests (< 512 at rate=50) run immediately, minimizing TTFT. The latency components of the composite fitness function (weight 0.6 total) are sensitive to this scheduling delay even at low rates.",
+      "applicability_bounds": "Applies to composite fitness scoring including latency components. The original RP-C2-3 (zero effect) is correct ONLY for pure throughput metrics. Phase 1 using batch=512 incidentally happens to use the optimal secondary knob value at low rates, so Phase 2 adds no improvement in practice.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-C2-4",
+      "statement": "Hypervolume (HV) is an insensitive metric for comparing search strategies when the Pareto problem is effectively single-objective (dominated by one extreme point). In degenerate cases, strategies with very different budget allocations (random 9% vs hierarchical 33% on the dominant tier) achieve identical HV once any strategy discovers the global maximum.",
+      "confidence": "high",
+      "regime": "2D Pareto (throughput, latency) when one configuration dominates all others in both objectives",
+      "evidence": [
+        "iteration-1-h-main"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 1,
+      "mechanism": "The 2D hypervolume is dominated by the extreme point (maximum throughput + minimum latency corner). Once found, this point alone accounts for nearly all achievable HV. With 500 evals and ~9% probability of hitting the dominant tier per uniform random sample, the expected number of dominant-tier samples is ~45 \u2014 more than enough to find the maximum. Hierarchical search allocates ~163 to the dominant tier, but the marginal benefit of additional dominant-tier evals is zero once the maximum is found.",
+      "applicability_bounds": "Applies when Pareto problem degenerates to a single dominant point. For genuine multi-objective problems with diverse Pareto fronts, hypervolume correctly discriminates between strategies. The 'degenerate' condition should be diagnosed BEFORE designing experiments using HV as the comparison metric.",
+      "superseded_by": null,
+      "category": "methodology",
+      "status": "active"
+    },
+    {
+      "id": "RP-C2-5",
+      "statement": "Phase 1 MUST use batch=512 for correct tier ranking, regardless of nreq. At nreq=2000, lean Phase 1 (batch=128) eliminates TP=8/1 and TP=1/8 from contention (never selects them), but systematically misranks TP=4/2 vs TP=2/4: in 12/18 conditions across rates and hardware, it selects TP=2/4 instead of TP=4/2. The mechanism is effective cluster batch capacity: at batch=128, TP=2/4 (4 instances \u00d7 128 = 512 effective) has 2\u00d7 the concurrent capacity of TP=4/2 (2 instances \u00d7 128 = 256 effective), giving TP=2/4 an artificial advantage that persists in steady state. At batch=512, both configurations exceed steady-state queue demand (~75 rps \u00d7 service time) and TP=4/2's per-GPU compute efficiency dominates. The prior characterization of 'safe on H100 at rates>=2000' was based on nreq=500 comparisons; at nreq=2000, lean fails even on H100 rate=2000 (0/3 seeds correct) and rate=5000 (0/3 seeds correct).",
+      "confidence": "high",
+      "regime": "qwen3-14b, H100 and A100-SXM, rates 500-5000, nreq=2000, seeds 42/123/456",
+      "evidence": [
+        "iteration-5-h-main",
+        "iteration-5-h-ablation"
+      ],
+      "contradicts": [
+        "iteration-4-RP-C2-5-partial-update"
+      ],
+      "extraction_iteration": 5,
+      "mechanism": "Effective cluster batch capacity = num_instances \u00d7 max_num_running_reqs. At batch=128: TP=2/4 has 4\u00d7128=512 effective capacity, TP=4/2 has 2\u00d7128=256. In steady-state queuing (rate >> capacity), this 2\u00d7 advantage means TP=2/4 processes larger concurrent batches and achieves higher measured fitness. At batch=512, both 4\u00d7512=2048 and 2\u00d7512=1024 exceed the steady-state concurrent request pool (~75 rps \u00d7 ~7s service = ~525 concurrent), so the capacity ceiling is not binding and true compute efficiency determines ranking.",
+      "applicability_bounds": "Applies when comparing tiers that share the same total GPU count (TP\u00d7instances = const). TP=4/2 and TP=2/4 both use 8 GPUs. The batch capacity effect is proportional to instance count ratio (4:2 = 2\u00d7). For configs with the same instance count or when batch size >> requests_in_flight, this effect disappears.",
+      "superseded_by": null,
+      "category": "configuration",
+      "status": "active"
+    },
+    {
+      "id": "RP-C2-6",
+      "statement": "At rate=2000 (H100, qwen3-14b), hierarchical Phase 1 search with max-throughput profile (batch=512, tokens=8192) reaches 95% of optimal throughput in exactly 14 evaluations regardless of workload seed. The number is deterministic: TP=4/2 is at index 13 in VALID_TP_INSTANCES ordering, and Phase 1 evaluates all tiers sequentially.",
+      "confidence": "high",
+      "regime": "rate=2000, qwen3-14b/H100, hierarchical Phase 1 with fixed VALID_TP_INSTANCES ordering",
+      "evidence": [
+        "iteration-2-h-main",
+        "iteration-2-h-robustness"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 2,
+      "mechanism": "VALID_TP_INSTANCES = [(tp=1,ni=1..8), (tp=2,ni=1..4), (tp=4,ni=1), (tp=4,ni=2), (tp=8,ni=1)]. TP=4/2 is at index 13 (0-based), so it is the 14th evaluation. With batch=512 (Phase 1 max-throughput profile), TP=4/2 gives 40,392 tok/s > 95% threshold of 38,373. The 14-eval determinism holds across seeds because Phase 1 uses a fixed secondary profile \u2014 only the BLIS workload varies, but the TP=4/2 advantage is structural at rate=2000.",
+      "applicability_bounds": "Applies when: (1) rate is high enough to create queue pressure in single-instance deployments (rate >> 500 req/s for qwen3-14b/H100), (2) the Phase 1 profile uses batch=512 (lower batch values may incorrectly rank TP=8/1 above TP=4/2). Does NOT apply at rate=50 where TP=8/1 dominates and is at index 14 (last), requiring 15 evals.",
+      "superseded_by": null,
+      "category": "search",
+      "status": "active"
+    },
+    {
+      "id": "RP-C2-7",
+      "statement": "UPDATED: TP=8/1's apparent optimality at low num_requests is a simulation duration artifact, not a rate-dependent property. At nreq=250 and nreq=500 (batch=512), TP=8/1 wins 100% of tested conditions regardless of rate (500-5000) or hardware (H100, A100-SXM). At nreq=750+, TP=4/2 wins. The prior observation of 'TP=8/1 optimal at rate=50' was also likely a short-simulation artifact.",
+      "confidence": "high",
+      "regime": "qwen3-14b, H100 and A100-SXM, rates 500-5000, batch=512, seeds 42/123/456",
+      "evidence": [
+        "iteration-5-h-control-negative",
+        "iteration-5-h-robustness"
+      ],
+      "contradicts": [
+        "RP-C2-1 (to be verified: if rate=50 is UNDER capacity, TP=8/1 advantage may be real)"
+      ],
+      "extraction_iteration": 5,
+      "mechanism": "At low nreq, single-instance (TP=8/1) with batch=512 can process up to 512 concurrent tokens per step. During the transient queue-building phase, this larger batch capacity allows TP=8/1 to complete requests faster than multi-instance configurations, artificially inflating its throughput metric. Once queues reach equilibrium (nreq>=750 at rate=500), TP=4/2's dual-instance aggregate throughput (~150 capacity vs ~73 for TP=8/1) dominates.",
+      "applicability_bounds": "Valid for deeply oversaturated regimes (rate >> capacity ~75 rps). May not apply for rate < capacity (undersaturated regime) where TP=8/1's faster single-request processing might be genuinely optimal.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-C2-8",
+      "statement": "The true fraction of BLIS configurations above 95% of optimal throughput at rate=2000 is approximately 2.67% (2304/86400), not 0.017% as estimated from the single optimal config. This is because multiple tiers (TP=4/2 and TP=8/1) with batch=512 all meet the threshold, giving ~2304 qualifying configs across the full secondary-knob space.",
+      "confidence": "high",
+      "regime": "rate=2000, qwen3-14b/H100, 95% threshold of 40,392 tok/s",
+      "evidence": [
+        "iteration-2-h-main"
+      ],
+      "contradicts": [
+        "bundle prediction of 0.017% and 150+ evals for random search"
+      ],
+      "extraction_iteration": 2,
+      "mechanism": "The 95% threshold (38,373 tok/s) is met by both TP=4/2/batch=512 (~40,392) and TP=8/1/batch=512 (~38,591). Each tier has ~1152 qualifying secondary-knob combinations (any scheduler, tokens, prefill, block_size, routing, admission, preemption with batch=512). Total: 2\u00d71152 = 2304 out of ~86,400 total configs = 2.67%. Random search with p=2.67% has expected evals = 37, consistent with observed 64 evals (within 2 standard deviations for geometric distribution).",
+      "applicability_bounds": "Applies to the specific 95% threshold relative to the known optimal. If the threshold is raised (e.g., 99%), the qualifying set shrinks to only TP=4/2/batch=512 with specific secondary knobs, making the search harder.",
+      "superseded_by": null,
+      "category": "search",
+      "status": "active"
+    },
+    {
+      "id": "RP-C2-9",
+      "statement": "NSGA-II (Optuna NSGAIISampler, population_size=20) does not provide reliable convergence speed advantages over hierarchical search for BLIS configuration optimization. Its apparent advantage at a single seed (evals_to_95pct=8 vs hierarchical=14) is explained by lucky random warmup sampling, not systematic evolutionary advantage.",
+      "confidence": "medium",
+      "regime": "rate=2000, qwen3-14b/H100, NSGA-II with population_size=20, seed=42",
+      "evidence": [
+        "iteration-2-h-main"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 2,
+      "mechanism": "NSGAIISampler's first population_size=20 trials are effectively random sampling. With p=2.67% of qualifying configs, P(hit threshold within 8 trials) ~19%. NSGA-II at seed=42 was in the lucky 19%. The evolutionary phase (after 20 trials) does not offer substantial advantage because: (1) the objective landscape has a clear batch-size dominant axis that random search already covers, and (2) the population diversity is quickly dominated by TP=4/2 high-batch configs. To confirm, NSGA-II should be run with multiple seeds; expected mean evals_to_95pct ~37 (same as random) or slightly better.",
+      "applicability_bounds": "Applies to NSGAIISampler with population_size=20 and seed=42. May differ for other seeds or population sizes. Multi-seed evaluation needed to confirm median/mean convergence speed.",
+      "superseded_by": null,
+      "category": "search",
+      "status": "active"
+    },
+    {
+      "id": "RP-C2-10",
+      "statement": "Extremes-first Phase 1 (4 evals: max-instance per TP level with batch=512) identifies the optimal parallelism tier in exactly 3 evaluations for H100 rate=2000-5000 (where optimal is TP=4/2 at position 3) and at most 4 evaluations overall (budget \u2264 4 evals). This is 11 fewer evaluations than sequential Phase 1 (14 evals) for the same tier identification task.",
+      "confidence": "high",
+      "regime": "BLIS with qwen3-14b, H100 or A100-SXM, rate\u22652000, budget\u22654, using composite fitness scoring",
+      "evidence": [
+        "iteration-3-h-main",
+        "iteration-3-h-control-negative",
+        "iteration-3-h-robustness"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 3,
+      "mechanism": "EXTREMES_PHASE1_CONFIGS order is (TP=1/8, TP=2/4, TP=4/2, TP=8/1). For H100 rate=2000-5000, TP=4/2 is optimal and evaluated at position 3. For A100-SXM rate=2000, TP=8/1 is optimal at position 4. Phase 1 uses batch=512 (RP-C2-5) which correctly discriminates tiers. The 95% threshold (0.95 * optimal) is first crossed at the eval where TP=4/2 is evaluated (H100) or TP=8/1 (A100-SXM).",
+      "applicability_bounds": "Applies when TP\u00d7instances\u22648 (single H100 node), batch=512 in Phase 1, composite fitness scoring. Does NOT apply if optimal tier changes with rate (e.g., rate=50 where TP=8/1 wins on H100). Portability across hardware requires only that the optimal tier be among the 4 max-instance configs, which is always true.",
+      "superseded_by": null,
+      "category": "search_strategy",
+      "status": "active"
+    },
+    {
+      "id": "RP-C2-11",
+      "statement": "UPDATED: Standard Phase 1 (batch=512) correctly identifies optimal parallelism tier on H100 across all rates (100% accuracy, 9/9 conditions \u00d7 seeds). On A100-SXM, standard Phase 1 is correct at rate=500 (3/3 seeds) but enters a tie zone at rates >=2000 where TP=4/2 and TP=8/1 are within 0.1-1.0% of each other \u2014 the winner depends on workload seed. The prior characterization 'A100-SXM always picks TP=8/1' was based on seed=42 only.",
+      "confidence": "high",
+      "regime": "qwen3-14b, H100/A100-SXM, rates 500-5000",
+      "evidence": [
+        "iteration-4-h-robustness"
+      ],
+      "contradicts": [
+        "prior RP-C2-11 which said A100-SXM consistently picks TP=8/1"
+      ],
+      "extraction_iteration": 4,
+      "mechanism": "On A100-SXM, TP=4/2 (2 instances) and TP=8/1 (1 instance) have near-identical composite fitness at rates >=2000 because the memory bandwidth difference between TP=4 and TP=8 on A100-SXM is smaller than on H100. The TP=4/2 vs TP=8/1 gap is <1.5% at these rates, making the winner sensitive to workload seed variation. On H100, the gap is much larger (>2%) at rates >=2000, so TP=4/2 dominates consistently.",
+      "applicability_bounds": "Applies to qwen3-14b. When TP tier gap is <2%, treat as tie zone and use seed-averaged scoring for reliable identification.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-C2-12",
+      "statement": "TPE Phase 2 (Optuna TPE, n_startup=5) and LHS Phase 2 show statistically indistinguishable convergence when the Phase 2 improvement window is \u22641% above Phase 1 score. TPE's surrogate model provides no reliable systematic advantage over LHS for small improvement windows (0.55% gap, 1/3 probability for the differentiating categorical value).",
+      "confidence": "medium",
+      "regime": "BLIS Phase 2 within TP=4/2 at H100 rate=5000, budget=46 Phase 2 evals, improvement gap=0.55%",
+      "evidence": [
+        "iteration-3-h-ablation"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 3,
+      "mechanism": "Phase 1 with batch=512 already captures 99.47% of optimal (0.1755 vs 0.176474). Phase 2 must find round-robin routing (1 of 3 options) to get remaining 0.55%. With 5 startup random trials, TPE has P=1-(2/3)^5=87% to sample round-robin, vs LHS which distributes samples across the space. Both strategies find the improvement but timing depends on seed. TPE won on 2/3 seeds (evals 20,12 vs 32,33 for LHS) and lost on 1/3 (eval 33 vs 10 for LHS). The improvement window is too small for TPE's surrogate to show systematic advantage over random sampling.",
+      "applicability_bounds": "When Phase 2 improvement window >5% (strong secondary knob signal), TPE should outperform LHS more reliably. The 26% batch-range scenario from the design (rate=5000 secondary knob prediction) was not realized because Phase 1 already uses batch=512. Future tests should set Phase 1 batch\u2260512 to create a genuine Phase 2 improvement window.",
+      "superseded_by": null,
+      "category": "search_strategy",
+      "status": "active"
+    },
+    {
+      "id": "RP-C2-13",
+      "statement": "Lean Phase 1 (batch=128) fails to identify the correct tier on H100 at rate=500 (0/3 seeds correct) and on A100-SXM at rates >=2000 (0/3 seeds correct). On H100 at rate=500, the wrong tier varies by seed: TP=2/4 (seed=42, margin 0.0002) or TP=4/2 (seeds 123,456, margin 0.003-0.004). When the wrong tier is TP=2/4 (unsaturated), Phase 2 cannot recover (deficit 24%). When the wrong tier is TP=4/2 (partially saturated), Phase 2 partially recovers but deficit remains 4-8%.",
+      "confidence": "high",
+      "regime": "qwen3-14b, H100/A100-SXM, rates 500-5000",
+      "evidence": [
+        "iteration-4-h-control-negative",
+        "iteration-4-h-robustness"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 4,
+      "mechanism": "At rate=500 on H100, TP=4/2 (2 instances) is partially saturated at batch=128 (250 req/s per instance). TP=2/4 (4 instances) is completely unsaturated at batch=128 (125 req/s per instance). TP=8/1 (1 instance) is saturated at batch=128 but its TRUE score (batch=512) is much higher. Lean Phase 1 sees TP=2/4 \u2248 TP=4/2 (both around 0.122-0.127) while TP=8/1 appears weaker (0.119-0.121). The TP=2/4 vs TP=4/2 winner depends on the 0.1-0.4% workload variation. On A100-SXM at rates >=2000, all tiers are partially saturated but the batch-sensitivity of TP=4/2 makes it appear stronger than TP=8/1 at batch=128, inverting the standard Phase 1 ranking.",
+      "applicability_bounds": "Lean Phase 1 (batch=128) is safe ONLY on H100 at rates >=2000 (confirmed correct in 6/6 conditions). Unsafe for: H100 rate=500, A100-SXM all rates tested (500, 2000, 5000).",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-C2-14",
+      "statement": "TPE Phase 2 (Optuna TPE, n_startup=5) converges to 95% of within-tier optimal in 2-3 evals on H100 rate=5000 when Phase 2 headroom is 25%+ (batch=128 starting point, batch=512 optimum). This is dramatically faster than LHS Phase 2 which requires 5-16 evals for the same 95% threshold.",
+      "confidence": "high",
+      "regime": "qwen3-14b, H100, rate=5000, Phase 2 budget=46, Phase 2 headroom=25%",
+      "evidence": [
+        "iteration-4-h-main",
+        "iteration-4-h-ablation"
+      ],
+      "contradicts": [
+        "RP-C2-12 which said TPE and LHS are indistinguishable when improvement window is <=1%"
+      ],
+      "extraction_iteration": 4,
+      "mechanism": "When Phase 2 headroom is large (25%), the dominant dimension (batch: 5 ordered values, 4x range) creates a strong monotone signal that TPE's Tree Parzen Estimator captures quickly. After 5 startup trials, TPE's density model assigns high probability to batch=512 combinations and converges in 2-3 directed trials. LHS samples uniformly across all 8 dimensions, hitting batch=512 with probability only 1/5 per sample. TPE's advantage here is not about LHS being bad \u2014 it's about the signal-to-noise ratio being very high (batch effect is 25x larger than any other dimension's effect).",
+      "applicability_bounds": "TPE advantage requires: (1) Phase 2 headroom >=20%, (2) at least one clearly dominant dimension (batch in this case). When headroom is <=1% (as in iter-3), TPE and LHS are indistinguishable (RP-C2-12 still applies for small-headroom cases).",
+      "superseded_by": null,
+      "category": "algorithmic",
+      "status": "active"
+    },
+    {
+      "id": "RP-C2-15",
+      "statement": "nreq>=750 (with batch=512) is the minimum simulation duration for correct Phase 1 tier ranking on H100 rate=500. Below nreq=750, TP=8/1 is artificially favored due to transient simulation dynamics. The transition from TP=8/1-dominant to TP=4/2-dominant occurs precisely between nreq=500 (TP=8/1 wins by 8%) and nreq=750 (TP=4/2 wins by 2%). At nreq=1000, TP=4/2 leads by 5% and the ranking is stable.",
+      "confidence": "high",
+      "regime": "qwen3-14b, H100, rate=500, batch=512, seed=42",
+      "evidence": [
+        "iteration-5-h-robustness"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 5,
+      "mechanism": "System capacity is ~75 rps. At rate=500, the arrival excess is ~425 req/s. nreq=500 provides only 1 second of arrivals, meaning only ~75 requests complete during the arrival window. The tail is dominated by drain dynamics where TP=8/1's faster per-token speed (ITL=10ms vs 21ms for TP=4/2) gives it an edge. By nreq=750 (~1.5s arrivals), enough queue has accumulated that TP=4/2's dual-instance throughput advantage (~150 concurrent capacity vs single instance) begins to dominate p99 TTFT metrics. By nreq=1000, the equilibrium is fully established.",
+      "applicability_bounds": "The exact transition threshold (nreq=750) is specific to H100 rate=500. For higher rates or larger models, the threshold may differ. For rate=2000, the transition likely occurs at lower nreq (faster queue buildup). Batch size interacts: at batch=128, lean Phase 1 may show a different transition threshold (untested in h-robustness).",
+      "superseded_by": null,
+      "category": "configuration",
+      "status": "active"
+    },
+    {
+      "id": "RP-C2-16",
+      "statement": "At nreq=2000, lean Phase 1 (batch=128) reliably distinguishes the 'multi-instance' regime from 'single-instance': it never selects TP=8/1 or TP=1/8 in any tested condition. However, it cannot precisely rank TP=4/2 vs TP=2/4, selecting TP=2/4 in 12/18 conditions where batch=512 would select TP=4/2. For use cases where TP=4/2 vs TP=2/4 precision is not critical (e.g., when Phase 2 can distinguish them), lean Phase 1 at nreq=2000 is a useful low-cost filter that eliminates the 2 clearly suboptimal tiers (TP=1/8, TP=8/1) while converging on the competitive 2-tier set {TP=4/2, TP=2/4}.",
+      "confidence": "high",
+      "regime": "qwen3-14b, H100 and A100-SXM, rates 500-5000, nreq=2000, seeds 42/123/456",
+      "evidence": [
+        "iteration-5-h-main"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 5,
+      "mechanism": "At nreq=2000, the simulation is long enough that TP=8/1's transient advantage dissipates and steady-state queuing dominates. Multi-instance configs uniformly outperform single-instance. But within multi-instance, the batch=128 capacity effect (effective_capacity = instances \u00d7 max_batch) creates a systematic TP=2/4 bias. The competitive TP=4/2 vs TP=2/4 scores (within 2-5% at batch=128) indicate both tiers are genuinely competitive at batch=128 in steady state.",
+      "applicability_bounds": "Valid for the 4-tier extremes Phase 1 structure. If Phase 1 uses all instances (not just max-per-TP), the effective capacity calculation changes. The 2-tier {TP=4/2, TP=2/4} collapse may not hold for other models or hardware where TP=4/2 and TP=2/4 have larger inherent performance gaps.",
+      "superseded_by": null,
+      "category": "configuration",
+      "status": "active"
+    }
+  ]
+}

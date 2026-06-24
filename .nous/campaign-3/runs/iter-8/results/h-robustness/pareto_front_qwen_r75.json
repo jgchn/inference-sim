@@ -1,0 +1,1768 @@
+{
+  "model": "qwen/qwen3-14b",
+  "rate": 75,
+  "total_configs": 1800,
+  "evaluated": 1800,
+  "pareto_size": 109,
+  "pareto_density": 0.06055555555555556,
+  "exhaustive_hv": 62917200000.0,
+  "reference_point": [
+    0.0,
+    50000.0,
+    9.0,
+    11000.0
+  ],
+  "hv_lo_bounds": [
+    -100.0,
+    0.0,
+    1.0,
+    2000.0
+  ],
+  "elapsed_s": 124.6,
+  "pareto_front": [
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -5.265513796462301,
+        20281.27544,
+        1.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 3000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -6.0067701104560935,
+        13285.850399999998,
+        1.0,
+        3000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -5.265513796462301,
+        20281.27544,
+        1.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 4000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -6.8993752339750625,
+        9078.23242,
+        1.0,
+        4000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 5000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -6.950154672217153,
+        85.32717,
+        1.0,
+        5000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -5.265513796462301,
+        20281.27544,
+        1.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 4000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -6.8993752339750625,
+        9078.23242,
+        1.0,
+        4000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 5000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -6.950154672217153,
+        85.32717,
+        1.0,
+        5000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 3000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -6.349876815564716,
+        14789.42011,
+        1.0,
+        3000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 5000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -6.950154672217153,
+        85.32717,
+        1.0,
+        5000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 5000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -6.950154672217153,
+        85.32717,
+        1.0,
+        5000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -8.510450343671133,
+        6016.820859999995,
+        2.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 3000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -9.003296376902474,
+        60.64924,
+        2.0,
+        3000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -8.510450343671133,
+        6016.820859999995,
+        2.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 3000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -9.003296376902474,
+        60.64924,
+        2.0,
+        3000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -8.510450343671133,
+        6016.820859999995,
+        2.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 3000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -9.003296376902474,
+        60.64924,
+        2.0,
+        3000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -8.52566850725903,
+        6147.046449999996,
+        2.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 3000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -9.003296376902474,
+        60.64924,
+        2.0,
+        3000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -8.52566850725903,
+        6147.046449999996,
+        2.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 3000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -9.003296376902474,
+        60.64924,
+        2.0,
+        3000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -8.52566850725903,
+        6147.046449999996,
+        2.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 2,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 3000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -9.003296376902474,
+        60.64924,
+        2.0,
+        3000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -10.055588297668342,
+        51.62027,
+        3.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -10.055588297668342,
+        51.62027,
+        3.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -10.055588297668342,
+        51.62027,
+        3.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -10.055588297668342,
+        51.62027,
+        3.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -10.055588297668342,
+        51.62027,
+        3.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 3,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -10.055588297668342,
+        51.62027,
+        3.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 64,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -10.74188853142271,
+        49.48859,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -10.74188853142271,
+        49.48859,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -10.74188853142271,
+        49.48859,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -10.74188853142271,
+        49.48859,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 64,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -10.74188853142271,
+        49.48859,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -10.74188853142271,
+        49.48859,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -10.74188853142271,
+        49.48859,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 4,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -10.74188853142271,
+        49.48859,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 64,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 16
+      },
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 64,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 16
+      },
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 16
+      },
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 16
+      },
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 64,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 16
+      },
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 64,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 16
+      },
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 16
+      },
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 16
+      },
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 1,
+        "num_instances": 5,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -9.566415148073997,
+        10161.834,
+        2.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 3000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -10.807976199971769,
+        6308.06733,
+        2.0,
+        3000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -9.566415148073997,
+        10161.834,
+        2.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 4000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -12.5834629639743,
+        88.00329999999362,
+        2.0,
+        4000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 5000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -12.614224960574239,
+        51.65414,
+        2.0,
+        5000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -9.566415148073997,
+        10161.834,
+        2.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 4000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -12.5834629639743,
+        88.00329999999362,
+        2.0,
+        4000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 5000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -12.614224960574239,
+        51.65414,
+        2.0,
+        5000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 3000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -11.465532373905228,
+        6832.283979999999,
+        2.0,
+        3000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 4000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -12.5834629639743,
+        88.00329999999362,
+        2.0,
+        4000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 5000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -12.614224960574239,
+        51.65414,
+        2.0,
+        5000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 4000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -12.5834629639743,
+        88.00329999999362,
+        2.0,
+        4000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 5000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -12.614224960574239,
+        51.65414,
+        2.0,
+        5000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -15.352340042050061,
+        2123.6195,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 3000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -16.00893554746517,
+        39.4655,
+        4.0,
+        3000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -15.352340042050061,
+        2123.6195,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 3000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -16.00893554746517,
+        39.4655,
+        4.0,
+        3000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -15.352340042050061,
+        2123.6195,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 3000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -16.00893554746517,
+        39.4655,
+        4.0,
+        3000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 3000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -16.00893554746517,
+        39.4655,
+        4.0,
+        3000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 3000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -16.00893554746517,
+        39.4655,
+        4.0,
+        3000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 2,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 3000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -16.00893554746517,
+        39.4655,
+        4.0,
+        3000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 3,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 64,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -17.397655248411553,
+        36.07364,
+        6.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 3,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -17.397655248411553,
+        36.07364,
+        6.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 3,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -17.397655248411553,
+        36.07364,
+        6.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 3,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -17.397655248411553,
+        36.07364,
+        6.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 3,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 64,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -17.397655248411553,
+        36.07364,
+        6.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 3,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -17.397655248411553,
+        36.07364,
+        6.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 3,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -17.397655248411553,
+        36.07364,
+        6.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 2,
+        "num_instances": 3,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -17.397655248411553,
+        36.07364,
+        6.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -16.013310263491014,
+        4796.73258,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 3000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -18.233819377061618,
+        2802.73833,
+        4.0,
+        3000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -16.013310263491014,
+        4796.73258,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 4000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -20.796679186267536,
+        34.63711,
+        4.0,
+        4000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -16.013310263491014,
+        4796.73258,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 4000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -20.796679186267536,
+        34.63711,
+        4.0,
+        4000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 3000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -19.29660218674885,
+        3386.51849,
+        4.0,
+        3000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 3000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -19.054538567195877,
+        3112.9547199999997,
+        4.0,
+        3000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 4000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -20.796679186267536,
+        34.63711,
+        4.0,
+        4000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 3000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -19.054538567195877,
+        3112.9547199999997,
+        4.0,
+        3000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 4000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -20.796679186267536,
+        34.63711,
+        4.0,
+        4000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -25.180091159484025,
+        28.94737,
+        8.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -25.180091159484025,
+        28.94737,
+        8.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -25.180091159484025,
+        28.94737,
+        8.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -25.180091159484025,
+        28.94737,
+        8.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -25.180091159484025,
+        28.94737,
+        8.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -25.180091159484025,
+        28.94737,
+        8.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 3000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -27.853124347627602,
+        1142.9107999999999,
+        8.0,
+        3000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 4000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -29.923590112647354,
+        26.34634,
+        8.0,
+        4000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 4000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -29.923590112647354,
+        26.34634,
+        8.0,
+        4000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -25.353005744610808,
+        3369.8855299999996,
+        8.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 128,
+        "total_kv_blocks": 3000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -28.577523748993894,
+        1262.5808299999994,
+        8.0,
+        3000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -25.353005744610808,
+        3369.8855299999996,
+        8.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 256,
+        "total_kv_blocks": 4000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -29.923590112647354,
+        26.34634,
+        8.0,
+        4000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 2000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -25.353005744610808,
+        3369.8855299999996,
+        8.0,
+        2000.0
+      ]
+    },
+    {
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "sjf",
+        "max_num_running_reqs": 512,
+        "total_kv_blocks": 4000,
+        "block_size_in_tokens": 32
+      },
+      "objectives": [
+        -29.923590112647354,
+        26.34634,
+        8.0,
+        4000.0
+      ]
+    }
+  ]
+}

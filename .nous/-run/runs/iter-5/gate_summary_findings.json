@@ -1,0 +1,11 @@
+{
+  "gate_type": "findings",
+  "summary": "All four arms in iteration 5 are CONFIRMED. The bracket search (K=1) at rate=100 req/s deterministically selects TP=8/1-instance as the best configuration across all 25 seed combinations (5 blis_seeds \u00d7 5 search_seeds), requiring exactly 4 evaluations every time. The rate=100 workload produces a clean monotonic TP landscape (TP1 < TP2 < TP4 < TP8) that makes both bracket search and flat TPE converge rapidly and reliably.",
+  "key_points": [
+    "h-main CONFIRMED: Bracket K=1 finds TP=8/1inst as Phase 1 winner on all 5 search seeds with evals_to_best=4. Phase 1 max-profile scores increase monotonically: TP1=0.108, TP2=0.137, TP4=0.156, TP8=0.165. Phase 2 TPE adds zero improvement \u2014 all 96 TPE trials fail to beat the Phase 1 score of 0.1647 because TP=8/1-instance makes routing and block_size degenerate (single instance, no routing needed).",
+    "h-robustness CONFIRMED: 25/25 blis_seed \u00d7 search_seed combinations select TP=8/1inst with evals_to_best=4. TP=8 margins over TP=4 range 4.7\u20136.4% (predicted 5.2\u20136.6%). Phase 1 is fully deterministic within each blis_seed regardless of search seed, confirming RP-9.",
+    "h-ablation CONFIRMED: At rate=125 (crossover point), evals_to_best drops to 3 on all 25 combinations because TP=4 at eval position 3 already exceeds the 1% early-stopping threshold. Minor discrepancy: predicted blis_seed=46 would flip to TP=4 winner, but observed TP=8 wins by 0.001% (essentially tied). The crossover behavior is confirmed \u2014 TP=4 and TP=8 are within noise at this rate.",
+    "h-control-negative CONFIRMED (conservative): Flat TPE at rate=100 has median evals_to_best=6 across 5 seeds (predicted <20, prior rate=500 baseline was 26). One seed found the optimum on its very first evaluation. The monotonic TP landscape at rate=100 provides dramatically cleaner signal for TPE than the non-monotonic rate=500 landscape seen in iteration 4.",
+    "No surprises invalidate findings. The only discrepancies are: (1) blis46 crossover direction was a coin-flip rather than TP=4 favored, and (2) TPE converged 3\u00d7 faster than the conservative prediction. Both strengthen rather than weaken confidence in the monotonic-landscape hypothesis."
+  ]
+}

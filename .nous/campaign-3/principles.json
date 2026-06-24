@@ -1,0 +1,319 @@
+{
+  "principles": [
+    {
+      "id": "RP-1",
+      "statement": "Multi-objective search algorithm comparison (NSGA-II vs random) requires both a non-trivial Pareto frontier AND a sparse Pareto-optimal configuration set. In BLIS's corrected 6-parameter 4-objective space: Pareto density at rate=50 is 4.50% (Qwen) and 5.33% (Llama), at rate=75 is 6.06% (Qwen) and 4.83% (Llama), and at rate=100 is 6.89% (Qwen) and 5.89% (Llama). Confirmed by both iter-7 and iter-10 exhaustive sweeps. The density threshold guidance for NSGA-II advantage magnitude (>5% = moderate advantage, <5% = decisive advantage) is no longer reliable \u2014 with pop_size=40, NSGA-II wins at both 4.50% and 5.33% density at rate=50, and at both 6.89% and 5.89% at rate=100. The convergence gap is primarily determined by landscape structure (block_size=32 concentration, multi-axis NDR), not density alone.",
+      "confidence": "high",
+      "regime": "BLIS 6-parameter 4-objective space, H100, rates 50-100, Qwen and Llama",
+      "evidence": [
+        "iteration-7",
+        "iteration-9",
+        "iteration-10-h-robustness"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 10,
+      "mechanism": "Exhaustive sweeps at rate=50 replicate the density values from iter-7 exactly, confirming measurement stability. The density values are structural properties of the BLIS configuration space at given rate/model combinations, not algorithm-dependent.",
+      "applicability_bounds": "Same as prior RP-1 plus: density values are now confirmed stable across iterations (iter-7 and iter-10 match exactly for rate=50).",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-2",
+      "statement": "Before running a search algorithm comparison on BLIS, validate BOTH objective diversity AND Pareto set density. The density threshold guidance (>20% = algorithms equivalent, 5-20% = moderate NSGA-II advantage, <5% = decisive NSGA-II advantage) was calibrated at rate=50 req/s. At higher rates (75-100 req/s), Pareto density is typically 6-7% even with block_size as a co-variate, placing the comparison in the 'moderate NSGA-II advantage' regime (~2x difference in final HV gap: 1.46-2.12% vs 4.9% at rate=50). NSGA-II retains a convergence SPEED advantage (reaches 95% of exhaustive HV ~50-60 evals before random at rates 75-100), but the final HV gap narrows significantly as random search benefits from higher density.",
+      "confidence": "high",
+      "regime": "BLIS corrected 6-parameter space, rates 50-100 req/s on H100 hardware, budget 200 evals",
+      "evidence": [
+        "iteration-5-h-main",
+        "iteration-6-h-main",
+        "iteration-6-h-control-negative",
+        "iteration-6-h-ablation"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 6,
+      "mechanism": "Higher arrival rate increases Pareto density by expanding the throughput frontier. At rate=50, only KV-efficient configs are Pareto-optimal. At rate=75-100, throughput-limited low-cost configs (tp=1) also become Pareto-optimal, and additional mid-range configs populate new tradeoff regions created by the higher throughput ceiling. Higher density = more expected Pareto-optimal hits per random eval = random search more competitive.",
+      "applicability_bounds": "Calibrated on qwen/qwen3-14b, H100. The specific density values (4.5% at rate=50, 6-7% at rate=75-100) are model and hardware specific. The threshold guidance principle (density > 5% \u2192 weaker NSGA-II advantage) should generalize, but the mapping from load rate to density may not.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-3",
+      "statement": "In BLIS at rate=50 req/s with qwen/qwen3-14b on H100, the batch size threshold for tier-optimal performance is approximately max_num_running_reqs >= 256. Configs with batch < 256 show severely degraded TTFT (queueing-dominated regime), while batch >= 256 unlocks near-optimal TTFT for the GPU tier. This makes ~60% of within-tier configs (batch={256,512} out of {32,64,128,256,512}) Pareto-optimal within their GPU tier. This threshold has not been verified at rates > 50 req/s; at rate=100, the higher throughput demand may raise the effective threshold.",
+      "confidence": "medium",
+      "regime": "rate=50 req/s. Rate=100 behavior untested for batch threshold specifically.",
+      "evidence": [
+        "iteration-4-h-main",
+        "iteration-5-h-main"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 6,
+      "mechanism": "Batch size determines maximum concurrent requests in execution. Under KV stress, smaller batches mean more requests queue behind KV-blocked slots. At rate=100, higher arrival rate means the queueing effect is exacerbated, potentially raising the threshold further.",
+      "applicability_bounds": "Established at rate=50. Rate=100 behavior for batch threshold is an open question for iter-7.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-4",
+      "statement": "Multi-objective TPE (Optuna TPESampler with multivariate=True) performs WORSE than uniform random search on BLIS's configuration space due to conditional parameter incompatibility: when num_instances depends on tp and routing parameters depend on num_instances, Optuna falls back to independent RandomSampler for the conditional parameters throughout the optimization. This prevents the TPE model from learning the tp\u2192instances\u2192routing dependency chain, causing the model to over-commit to regions accessible without exploiting that dependency.",
+      "confidence": "high",
+      "regime": "Optuna TPESampler with multivariate=True on parameter spaces with conditional dependencies; Optuna 4.x",
+      "evidence": [
+        "iteration-2-h-robustness"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 2,
+      "mechanism": "Optuna's multivariate TPE models the joint distribution of parameters to capture correlations. However, when some parameters are only available in certain trials (e.g., routing_policy only appears when num_instances > 1), multivariate mode cannot build a joint model across all parameters. It falls back to univariate random sampling for the conditional parameters. This means TPE effectively uses a misspecified model that ignores the most important structural dependency (tp determines the feasible range of num_instances). The model then oversamples tp values where many instances are feasible, biasing toward certain GPU tiers. Confirmed by Optuna warnings appearing for >90% of trials post-startup.",
+      "applicability_bounds": "Applies to Optuna multivariate TPE when search space has hierarchical conditional dependencies. Solution: use non-multivariate TPE (multivariate=False) which handles independent parameters correctly, or restructure the space to avoid conditionals by representing num_instances as a fraction of max_instances (always a fixed [1/max, 2/max, ..., 1.0] categorical). Expected to apply to any Optuna version that uses the Gaussian tree-based TPE approach.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-5",
+      "statement": "In the BLIS configuration space, TP, num_instances, AND total_kv_blocks are dominant parameters when kv_blocks is constrained. block_size_in_tokens is ALSO dominant for high-TP configurations because it multiplies the effective KV token capacity (effective_kv_tokens = total_kv_blocks \u00d7 block_size). For tp=8,inst=1 at kv=3000: block_size=16 \u2192 48k token capacity (107 preemptions, ttft=2323ms) vs block_size=32 \u2192 96k token capacity (0 preemptions, ttft=25ms). block_size is non-differentiating only when the KV token capacity is already well above the threshold for the GPU tier (all blocks above 4000 for tp=2,inst=2). routing_policy, gpu_memory_utilization remain secondary differentiators.",
+      "confidence": "high",
+      "regime": "BLIS with qwen/qwen3-14b on H100, rate=50 req/s, prefix_tokens=512. block_size differentiation is most pronounced for high-TP single-instance configs where kv_blocks\u00d7block_size crosses the preemption-free threshold.",
+      "evidence": [
+        "iteration-4-h-ablation",
+        "iteration-4-block-size-probe"
+      ],
+      "contradicts": [
+        "RP-5-prior"
+      ],
+      "extraction_iteration": 4,
+      "mechanism": "total_kv_blocks specifies the NUMBER of KV blocks per instance, not tokens. Effective KV token capacity = total_kv_blocks \u00d7 block_size_in_tokens. For tp=8,inst=1 at kv=3000: block_size=16 gives 48k tokens (below the ~80k threshold for tp=8 at rate=50), causing heavy preemption (107 events). block_size=32 gives 96k tokens (above threshold), eliminating preemptions entirely. The cliff interaction between total_kv_blocks and block_size creates qualitatively different operating regimes, making block_size a structural parameter for high-TP configs, not merely a secondary one.",
+      "applicability_bounds": "The block_size differentiation is most extreme for tp=8 (highest compute, most token throughput per batch). For tp=1,2,4 at moderate kv_blocks, block_size has less impact because those tiers are not as memory-stressed. The effect disappears when total_kv_blocks is already large enough that even block_size=16 provides adequate token capacity.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-6",
+      "statement": "In BLIS's corrected 6-parameter 4-objective search space (including block_size_in_tokens), NSGA-II's convergence advantage over random search is decisive: a >80-eval gap to 95% of exhaustive HV at budget=200 (vs ~47 evals in iter-4's 5-parameter space). Including block_size amplifies the gap by creating a 3-way interaction (tp \u00d7 kv_blocks \u00d7 block_size) that: (1) reduces Pareto density from 26.4% to 4.5%, and (2) provides NSGA-II's crossover with more exploitable gene structure. At budget=200 on 1800 configs (11.1% coverage), random never reaches 95% of exhaustive HV while NSGA-II reaches 99.2%.",
+      "confidence": "high",
+      "regime": "BLIS, 6-parameter corrected space: tp, num_instances, scheduler, max_batch, total_kv_blocks, block_size_in_tokens; 4 objectives; budget=200",
+      "evidence": [
+        "iteration-5-h-main",
+        "iteration-5-h-control-negative"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 5,
+      "mechanism": "The tp \u00d7 kv_blocks \u00d7 block_size interaction means optimal configs occupy a narrow 3D ridge: high-tp + block_size=32 + threshold kv_blocks. Random must independently discover this combination (probability ~4.5% per eval). NSGA-II's crossover can combine 'use high-tp' from one parent and 'use block_size=32' from another to create the optimal configuration. The 4-generation evolution (4\u00d740 evals = 160 offspring) is sufficient to propagate and refine the optimal gene combination.",
+      "applicability_bounds": "The gap amplification is specific to the corrected space including block_size. In iter-4's reduced space (block_size fixed at 16), the gap was only ~47 evals because all configs used the same block_size and the interaction structure was absent. The gap magnitude (>80 evals) may change at different rates or hardware configs.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-7",
+      "statement": "In BLIS's 4-objective KV-constrained space, adding both total_kv_blocks AND block_size_in_tokens as searchable parameters reduces Pareto density dramatically: from ~65% (3-obj) to ~26% (4-obj, kv only) to ~4.5% (4-obj, kv+block_size corrected space). Each parameter that creates strong dominance relationships via threshold effects reduces density by 3-6x. At 4.5% density and 11.1% coverage (200/1800), NSGA-II achieves a decisive convergence speed advantage (>80 eval gap) while random plateaus at 94.3% of exhaustive HV.",
+      "confidence": "high",
+      "regime": "BLIS 4-objective optimization experiments across iter-1 through iter-5",
+      "evidence": [
+        "iteration-5-h-robustness",
+        "iteration-4-h-robustness",
+        "iteration-3-h-main"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 5,
+      "mechanism": "block_size=32 dominates block_size=16 at the same kv_blocks when the KV threshold (effective_tokens = kv_blocks \u00d7 block_size) is the binding constraint. Additionally, higher-TP configs dominate lower-TP configs at the same gpu_count when block_size is large enough to unlock their throughput. These cascading dominance relationships (block_size dominates kv_blocks equivalents; high-TP dominates low-TP) thin the Pareto front to only 4.5% of all configs.",
+      "applicability_bounds": "Density reduction via block_size is specific to the KV threshold mechanism. If block_size were not a threshold-crossing parameter (e.g., if performance were linear in block_size), it would not thin the Pareto front. The same mechanism would apply to any parameter that multiplies an existing constrained resource.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-8",
+      "statement": "In BLIS, the EFFECTIVE KV cache capacity in tokens is total_kv_blocks \u00d7 block_size_in_tokens per instance. When sweeping total_kv_blocks as a hyperparameter, the block_size_in_tokens must be treated as a co-variate that modulates the actual capacity. Fixing block_size=16 while sweeping total_kv_blocks=[2000-10000] yields token capacity [32k-160k tokens]; fixing block_size=32 yields [64k-320k tokens]. For tp=8 at rate=50 req/s, the stress-free threshold is approximately 80k-96k tokens per instance \u2014 only accessible with block_size=32 at kv_blocks=3000, or block_size=16 at kv_blocks>=5000.",
+      "confidence": "high",
+      "regime": "BLIS with qwen/qwen3-14b on H100, rate=50 req/s, prefix_tokens=512. Validated empirically at tp=8,inst=1: block_size=32 at kv=3000 achieves rps=26.28, ttft_p99=25ms, 0 preemptions; block_size=16 at kv=3000 achieves rps=21.35, ttft_p99=2323ms, 107 preemptions.",
+      "evidence": [
+        "iteration-4-h-ablation",
+        "iteration-4-block-size-probe"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 4,
+      "mechanism": "The KV cache stores all active tokens. Each block contains block_size_in_tokens tokens. A larger block_size allows more tokens to be stored in the same number of blocks, reducing the probability of preemption. At tp=8, the high token throughput rate means the KV cache fills faster, making the token capacity (not block count) the binding constraint.",
+      "applicability_bounds": "Applies to any BLIS configuration where total_kv_blocks is near the preemption threshold. The absolute token threshold varies with model, TP, and request workload (input/output length distribution). block_size differentiation is less impactful when kv_blocks is far above or below the preemption cliff.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-9",
+      "statement": "At budget=100 on the 1800-config corrected space (5.6% coverage), NSGA-II (pop=20, 4 gens) achieves 95.0% of exhaustive HV while random achieves 91.9% \u2014 a 3.1% gap. Despite the ultra-sparse Pareto front (4.5% density), the gap at half-budget is smaller than at full budget (3.1% vs 4.9%) because: (1) random with 100 evals has ~4.5 expected Pareto-optimal hits, sufficient for ~90% HV coverage, and (2) NSGA-II with pop=20 has reduced diversity that limits discovery in early generations. The algorithm advantage GROWS with budget rather than being maximized at low budgets, contrary to the prediction.",
+      "confidence": "medium",
+      "regime": "BLIS, 1800-config corrected space, budget=100, comparison of NSGA-II (pop=20) vs random",
+      "evidence": [
+        "iteration-5-h-ablation"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 5,
+      "mechanism": "With 4.5% Pareto density, even 100 random evals discover ~4-5 Pareto-optimal configs, which may include high-value tp=8/bs=32 configs that contribute large HV contributions. The few high-value Pareto configs (particularly tp=8, block_size=32, large-kv combinations) dominate the HV calculation, making HV sensitive to single lucky random discoveries. NSGA-II with pop=20 has fewer diverse parents for crossover, limiting the exploration-exploitation balance vs pop=40.",
+      "applicability_bounds": "The 'gap grows with budget' finding may be specific to this particular Pareto front structure (concentrated high-HV configs accessible from multiple starting points). For more distributed Pareto fronts, NSGA-II might maintain a larger advantage at low budgets.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-10",
+      "statement": "In BLIS, Pareto density in the 6-parameter 4-objective space does NOT monotonically increase with arrival rate for all model architectures. For Qwen3-14B: density increases with rate (rate=50: 4.5%, rate=75: 6.06%). For Llama-3.1-8B: density DECREASES with rate (rate=50: 5.33%, rate=75: 4.83%). The rate-density relationship is model-architecture-dependent. Higher load can either expand or contract the Pareto frontier depending on whether the model's throughput ceiling allows load-intensive configs to maintain their dominance structure.",
+      "confidence": "high",
+      "regime": "6-parameter 4-objective space (tp, instances, scheduler, batch, kv_blocks, block_size) on H100 at rates 50-75 req/s",
+      "evidence": [
+        "iteration-8-h-robustness"
+      ],
+      "contradicts": [
+        "RP-10 prior version (claimed model-independent monotone increase)"
+      ],
+      "extraction_iteration": 8,
+      "mechanism": "For Qwen (slower throughput): rate=75 increases queueing pressure, opening new throughput-vs-cost tradeoff regions that expand the Pareto frontier. For Llama (faster throughput): rate=75 is not as stressful relative to Llama's capacity ceiling, so load-intensive configs (high TP, high instances) dominate more strictly, concentrating rather than expanding the frontier.",
+      "applicability_bounds": "Verified for Qwen3-14B and Llama-3.1-8B on H100 at rates 50 and 75. Rate=100 not yet measured for Llama at rate=75.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-11",
+      "statement": "The iter-7 report of Llama-3.1-8B showing negative NSGA-II gap at rate=50 was a pop_size artifact, not a structural phenomenon. With pop_size=40 (iter-10 methodology), NSGA-II wins for Llama at rate=50 with gap=+38.6 evals (vs random reaching 95% HV at eval=117.8). The apparent random-wins pattern at rates 50-75 for Llama was specific to smaller population sizes (iter-7 unknown, likely \u226420). With pop_size=40, NSGA-II has universal advantage at both rate=50 and rate=100 for both Qwen and Llama.",
+      "confidence": "medium",
+      "regime": "BLIS 6-parameter 4-objective space, pop_size=40, n_gens=4, seed=42, budget=200",
+      "evidence": [
+        "iteration-10-h-ablation"
+      ],
+      "contradicts": [
+        "RP-11"
+      ],
+      "extraction_iteration": 10,
+      "mechanism": "NSGA-II requires sufficient population size to maintain genetic diversity across the fitness landscape. With smaller pop_size (\u226420), NSGA-II over-concentrates around early Pareto-promising regions, reducing effective coverage and potentially losing to random's uniform exploration. With pop_size=40, NSGA-II maintains enough diversity to exploit crossover yield (~15x advantage for Llama) while preserving coverage.",
+      "applicability_bounds": "Applies when pop_size \u2265 40 and budget \u2265 5\u00d7pop_size. For smaller pop_size (\u226420), Llama rate=50 may still show random-wins behavior. The rate breakpoint for universal NSGA-II advantage shifts when pop_size is varied.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-12",
+      "statement": "Pareto density alone is insufficient to predict NSGA-II vs random gap sign or magnitude. Additionally, crossover yield advantage (crossover_yield / pareto_density) is NOT a reliable gap-direction predictor across different model architectures and load regimes \u2014 it is uniformly high (9-17x) across all tested conditions regardless of gap sign, because it is dominated by block_size=32 concentration which is near-100% at both rate=50 and rate=100 for both models.",
+      "confidence": "high",
+      "regime": "BLIS 6-parameter 4-objective space (tp, instances, scheduler, max_batch, kv_blocks, block_size), qwen3-14b and llama-3.1-8b, rates 50 and 100",
+      "evidence": [
+        "iteration-10-h-main",
+        "iteration-9-h-main"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 10,
+      "mechanism": "block_size=32 dominates the Pareto front at both rate=50 (100% for both models) and rate=100 (93.5% for Qwen). When both Pareto parents have block_size=32, any crossover offspring also has block_size=32, inflating yield regardless of other parameter distributions. The crossover yield metric cannot distinguish conditions where NSGA-II advantage varies because the dominant axis (block_size) produces the same yield concentration at all load regimes.",
+      "applicability_bounds": "In spaces where one binary parameter (block_size) dominates the Pareto front, crossover yield will be uniformly high. This metric would be more informative in spaces where the Pareto front varies by a continuous parameter or one without such extreme concentration.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-13",
+      "statement": "NSGA-II's convergence speed advantage (or disadvantage) over random search at the 95% HV threshold scales consistently with Pareto density across different model architectures in BLIS. Llama-3.1-8B (density 5.33%) shows reversed advantage (-22.9 evals vs Qwen3-14B density 4.5%, advantage +4.6 evals), confirming that the density-driven mechanism is portable: the SAME search algorithm applied to different models produces a proportionally different convergence gap. The gap direction is determined by whether density is above or below the ~5% breakeven.",
+      "confidence": "medium",
+      "regime": "BLIS at rate=50, same 1800-config parameter space, same NSGA-II implementation (pop=40, 4 gens), comparing Llama-3.1-8B (32 layers) vs Qwen3-14B (40 layers)",
+      "evidence": [
+        "iteration-7-h-main",
+        "iteration-7-h-control-negative",
+        "iteration-7-h-ablation"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 7,
+      "mechanism": "Llama-3.1-8B requires 80% of Qwen3-14B's KV bytes per token (32/40 layers, same head_dim=128 and num_kv_heads=8). This shifts the KV stress threshold lower: at tp=8,kv=3000,bs=16, Llama shows 40x TTFT improvement with bs=32 (22ms vs 883ms) vs Qwen's 92x (25ms vs 2323ms). The weaker binary stress interaction means fewer configs are catastrophically dominated, expanding the Pareto set from 81 to 96 configs (4.5% to 5.33%). This 0.83pp density increase is sufficient to push the 95%-threshold convergence advantage from +4.6 evals (NSGA-II barely wins) to -22.9 evals (random wins). The tp\u00d7kv\u00d7block_size interaction structure is preserved but weakened, consistent with the portability prediction's mechanism.",
+      "applicability_bounds": "Tested only at rate=50, same search space. Model portability applies when the KV stress interaction exists but differs in magnitude. For models with no block_size interaction (e.g., models with small KV per token that are never stressed at kv=2000), the mechanism would not produce the same density gradient. The density-to-gap mapping may shift with different budget sizes or Pareto front geometries.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-14",
+      "statement": "NSGA-II's convergence advantage in BLIS is driven by MULTIPLE exploitable landscape axes, not exclusively by KV threshold effects. The KV cliff (kv_blocks axis) is the primary individual contributor (NDR ~0.71-0.73 for both Qwen and Llama at rate=100), but the batch size axis (max_num_running_reqs, NDR ~0.50), block size axis (block_size_in_tokens, NDR ~0.26), and scheduler axis (NDR ~0.22) also provide exploitable gradients. Removing the KV cliff entirely (fixing kv=10000) reduces but does not eliminate NSGA-II's advantage: gap drops from +62.3 to +29.0 for Qwen, confirming multi-axis exploitability. The tp and num_instances axes have NDR=0 for both models because changing GPU count creates inescapable resource-performance tradeoffs rather than clean dominance relationships.",
+      "confidence": "high",
+      "regime": "BLIS 6-parameter space (4-objective or 3-objective). Rate=100 req/s. H100 hardware.",
+      "evidence": [
+        "iteration-9-h-robustness",
+        "iteration-9-h-main",
+        "iteration-9-h-control-negative"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 9,
+      "mechanism": "Each high-NDR axis creates dominance relationships where one config strictly improves ALL objectives simultaneously. For kv_blocks: low-kv configs in the stress-free regime are dominated by higher-kv configs when the performance gain (lower TTFT) is so large it offsets the kv_blocks cost increase \u2014 wait, actually kv_blocks IS an objective. Rather, kv_blocks axis NDR comes from configs where changing kv doesn't change performance (both in stress-free regime), so lower kv strictly dominates (same-or-better objectives, fewer blocks). For max_num_running_reqs: similar mechanism where batch size beyond a threshold doesn't improve performance but wastes memory. NSGA-II's crossover recombines 'good gene' values (high kv, right batch size) from fit parents to rapidly locate the frontier.",
+      "applicability_bounds": "Applies at high load rates where KV stress is present. At low rates, KV axis contributes less NDR and the landscape may become smoother, reducing NSGA-II's advantage. The cliff-free experiment confirms a +29 baseline NSGA-II advantage from non-KV axes alone at rate=100.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-15",
+      "statement": "Overall Neighbor Dominance Rate (NDR) is NOT a reliable predictor of NSGA-II vs random search gap direction or magnitude across different models. Qwen and Llama have nearly identical overall NDR (~35.6% and ~35.75% respectively) at rate=100 despite having different gap magnitudes (Qwen=+62.3, Llama=+40.3). NDR equality does not imply gap equality. The per-axis NDR breakdown is more informative: axes with NDR>0.5 (kv_blocks: ~0.71-0.73; max_batch: ~0.50) are the primary gap drivers, but their relative contribution depends on how KV-stressed the model is at the given rate.",
+      "confidence": "medium",
+      "regime": "BLIS multi-objective search. Two model architectures (Qwen3-14B, Llama-3.1-8B) at rate=100.",
+      "evidence": [
+        "iteration-9-h-robustness",
+        "iteration-9-h-main",
+        "iteration-9-h-ablation"
+      ],
+      "contradicts": [
+        "RP-12-partial"
+      ],
+      "extraction_iteration": 9,
+      "mechanism": "Overall NDR aggregates across all axes. Two landscapes can have similar overall NDR but different exploitability if one has NDR concentrated on a small number of highly-correlated axes (easier for crossover to exploit) vs distributed across many axes. The concentration of NDR matters as much as the magnitude. Future experiments should measure NDR concentration (Herfindahl-Hirschman Index across axes) as a more predictive metric.",
+      "applicability_bounds": "Measured at rate=100 only. At lower rates, models may diverge in overall NDR. The equal-NDR-but-different-gap finding is a rate=100 specific observation; at rate=75, Qwen had density 6.06% and Llama 4.83% (different), suggesting NDR may diverge at lower rates.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-16",
+      "statement": "At rate=50 with pop_size=40, NSGA-II has a structural advantage over random search for both Qwen3-14B (gap=+55.4 evals) and Llama-3.1-8B (gap=+38.6 evals). NSGA-II advantage is universal across both models at rate=50 when using adequate population size (\u226540). This extends the earlier finding (rate=100 universal advantage) to lower load regimes. At rate=100, gaps are +62.3 (Qwen) and +40.3 (Llama); at rate=50, gaps are +55.4 and +38.6 \u2014 similar magnitudes, confirming that the advantage is not rate-dependent when pop_size is held constant at 40.",
+      "confidence": "high",
+      "regime": "BLIS 6-parameter 4-objective space, H100, pop_size=40, n_gens=4, budget=200, seed=42/43",
+      "evidence": [
+        "iteration-9-h-ablation",
+        "iteration-10-h-ablation"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 10,
+      "mechanism": "With pop_size=40, NSGA-II maintains sufficient diversity to exploit the high crossover yield (14-17x yield advantage) in the Pareto-concentrated block_size=32 region. The multi-axis NDR structure (kv_blocks NDR ~0.75, max_batch NDR ~0.45-0.49) provides exploitable gradients that NSGA-II leverages through crossover and selection, independent of load regime.",
+      "applicability_bounds": "Applies when pop_size=40 and budget=200 in the 1800-config 4-objective space. With smaller pop_size (\u226420), the gap may become negative for Llama at lower rates. The pop_size threshold for universal NSGA-II advantage at rate=50 is between 20 and 40.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-17",
+      "statement": "In BLIS's 6-parameter 4-objective space, block_size=32 dominates the Pareto front at rate=50 even MORE than at rate=100: 100% of Pareto configs use block_size=32 at rate=50 for both Qwen (81/81) and Llama (96/96), vs 93.5% for Qwen at rate=100. At rate=50, no block_size=16 configs are Pareto-optimal for either model. This extreme concentration drives crossover yield to ~75-79% at rate=50, higher than the ~65-67% at rate=100.",
+      "confidence": "high",
+      "regime": "BLIS, H100, rate=50, qwen3-14b and llama-3.1-8b, exhaustive 1800-config sweep",
+      "evidence": [
+        "iteration-10-h-robustness"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 10,
+      "mechanism": "At rate=50, the KV capacity threshold effect is slightly weaker for each individual GPU tier (lower throughput demand), but block_size=32 provides a 2x KV token capacity advantage over block_size=16 for the same kv_blocks count. At low rates, this advantage is sufficient to make block_size=16 configs Pareto-dominated across all tp/instance configurations, creating complete block_size=32 dominance. At higher rates (100), a small number of high-GPU-count configs with block_size=16 survive on the Pareto front because their raw throughput advantage outweighs the KV capacity penalty.",
+      "applicability_bounds": "H100 hardware, trained-physics latency model, prefix_tokens=512, rates \u2264 50. May not hold at lower rates where more diverse workload configurations survive on the Pareto front.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-18",
+      "statement": "Crossover operator topological bias inflates baseline crossover yields above Pareto density in BLIS's configuration space. A null model (random Pareto labeling, same N) produces yields of ~21-23% regardless of condition (density ranges 4.5-6.9%, rate 50-100, either model). Null yield is 3-5x density, not \u22481x density. When interpreting crossover yield advantage, the effective signal-to-noise is crossover_yield / null_yield (~3x observed/null) rather than crossover_yield / density (9-17x observed/density). The large density-relative advantage is partly an artifact of topological bias.",
+      "confidence": "high",
+      "regime": "BLIS 6-parameter space, uniform crossover with tp\u00d7instances constraint normalization",
+      "evidence": [
+        "iteration-10-h-control-negative"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 10,
+      "mechanism": "The crossover operator's normalize_config step (clamp num_instances to 8//tp) biases offspring toward low tp values where the instance range is largest (tp=1: 1-8 instances; tp=8: only 1 instance). Combined with uniform sampling over parameter values (not configs), the crossover output is not uniformly distributed over the config space. This topological concentration means random 'Pareto' labels produce ~21-23% null yield rather than the density-level ~5-7%. The true structural contribution of real Pareto front clustering is ~3x (observed/null), not 9-17x (observed/density).",
+      "applicability_bounds": "Applies to this specific crossover operator (uniform crossover + normalize_config) in BLIS's parameter space. Other crossover operators (e.g., SBX for continuous parameters) would have different baseline biases.",
+      "superseded_by": null,
+      "category": "methodology",
+      "status": "active"
+    }
+  ]
+}

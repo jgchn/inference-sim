@@ -1,0 +1,33 @@
+{
+  "iteration": 1,
+  "bundle_ref": "runs/iter-1/bundle.yaml",
+  "arms": [
+    {
+      "arm_type": "h-main",
+      "predicted": "NSGA-II with 500 evaluations (pop=50, gen=10) will produce a Pareto front with consistently higher hypervolume than 500 uniform random samples, because selection pressure concentrates evaluations near the Pareto frontier rather than wasting budget on dominated interior points.",
+      "observed": "NSGA-II achieved hypervolume=249720.535 using 558 evals (pop=50, gen=10). This is identical to random's hypervolume=249720.535 at 500 evals. NSGA-II's generation-by-generation HV was flat: [249720.535, 249720.535, 249720.535, ...] across all 10 generations — no improvement over the initial population. The optimal Pareto point (rps=12.5002, ttft_p99=22.73ms) was found by random at eval #1. NSGA-II spent 558 evaluations achieving the same result as 50 random evaluations.",
+      "status": "REFUTED",
+      "error_type": "regime",
+      "diagnostic_note": "The search space at rate=20 req/s with 100 requests has a degenerate structure: ~24% of randomly sampled configs (102/429) achieve the identical optimal point (rps=12.5002, ttft_p99=22.73ms). This is a 'single-point Pareto frontier' — there is no multi-dimensional tradeoff; instead, configs are binary: saturated (low rps, high ttft) or unsaturated (all hitting the same ceiling). Selection pressure cannot help when the optimal point is reachable immediately by any method. The NSGA-II diagnostic condition 'the space may be too small relative to population size for selection pressure to matter' fully applies. The discrete crossover operators DID generate valid offspring efficiently (no excessive pruning), but the lack of meaningful gradient in the objective space made it irrelevant."
+    },
+    {
+      "arm_type": "h-control-negative",
+      "predicted": "500 uniform random samples will produce a Pareto front with lower hypervolume than NSGA-II at the same budget, because random sampling allocates evaluations uniformly across the space including heavily dominated regions.",
+      "observed": "Random search achieved hypervolume=249720.535 at 500 evals — identical to NSGA-II. The optimal config was found at random eval #1. 14.7% of evaluated configs (63/429) were non-dominated, all tied at (rps=12.5002, ttft_p99=22.73ms). The mechanism was partially correct — random does sample dominated interior points (~85% of samples). However, the optimal point is so commonly achievable that this waste doesn't prevent finding it immediately.",
+      "status": "REFUTED",
+      "error_type": "regime",
+      "diagnostic_note": "The diagnostic condition triggered: 'the Pareto frontier likely comprises a large fraction of the search space (many non-dominated points), making random sampling a competitive strategy.' Indeed, ~24% of the full search space hits the optimal point, so even 1 random sample finds it with 24% probability — or with near-certainty in 50 samples. The prediction was refuted because its implicit assumption (that optimal configs are rare) was wrong for this regime."
+    },
+    {
+      "arm_type": "h-robustness",
+      "predicted": "LHS with 500 evaluations will produce higher hypervolume than uniform random (better space coverage) but lower than NSGA-II (no selection pressure).",
+      "observed": "LHS achieved hypervolume=249720.535 at 500 evals — identical to both random and NSGA-II. 14.3% of evaluated configs were Pareto-optimal (59/413), all tied at the same single point. LHS did not outperform random, and did not underperform NSGA-II.",
+      "status": "REFUTED",
+      "error_type": "regime",
+      "diagnostic_note": "The LHS diagnostic condition applied: 'the discrete/categorical nature of the space may make LHS stratification ineffective.' More fundamentally, all methods are equivalent here because the optimal point is reachable immediately by any method. LHS's stratification advantage (even coverage) provides no benefit when the optimal configs are distributed throughout ~24% of the space."
+    }
+  ],
+  "experiment_valid": true,
+  "discrepancy_analysis": "All three predictions were refuted by the same root cause: the workload regime (rate=20 req/s, 100 requests, H100 hardware, model=qwen/qwen3-14b) creates a degenerate objective space with a single Pareto-optimal point (rps=12.5002, ttft_p99=22.73ms) achievable by ~24% of the configuration space. At this load level, any configuration with sufficient capacity (TP>=2 with 2+ instances, or equivalent) is unsaturated and produces identical metrics. The search space is binary: configs either saturate under rate=20 (low-TP, single-instance, tiny batch) or don't (and all produce the same metrics). This makes multi-objective search algorithm comparison meaningless — all methods converge to the same hypervolume within their first few evaluations. The h-main prediction's mechanism (selection pressure concentrating evaluations near the frontier) cannot engage when the frontier is a single point reachable immediately at random. To test the hypothesis meaningfully, a higher arrival rate (e.g., rate=80-150 req/s, creating genuine queueing competition) is required to produce a multi-dimensional tradeoff frontier where throughput and latency genuinely trade off against each other.",
+  "dominant_component_pct": null
+}

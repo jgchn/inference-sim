@@ -1,0 +1,11 @@
+{
+  "gate_type": "design",
+  "summary": "Iteration 6 tests whether the rate-dependent TP winner pattern (TP=8 wins at low request rates, TP=4 wins at high rates) observed on H100 in iteration 5 also holds on A100-SXM hardware, and whether the bracket K=1 hierarchical search algorithm adapts correctly without modification. Four arms probe this across two models (qwen3-14b, llama-3.1-8b), two rates (100, 200), and compare against flat TPE search.",
+  "key_points": [
+    "h-main: Bracket K=1 on A100-SXM qwen3-14b at rate=100 should identify TP=8/1-instance as winner on all 5 seeds with evals_to_best=4, matching global best 0.130754. Phase 1 scores should be monotonically increasing (TP1: ~0.08, TP2: ~0.11, TP4: ~0.13, TP8: ~0.131). Confirmation = 5/5 seeds pick TP=8, evals_to_best=4; refutation = TP=4 wins or evals_to_best differs.",
+    "h-robustness: Llama-3.1-8b on A100-SXM at rate=100 should show TP=8 winning across all 25 seed combinations (5 blis_seeds \u00d7 5 search_seeds) with a wider 4.3% margin vs qwen's 2.5%, confirming the smaller model amplifies the bandwidth-pooling advantage. All seeds should yield identical Phase 1 results per blis_seed (RP-9 determinism). Refutation = any seed flips to TP=4.",
+    "h-ablation (crossover): At rate=200 on A100-SXM, TP=4 and TP=8 should be effectively tied (~0.1345 each, margin ~0.001%), yielding evals_to_best=3 (TP=4 clears the 1% threshold at position 3 before TP=8 is evaluated at position 4). This tests that A100-SXM's crossover rate (~200) is lower than H100's (~125), consistent with A100's lower memory bandwidth (2.04 vs 3.35 TB/s).",
+    "h-control-negative: Flat TPE at rate=100 should converge faster than at rate=500 (median evals_to_best <15 vs 26) due to the monotonic TP landscape, but bracket K=1 (deterministic evals_to_best=4) should still outperform. Refutation = TPE median < 4 evals, which would challenge bracket's optimality claim.",
+    "Code changes are limited to adding 7 new GLOBAL_BEST_TABLE entries and updating 1 existing entry in search_blis_iter6.py, all derived from prior probing runs. No algorithmic changes to the search procedure itself."
+  ]
+}

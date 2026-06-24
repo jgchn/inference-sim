@@ -1,0 +1,24 @@
+metadata:
+  iteration: 1
+  family: "pareto-search-strategy"
+  research_question: "Does hierarchical decomposition (parallelism-first, then within-tier exploration) discover the Pareto frontier (throughput vs tail latency) more efficiently than random search across BLIS's 86,400-configuration space?"
+
+arms:
+  - type: h-main
+    prediction: "Hierarchical search (15-eval Phase 1 TP/instance screening + 485-eval Phase 2 Latin Hypercube within top-3 tiers) will achieve a higher hypervolume ratio than random search at 500 evaluations. The hierarchical approach will discover Pareto-optimal points spanning a wider throughput range because it concentrates budget on productive parallelism tiers rather than wasting evaluations on dominated tiers (e.g., TP=1 with 1 instance at high load)."
+    mechanism: "The search space has hierarchical structure: TP × num_instances determines the compute capacity ceiling (observed 8x throughput range between worst and best parallelism tiers at rate=50). Within a tier, batching and scheduling knobs create a secondary throughput-latency tradeoff (observed ~2x range within a tier). By identifying productive tiers first (15 evals) and concentrating remaining budget there, hierarchical search avoids the ~50% of configurations that lie in inherently dominated parallelism tiers."
+    diagnostic: "If hierarchical search does NOT outperform random: (1) Check whether Phase 1 screening correctly identifies the top tiers — the 'max-throughput profile' may not represent tier potential if latency-optimized configs within a weak tier dominate throughput-optimized configs in a strong tier. (2) Check whether Latin Hypercube sampling within a tier is too sparse to find the actual Pareto front — may need adaptive sampling instead."
+    code_changes:
+      - file: "search_pareto.py"
+        intent: "Create a new Python script implementing both random search and hierarchical decomposition search for Pareto frontier discovery. The script should: (1) define the configuration space with all valid TP×instances combinations, (2) implement uniform random sampling, (3) implement two-phase hierarchical search (Phase 1: evaluate each TP×instances pair with max-throughput defaults; Phase 2: Latin Hypercube Sampling within top-3 tiers), (4) compute hypervolume for each strategy's discovered Pareto front, (5) output results as JSON including all evaluated configs, Pareto-optimal configs, and hypervolume values."
+        rationale: "This is the core experimental artifact. A new script (not modifying existing search_blis.py) isolates the experiment from prior campaign code."
+
+  - type: h-control-negative
+    prediction: "When the arrival rate is low enough that all parallelism tiers are unsaturated (rate=5, where even TP=1/1-instance handles load comfortably), hierarchical search's advantage will vanish — random search will achieve comparable hypervolume ratio because no tier is inherently dominated, so concentrating budget provides no benefit."
+    mechanism: "At low load (rate=5, observed tokens_per_sec=2265 for TP=2/2inst which is far below capacity), the throughput-latency tradeoff collapses: throughput is limited by arrival rate, not compute capacity. All tiers achieve similar throughput (arrival-rate-limited), so the Pareto frontier is essentially flat and any sampling strategy finds it. Hierarchical tier screening adds overhead (15 evaluations) with no benefit."
+    diagnostic: "If hierarchical STILL outperforms random at rate=5: the mechanism may be about latency differentiation rather than throughput capacity. Check whether scheduling/batching knobs create latency variation even when throughput is capped by arrival rate."
+
+  - type: h-robustness
+    prediction: "Hierarchical search's hypervolume advantage over random search will hold across 5 different random seeds (42, 123, 456, 789, 1024) for workload generation, confirming the structural advantage is not an artifact of a particular workload sample."
+    mechanism: "The hierarchical advantage derives from search space structure (TP dominates throughput), not workload-specific lucky draws. Different seeds change individual request lengths but preserve the statistical distribution, so the TP-dominance hierarchy remains stable."
+    diagnostic: "If advantage disappears for some seeds: check whether those seeds produce workload mixes where TP=1 configs with many short requests outperform TP=8 with fewer long requests, breaking the TP-dominance assumption."

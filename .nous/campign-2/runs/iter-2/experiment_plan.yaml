@@ -1,0 +1,88 @@
+metadata:
+  iteration: 2
+  bundle_ref: "runs/iter-2/bundle.yaml"
+
+setup:
+  - cmd: "go build -o blis main.go"
+    description: "Build the BLIS binary"
+  - cmd: "git apply /Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-2/patches/h-main.patch"
+    description: "Apply search_pareto_iter2.py patch (new file)"
+
+arms:
+  - arm_id: "h-main"
+    conditions:
+      - name: "random-seed42"
+        cmd: >
+          python3 search_pareto_iter2.py --strategy random --budget 500 --rate 2000
+          --num-requests 1000 --seed 42 --known-optimum 40392
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-2/results/h-main/random_s42.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-2/results/h-main/random_s42.json"
+        inputs: []
+
+      - name: "hierarchical-seed42"
+        cmd: >
+          python3 search_pareto_iter2.py --strategy hierarchical --budget 500 --rate 2000
+          --num-requests 1000 --seed 42 --known-optimum 40392
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-2/results/h-main/hierarchical_s42.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-2/results/h-main/hierarchical_s42.json"
+        inputs: []
+
+      - name: "nsga2-seed42"
+        cmd: >
+          python3 search_pareto_iter2.py --strategy nsga2 --budget 500 --rate 2000
+          --num-requests 1000 --seed 42 --known-optimum 40392
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-2/results/h-main/nsga2_s42.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-2/results/h-main/nsga2_s42.json"
+        inputs: []
+
+  - arm_id: "h-control-negative"
+    conditions:
+      - name: "random-rate50-seed42"
+        cmd: >
+          python3 search_pareto_iter2.py --strategy random --budget 100 --rate 50
+          --num-requests 200 --seed 42 --known-optimum 14232
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-2/results/h-control-negative/random_s42.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-2/results/h-control-negative/random_s42.json"
+        inputs: []
+
+      - name: "hierarchical-rate50-seed42"
+        cmd: >
+          python3 search_pareto_iter2.py --strategy hierarchical --budget 100 --rate 50
+          --num-requests 200 --seed 42 --known-optimum 14232
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-2/results/h-control-negative/hierarchical_s42.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-2/results/h-control-negative/hierarchical_s42.json"
+        inputs: []
+
+      - name: "nsga2-rate50-seed42"
+        cmd: >
+          python3 search_pareto_iter2.py --strategy nsga2 --budget 100 --rate 50
+          --num-requests 200 --seed 42 --known-optimum 14232
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-2/results/h-control-negative/nsga2_s42.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-2/results/h-control-negative/nsga2_s42.json"
+        inputs: []
+
+  - arm_id: "h-robustness"
+    conditions:
+      - name: "hierarchical-seed42"
+        cmd: >
+          python3 search_pareto_iter2.py --strategy hierarchical --budget 200 --rate 2000
+          --num-requests 1000 --seed 42 --known-optimum 40392
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-2/results/h-robustness/hierarchical_s42.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-2/results/h-robustness/hierarchical_s42.json"
+        inputs: []
+
+      - name: "hierarchical-seed123"
+        cmd: >
+          python3 search_pareto_iter2.py --strategy hierarchical --budget 200 --rate 2000
+          --num-requests 1000 --seed 123 --known-optimum 40392
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-2/results/h-robustness/hierarchical_s123.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-2/results/h-robustness/hierarchical_s123.json"
+        inputs: []
+
+      - name: "hierarchical-seed456"
+        cmd: >
+          python3 search_pareto_iter2.py --strategy hierarchical --budget 200 --rate 2000
+          --num-requests 1000 --seed 456 --known-optimum 40392
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-2/results/h-robustness/hierarchical_s456.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-2/results/h-robustness/hierarchical_s456.json"
+        inputs: []

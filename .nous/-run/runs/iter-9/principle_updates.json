@@ -1,0 +1,58 @@
+[
+  {
+    "id": "RP-28",
+    "statement": "Lean bracket (TP={4,8}, max-profile only, budget=2, no Phase 2) achieves within 1% of global best across all tested regimes, now including llama-3.1-70b (70B) on all 3 hardware platforms and 2 arrival rates. Extended to 4 models (qwen3-14b, llama-3.1-8b, qwen3-32b, llama-3.1-70b) and all 3 hardware platforms (H100, A100-SXM, L40S). Total: 75/75 runs at global best across iter-7 through iter-9 combined.",
+    "confidence": "high",
+    "regime": "BLIS 70B model on H100/A100-SXM/L40S at rates 100 and 500 req/s, 1000 requests",
+    "evidence": ["iteration-9-h-main"],
+    "contradicts": [],
+    "extraction_iteration": 9,
+    "mechanism": "At 70B parameters, per-step latency is completely dominated by weight transfer time (sim/latency/roofline.go:291-351). TP=8 distributes 140GB bf16 weights across 8 GPUs creating a per-step latency gap (9-20% depending on hardware) so large that no practical arrival rate enables TP=4/2inst to overcome via queuing benefits. Max-profile (mr=512, mt=8192, pf=4096) ensures full expression of this advantage at eval 2.",
+    "applicability_bounds": "Applies to all models 8B-70B on H100, A100-SXM, L40S at rates 100-2000 req/s. For models where TP=1 or TP=2 is infeasible/catastrophic (70B: TP=1 OOM, TP=2 scores 6.9x worse), lean bracket TP={4,8} is sufficient. Does not apply to multi-node regimes (>8 GPUs total) or models requiring TP>8.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-27",
+    "statement": "The model-size-aware formula (load_index = params_B / bandwidth_TB_s; if load_index > 12: predict TP=8 always; else: predict via 400/BW crossover) achieves 24/24 (100%) accuracy on the 4-model x 3-hardware x 2-rate test grid. The bandwidth-only formula (400/BW) achieves 18/24 (75%). All 6 failures of the bandwidth-only formula occur at load_index > 12 (qwen3-14b L40S, qwen3-32b A100-SXM, qwen3-32b L40S, llama-3.1-70b H100/A100-SXM/L40S at rate=500).",
+    "confidence": "high",
+    "regime": "All 4 tested models (8B, 14B, 32B, 70B) on all 3 hardware platforms at rates 100 and 500 req/s",
+    "evidence": ["iteration-9-h-control-negative"],
+    "contradicts": [],
+    "extraction_iteration": 9,
+    "mechanism": "load_index = params/BW captures the ratio of weight-transfer compute to memory bandwidth. When load_index > 12, TP=8's bandwidth distribution advantage (8x GPUs) is so large relative to the single-instance queue saturation pressure that no practical arrival rate (100-2000 req/s) creates enough multi-instance queuing advantage to overcome the per-step latency gap. Boundary: crossover-exists regimes have load_index <= 9.6 (32B/H100=9.55); no-crossover regimes have load_index >= 15.7 (32B/A100-SXM=15.7). Any threshold 10-15 gives identical 24/24 accuracy. 70B load indices: H100=20.90, A100-SXM=34.33, L40S=81.02.",
+    "applicability_bounds": "Applies to 4 tested model sizes (8B, 14B, 32B, 70B) on H100, A100-SXM, L40S. Threshold=12 validated between load_index 9.55 and 15.7. Does not apply to models not in MODEL_PARAMS dict or hardware not in HW_BANDWIDTH dict. For multi-node configs (TP=16+), formula may not apply.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-32",
+    "statement": "For large models (70B), the TP=8 advantage is structural and rate-independent: no crossover exists at any practical arrival rate (100-2000 req/s) on any tested hardware. TP=8 wins with margins 9-20% across all regimes. Default-profile (mr=256, mt=4096, pf=1024) preserves the TP=8 winner identification (6/6 correct) though scores are 15-19% below max-profile because the advantage comes from raw per-step latency physics, not batch-size-dependent queue dynamics.",
+    "confidence": "high",
+    "regime": "llama-3.1-70b-instruct on H100, A100-SXM, L40S at rates 100-2000 req/s, 1000 requests, blis seeds 42-46",
+    "evidence": ["iteration-9-h-main", "iteration-9-h-ablation", "iteration-9-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 9,
+    "mechanism": "At 70B, the weight transfer time per step at TP=4 (two H100 GPUs sharing 140GB) is 2x longer than at TP=8 (eight H100 GPUs each holding 17.5GB). This gap (roofline.go:291-351) is so large that even with 2 instances at TP=4 routing traffic, the per-token latency deficit cannot be overcome by queue redistribution. This is qualitatively different from 14B/32B models where the crossover regime exists because the weight-transfer gap is smaller. TP=1 OOMs (137 GiB > 72 GiB per GPU), TP=2 scores 6.9x worse than TP=8.",
+    "applicability_bounds": "Confirmed for 70B at load_index > 20.9 on all tested hardware. Expected to generalize to any model with load_index >> 12. May not apply to future hardware with dramatically different bandwidth (e.g., H200 at 4.8 TB/s would give 70B load_index=14.6 — still above threshold=12 so TP=8 still wins). Not validated for models beyond 70B that require multi-node (405B+).",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-20",
+    "statement": "Lean bracket (TP={4,8} max-profile, budget=2) is robust to BLIS workload variation across seeds for 70B on both H100 and L40S: 50/50 (hardware x blis_seed x search_seed) combinations achieve correct TP=8 identification. All 5 search seeds produce identical results per blis_seed (deterministic). Minimum TP=8 margin across all blis seeds: 2.4% (H100 blis_seed=45). L40S margins: 11.7-20.3%. 70B workload variation is larger than 14B: H100 scores range 0.091801-0.095769 (+4.3% vs reference) vs 14B range of +5.1%.",
+    "confidence": "high",
+    "regime": "llama-3.1-70b-instruct H100 and L40S at rate=500, blis seeds 42-46, 5 search seeds each",
+    "evidence": ["iteration-9-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 9,
+    "mechanism": "BLIS seed controls request arrival times and token counts, not the latency model physics. The 70B weight-transfer advantage of TP=8 is structural (hardware bandwidth / model size), not workload-dependent. Different blis seeds create different queue dynamics and P99 tails but cannot change which TP level has lower per-step latency. The larger absolute margins for 70B (min 2.4% vs 14B min ~0.03%) make lean bracket more robust to blis_seed variation, not less.",
+    "applicability_bounds": "Extends RP-20 from 14B (qwen3-14b H100 rate=500) to 70B. Confirmed for both high-bandwidth (H100) and low-bandwidth (L40S) hardware. Lean bracket determinism (all 5 search seeds identical per blis_seed) holds because bracket profiles are deterministic (no RNG in lean bracket with K=1).",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  }
+]

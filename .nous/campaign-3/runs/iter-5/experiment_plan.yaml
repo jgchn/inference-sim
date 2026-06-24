@@ -1,0 +1,49 @@
+metadata:
+  iteration: 5
+  bundle_ref: "runs/iter-5/bundle.yaml"
+  description: >
+    Corrected search space (1800 configs, 6 parameters including block_size_in_tokens).
+    Tests whether block_size x kv_blocks x tp three-way interaction amplifies NSGA-II's
+    convergence speed advantage over random search beyond iter-4's 47-eval gap.
+    Reference point (0, 50000, 9, 11000). 4 objectives: max rps, min ttft_p99, min gpu_count, min total_kv_blocks.
+
+setup:
+  - cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-5-9ae74af5 && go build -o blis main.go"
+    description: "Build BLIS binary in worktree"
+
+arms:
+  - arm_id: "h-robustness"
+    conditions:
+      - name: "exhaustive-1800-seed42"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-5-9ae74af5 && python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-5/inputs/search_exhaustive.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-5/results/h-robustness/pareto_front.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-5/inputs/search_exhaustive.py"
+        description: "Exhaustive sweep of all 1800 corrected-space configs. Swept: tp=[1,2,4,8], num_instances=range(1,8//tp+1), scheduler=[fcfs,sjf], max_num_running_reqs=[32,64,128,256,512], total_kv_blocks=[2000,3000,4000,5000,7500,10000], block_size_in_tokens=[16,32]. Fixed: routing=round-robin, gpu_mem=0.9. Outputs pareto_front.json and convergence.json."
+
+  - arm_id: "h-main"
+    conditions:
+      - name: "nsga2-corrected-pop40-gen4-seed42"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-5-9ae74af5 && python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-5/inputs/search_nsga2_corrected.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-5/results/h-main/pareto_front.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-5/inputs/search_nsga2_corrected.py"
+        description: "NSGA-II on corrected 6-param 1800-config space. pop=40, 4 generations (40 init + 4x40 = 200 total evals). 6-gene encoding: (tp_idx, inst_idx, sched_idx, batch_idx, kv_idx, block_size_idx). Crossover: uniform per-gene p=0.5 with tp-instances constraint repair. Mutation: 15% per-gene. Track HV every 40 evals vs exhaustive reference HV."
+
+  - arm_id: "h-control-negative"
+    conditions:
+      - name: "random-corrected-200evals-seed42"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-5-9ae74af5 && python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-5/inputs/search_random_corrected.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-5/results/h-control-negative/pareto_front.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-5/inputs/search_random_corrected.py"
+        description: "Uniform random search on corrected 6-param 1800-config space. 200 evals, seed=42. Track HV every 40 evals vs exhaustive reference HV."
+
+  - arm_id: "h-ablation"
+    conditions:
+      - name: "budget100-nsga2-pop20-gen4-and-random-seed42"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-5-9ae74af5 && python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-5/inputs/search_budget100.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-5/results/h-ablation/pareto_front.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-5/inputs/search_budget100.py"
+        description: "Budget=100: NSGA-II (pop=20, 4 gens=100 total evals, seed=42) vs random (100 evals, seed=43) on corrected 1800-config space. Track HV every 20 evals. Outputs pareto_front.json, convergence_nsga2.json, convergence_random.json."

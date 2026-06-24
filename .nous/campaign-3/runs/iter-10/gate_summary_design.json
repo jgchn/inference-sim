@@ -1,0 +1,10 @@
+{
+  "gate_type": "design",
+  "summary": "This iteration tests whether 'Crossover Yield Advantage' (a metric quantifying how much NSGA-II's crossover operator benefits from Pareto front clustering) reliably predicts whether NSGA-II or random search converges faster across different model architectures (Qwen 14B vs Llama 8B) and load levels (rate=50 vs rate=100). The core claim is that a yield_advantage threshold of ~4 separates conditions where NSGA-II wins from those where random search wins.",
+  "key_points": [
+    "Experiments: Run exhaustive sweeps (~1800 configs each) for both Qwen and Llama at rate=50 to establish ground-truth Pareto fronts, compute crossover yield metrics, and run NSGA-II vs random comparisons at rate=50 \u2014 complementing existing rate=100 data from prior iterations.",
+    "Confirmation criteria (h-main): Yield_advantage > 5 should predict positive NSGA-II gap (it converges faster), yield_advantage < 3 should predict zero or negative gap \u2014 with zero sign mismatches across all 4 conditions (2 models \u00d7 2 rates). Specifically: Qwen rate=50 predicted to show yield_advantage > 5 with NSGA-II winning; Llama rate=50 predicted to show yield_advantage < 3 with random winning or tying.",
+    "Refutation signals: If Llama at rate=50 shows yield_advantage > 5 or NSGA-II wins (contradicting iter-7's -22.9 gap), or if Qwen at rate=50 shows yield_advantage < 3, the proposed mechanism (Pareto front spatial clustering drives crossover effectiveness) would be undermined. A null-model control (random Pareto labels) must show yield within 2\u00d7 of density to validate the metric isn't an artifact of constraint topology.",
+    "Key risk: The rate=50 conditions may produce very high Pareto density (many configs are optimal when load is low), making 95% HV achievable within the first evaluation checkpoint \u2014 rendering gap measurements unreliable. Diagnostics specify checking if both algorithms reach 95% HV within eval=40."
+  ]
+}

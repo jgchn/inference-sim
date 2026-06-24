@@ -1,0 +1,10 @@
+{
+  "gate_type": "continue",
+  "summary": "Three iterations have established that BLIS's default 3-objective space (maximize rps, minimize TTFT, minimize GPU count) is trivially easy for any search algorithm, while adding KV block count as a 4th objective and searchable parameter creates a genuinely harder problem \u2014 but NSGA-II's advantage over random search is real yet modest (+4.4% final hypervolume, 2\u00d7 Pareto solutions) rather than the large convergence-speed gap originally predicted.",
+  "key_points": [
+    "NSGA-II vs. random on 4-objective space: NSGA-II achieves 5.81\u00d710\u00b9\u2070 final hypervolume vs. random's 5.56\u00d710\u00b9\u2070 (+4.4%), and finds 46 Pareto-optimal solutions vs. 23 (2\u00d7). Both algorithms reach 95% of their own final HV at eval=120, but on a shared reference NSGA-II hits 95% at eval=120 while random needs eval=160 \u2014 a 40-eval gap, not the predicted 80-eval gap.",
+    "Key discovery this iteration: `--total-kv-blocks` is per-instance, creating a non-linear TP\u00d7blocks interaction that reverses prior dominance findings. For example, tp=4,instances=1 at 5,000 blocks yields 16.76 rps but 2,640ms TTFT (stressed), while tp=2,instances=2 at the same blocks yields 14.83 rps and 39ms TTFT (unstressed) \u2014 a genuine Pareto tradeoff that depends on which KV 'cliff' each config sits near.",
+    "Still unknown: whether removing non-differentiating parameters (routing policy, block size, GPU memory utilization \u2014 each <3% effect) from the search space would sharpen NSGA-II's advantage by reducing noise, and whether a workload with heterogeneous request sizes would make scheduler choice (fcfs vs. sjf) a meaningful differentiator rather than only impacting results under KV stress.",
+    "Suggested next iteration: prune the search space to only parameters that demonstrably differentiate (tp, num_instances, total_kv_blocks, scheduler, max_batch_size), and/or introduce a constraint-satisfaction objective (e.g., ttft_p99 < 1,000ms AND rps > 15) to test whether NSGA-II's feasibility-finding ability gives it a clearer edge over random search."
+  ]
+}

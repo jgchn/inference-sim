@@ -1,0 +1,40 @@
+metadata:
+  iteration: 1
+  family: "search-algorithm-comparison"
+  research_question: "Does evolutionary multi-objective optimization (NSGA-II) discover higher-quality Pareto fronts than random sampling within the same evaluation budget over BLIS's discrete configuration space?"
+
+# Arm selection rationale:
+# - h-main: Tests the core claim that NSGA-II's selection pressure improves Pareto front quality
+# - h-control-negative: Random search establishes the baseline against which structured methods are measured
+# - h-robustness: Latin Hypercube tests whether mere stratification (without selection pressure) suffices,
+#   isolating the contribution of evolutionary operators from better space coverage
+# - h-ablation omitted: NSGA-II is the atomic unit being tested; ablating crossover vs mutation
+#   is premature for iteration 1 where we first need to know if the approach works at all
+
+arms:
+  - type: h-main
+    prediction: "NSGA-II with 500 evaluations (pop=50, gen=10) will produce a Pareto front with consistently higher hypervolume than 500 uniform random samples, because selection pressure concentrates evaluations near the Pareto frontier rather than wasting budget on dominated interior points."
+    mechanism: "NSGA-II's non-dominated sorting and crowding distance operators preferentially select configurations near the current Pareto front for reproduction. Crossover between high-performing parents (e.g., combining TP=4 from a throughput-optimal config with scheduler=fcfs from a latency-optimal config) explores the neighborhood of known-good solutions. Over 10 generations, this concentrates the population along the true Pareto frontier, yielding higher hypervolume than uniform sampling which allocates equal probability to dominated regions."
+    diagnostic: "If NSGA-II does NOT outperform random: (1) Check if the discrete crossover operators are producing invalid configurations that get pruned, effectively wasting evaluations. (2) Check if the search space has few local optima (nearly convex Pareto front) making random sampling sufficient. (3) Inspect generation-over-generation hypervolume — if it plateaus at gen 1-2, the space may be too small relative to population size for selection pressure to matter."
+    code_changes:
+      - file: ".nous/campaign-3/runs/iter-1/inputs/search_nsga2.py"
+        intent: "Implement NSGA-II search over BLIS configuration space with discrete crossover/mutation operators, constraint-aware offspring generation, and hypervolume tracking per generation. Population size 50, 10 generations, 500 total evaluations."
+        rationale: "This is the primary experimental implementation. Must handle: discrete parameter encoding, constraint validation (TP*instances<=8, conditional routing/scorer), subprocess invocation of ./blis run, JSON metric parsing, and Pareto front extraction."
+
+  - type: h-control-negative
+    prediction: "500 uniform random samples will produce a Pareto front, but with lower hypervolume than NSGA-II at the same budget, because random sampling allocates evaluations uniformly across the space including heavily dominated regions (e.g., TP=1/instances=1/batch=32 configurations that are strictly dominated on both objectives)."
+    mechanism: "Uniform random sampling has no selection pressure — each region of the configuration space receives equal probability regardless of objective values. With ~294K total configurations and only 500 samples (0.17% coverage), the probability of landing near the true Pareto frontier is low. Many samples will fall in the dominated interior where both throughput is low (due to under-provisioned TP/instances) and latency is high (due to queueing at small batch sizes)."
+    diagnostic: "If random DOES match NSGA-II: the Pareto frontier likely comprises a large fraction of the search space (many non-dominated points), making random sampling a competitive strategy. Verify by computing the fraction of all 500 random samples that are non-dominated — if >20%, the space may be 'easy' and structured search adds little value."
+    code_changes:
+      - file: ".nous/campaign-3/runs/iter-1/inputs/search_random.py"
+        intent: "Implement uniform random search over BLIS configuration space with constraint-aware sampling. Generate 500 valid random configurations, evaluate each, extract Pareto front, compute hypervolume."
+        rationale: "Establishes the baseline. Shares parameter space definition and constraint validation with NSGA-II but uses no selection pressure — pure Monte Carlo."
+
+  - type: h-robustness
+    prediction: "Latin Hypercube Sampling with 500 evaluations will produce higher hypervolume than uniform random (better space coverage) but lower than NSGA-II (no selection pressure), because LHS ensures even coverage across parameter dimensions but cannot concentrate evaluations near the frontier."
+    mechanism: "LHS stratifies each parameter dimension into N equal-probability intervals and samples once from each, ensuring no region is over- or under-represented. This eliminates clustering artifacts of pure random sampling (where some regions may get 0 samples by chance). However, unlike NSGA-II, LHS has no feedback mechanism — it cannot learn from good configurations to explore their neighborhoods. The hypervolume improvement over random quantifies the value of coverage alone, while the gap to NSGA-II quantifies the value of selection pressure."
+    diagnostic: "If LHS matches NSGA-II: selection pressure adds negligible value over good coverage, suggesting the Pareto front is well-distributed across the parameter space. If LHS matches random: the discrete/categorical nature of the space may make LHS stratification ineffective (LHS works best for continuous parameters)."
+    code_changes:
+      - file: ".nous/campaign-3/runs/iter-1/inputs/search_lhs.py"
+        intent: "Implement Latin Hypercube Sampling over BLIS configuration space. Map discrete parameters to continuous [0,1] intervals, apply LHS stratification, map back to nearest valid discrete values with constraint enforcement. 500 evaluations."
+        rationale: "Tests whether better space coverage alone (without evolutionary selection) improves Pareto front quality. Isolates the contribution of NSGA-II's evolutionary operators from its implicit coverage improvement."

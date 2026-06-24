@@ -1,0 +1,111 @@
+metadata:
+  iteration: 3
+  family: "multi-model-generalization"
+  research_question: "Does bracket K=1 hierarchical search correctly identify model-dependent TP winners (qwen3-14b→TP=8 on L40S vs llama→TP=4), and does it remain robust when TP margins approach zero (0.03% at seed=43)?"
+
+arms:
+  # Arms chosen:
+  # - h-main: Primary multi-model test. First time bracket faces a different TP winner (TP=8 for qwen vs TP=4 for llama on L40S).
+  # - h-robustness: Stress test with near-zero margins. Qwen on L40S has wildly variable margins (0.03%-7.5%) across seeds, far more extreme than llama (0.85%-3.5%).
+  # - h-control-negative: Hardware control. On H100, qwen should behave like llama (TP=4 wins), so the L40S-specific TP=8 effect should vanish. Validates mechanism specificity.
+  # - h-ablation: Flat TPE comparison. Tests whether TPE handles the 5.1% margin better than llama's 2.1%, and whether bracket's Phase 1 is still necessary.
+
+  - type: h-main
+    prediction: >
+      Bracket K=1 on L40S hard qwen3-14b (seed=42) correctly identifies TP=8/1inst as the
+      Phase 1 winner on all 5 search seeds, with evals_to_best=3. Phase 1 max-profile scores:
+      TP1=0.038284, TP2=0.063921, TP4=0.080647, TP8=0.084795. The 5.1% TP=8 margin over TP=4
+      is sufficient for unambiguous Phase 1 identification despite TP=8 being a different winner
+      than all previously tested regimes (which all favored TP=4).
+    mechanism: >
+      The bracket max profile (mr=512, mt=8192, pf=4096) creates a compute-saturated regime
+      where the TP-level advantage fully expresses regardless of model. On L40S, qwen3-14b's
+      larger model size (14B vs llama's 8B params) makes TP=8/1inst advantageous: higher TP
+      reduces per-request weight-loading latency on L40S's low bandwidth (0.864 TB/s), and the
+      larger model size amplifies this effect compared to the smaller llama. The bracket algorithm
+      is model-agnostic — it simply picks the highest Phase 1 scorer — so it handles this
+      different TP winner without any model-specific logic.
+    diagnostic: >
+      If TP=8 is NOT identified: check whether the BLIS fitness function changed, whether
+      qwen3-14b model config was updated, or whether the max-profile secondary params no longer
+      create a compute-saturated regime for qwen. If evals_to_best > 3: check whether the
+      GLOBAL_BEST_TABLE entry (0.084795) is incorrect or whether Phase 2 TPE is being counted
+      in evals_to_best despite Phase 1 already crossing the threshold.
+    code_changes:
+      - file: "search_blis_iter8.py"
+        intent: >
+          Copy search_blis_iter7.py (from iter-2 h-main.patch) and add a new entry to
+          GLOBAL_BEST_TABLE: ("qwen3-14b", "L40S", 500, 1000): 0.084795. This is the
+          max-profile TP=8/1inst score for qwen3-14b on L40S hard regime, verified by probing.
+        rationale: >
+          The table drives evals_to_best computation. Without an L40S qwen entry, the script
+          would skip evals_to_best calculation or error. The value 0.084795 was confirmed by
+          running BLIS with the max-profile configuration at seed=42.
+
+  - type: h-robustness
+    prediction: >
+      Bracket K=1 on L40S hard qwen3-14b achieves 25/25 correct Phase 1 identification of
+      TP=8/1inst across 5 blis_seeds (42-46) × 5 search seeds. evals_to_best=3 at all 25
+      combinations. This holds even at near-zero margins: seed=43 (TP margin 0.03%, scores
+      TP8=0.085773 vs TP4=0.085751) and seed=45 (margin 0.11%, TP8=0.088737 vs TP4=0.088640).
+      At these seeds, Phase 1 correctness is guaranteed because bracket evaluation is deterministic
+      per blis_seed — the 0.03% margin, while tiny, is resolved identically on every search seed.
+    mechanism: >
+      Bracket Phase 1 is deterministic: given a fixed blis_seed, the same 4 TP configs are
+      evaluated with the same BLIS workload, producing identical Phase 1 scores regardless of
+      search_seed (RP-9). The max-profile ensures TP-level differences express even when small.
+      At seed=43, the TP=8 vs TP=4 difference is only 0.022 (0.085773 - 0.085751), but this is
+      computed deterministically and bracket always picks the max. The near-zero margin means
+      the TP choice is nearly irrelevant (either would score within 1% of global best), but
+      bracket still makes a consistent decision.
+    diagnostic: >
+      If any seed fails Phase 1: this would contradict RP-9 (Phase 1 determinism). Check whether
+      the search script introduces stochasticity in Phase 1 evaluation (it should not for bracket
+      profiles). If evals_to_best > 3 at some seed: check whether that seed's TP=8 max-profile
+      score falls below the 1% threshold (0.99 × 0.084795 = 0.083947). Probed values show all
+      seeds exceed this threshold.
+
+  - type: h-control-negative
+    prediction: >
+      Bracket K=1 on H100 hard qwen3-14b (seed=42) identifies TP=4/2inst (NOT TP=8/1inst) on
+      all 5 search seeds, with evals_to_best=3. Phase 1 max-profile scores: TP1=0.120822,
+      TP2=0.155768, TP4=0.178063, TP8=0.169720. The 4.9% TP=4 margin over TP=8 matches the
+      pattern seen for llama on H100 (TP=4 wins). The model-dependent TP=8 effect observed on
+      L40S vanishes on H100 because H100's high bandwidth (3.35 TB/s vs L40S's 0.864 TB/s)
+      eliminates the weight-loading bottleneck that favors TP=8 for larger models.
+    mechanism: >
+      On H100, bandwidth is abundant (3.35 TB/s) — even qwen3-14b's larger weight set loads
+      efficiently at TP=4. The 2-instance parallelism at TP=4 provides higher aggregate
+      throughput than the single-instance TP=8, because two instances can overlap batch formation
+      and execution phases. On L40S, the bandwidth constraint (0.864 TB/s, 3.9× lower) makes
+      weight loading the bottleneck: TP=8's 8-way weight sharding reduces per-GPU loading time
+      enough to overcome the single-instance throughput disadvantage. This hardware-dependent
+      mechanism explains why the TP winner is model-dependent ONLY on low-bandwidth hardware.
+    diagnostic: >
+      If H100 selects TP=8 for qwen: the hypothesis that bandwidth drives the TP winner reversal
+      is wrong. Check whether qwen3-14b model configs changed (parameter count, architecture),
+      or whether the H100 hardware spec was modified. Also verify the table's H100 qwen global
+      best (0.179282) against the Phase 1 TP=4 score (0.178063, within 1%).
+
+  - type: h-ablation
+    prediction: >
+      Flat TPE on L40S hard qwen3-14b (seed=42) has higher median evals_to_best than bracket
+      K=1's deterministic 3. With qwen's 5.1% TP=8 margin on L40S (wider than llama's 2.1%),
+      TPE should perform better than for llama (which failed 4/5 seeds per RP-19). Predicted
+      range: 2-4 out of 5 seeds find the global best within budget=100. The improvement over
+      llama's TPE performance (1/5) is expected because wider margins create sharper gradients
+      in the fitness landscape that TPE can exploit, but bracket K=1 still achieves better
+      worst-case performance (evals_to_best=3 vs TPE's variable convergence).
+    mechanism: >
+      Flat TPE searches the full 10-dimensional space without Phase 1 TP pre-selection. With
+      a 5.1% TP=8 margin, the fitness landscape has a clearer peak than llama's 2.1% case,
+      making it easier for TPE's Bayesian model to identify TP=8 as important. However, TPE
+      must discover this from samples across all TP levels rather than evaluating them
+      systematically, so convergence is stochastic and seed-dependent.
+    diagnostic: >
+      If TPE achieves 5/5 success with low evals_to_best (< 10): the 5.1% margin may be
+      sufficient for TPE to match bracket's reliability, weakening the case for hierarchical
+      search at this margin width. Check convergence traces to verify TPE is genuinely finding
+      TP=8 early rather than getting lucky with secondary params at the wrong TP level. If TPE
+      achieves 0/5: the single-instance TP=8 config space may be harder for TPE to sample
+      (only 1 instance configuration at TP=8 vs 2 at TP=4) despite the wider margin.

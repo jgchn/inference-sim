@@ -1,0 +1,58 @@
+metadata:
+  iteration: 5
+  bundle_ref: "runs/iter-5/bundle.yaml"
+
+setup:
+  - cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && go build -o blis main.go"
+    description: "Build the blis binary"
+  - cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && git apply /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/patches/h-main.patch"
+    description: "Apply search script patch (creates search_blis_iter5.py)"
+
+arms:
+  - arm_id: "h-main"
+    conditions:
+      - name: "bracket-k1-rate100-blis42"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter5.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware H100 --budget 100 --seeds 42,43,44,45,46 --blis-seed 42 --rate 100 --num-requests 1000 --model qwen/qwen3-14b --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-main/results.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-main/results.json"
+
+  - arm_id: "h-robustness"
+    conditions:
+      - name: "bracket-k1-rate100-blis42"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter5.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware H100 --budget 100 --seeds 42,43,44,45,46 --blis-seed 42 --rate 100 --num-requests 1000 --model qwen/qwen3-14b --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-robustness/blis42.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-robustness/blis42.json"
+      - name: "bracket-k1-rate100-blis43"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter5.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware H100 --budget 100 --seeds 42,43,44,45,46 --blis-seed 43 --rate 100 --num-requests 1000 --model qwen/qwen3-14b --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-robustness/blis43.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-robustness/blis43.json"
+      - name: "bracket-k1-rate100-blis44"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter5.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware H100 --budget 100 --seeds 42,43,44,45,46 --blis-seed 44 --rate 100 --num-requests 1000 --model qwen/qwen3-14b --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-robustness/blis44.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-robustness/blis44.json"
+      - name: "bracket-k1-rate100-blis45"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter5.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware H100 --budget 100 --seeds 42,43,44,45,46 --blis-seed 45 --rate 100 --num-requests 1000 --model qwen/qwen3-14b --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-robustness/blis45.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-robustness/blis45.json"
+      - name: "bracket-k1-rate100-blis46"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter5.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware H100 --budget 100 --seeds 42,43,44,45,46 --blis-seed 46 --rate 100 --num-requests 1000 --model qwen/qwen3-14b --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-robustness/blis46.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-robustness/blis46.json"
+
+  - arm_id: "h-ablation"
+    conditions:
+      - name: "bracket-k1-rate125-blis42"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter5.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware H100 --budget 100 --seeds 42,43,44,45,46 --blis-seed 42 --rate 125 --num-requests 1000 --model qwen/qwen3-14b --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-ablation/blis42.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-ablation/blis42.json"
+      - name: "bracket-k1-rate125-blis43"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter5.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware H100 --budget 100 --seeds 42,43,44,45,46 --blis-seed 43 --rate 125 --num-requests 1000 --model qwen/qwen3-14b --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-ablation/blis43.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-ablation/blis43.json"
+      - name: "bracket-k1-rate125-blis44"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter5.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware H100 --budget 100 --seeds 42,43,44,45,46 --blis-seed 44 --rate 125 --num-requests 1000 --model qwen/qwen3-14b --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-ablation/blis44.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-ablation/blis44.json"
+      - name: "bracket-k1-rate125-blis45"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter5.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware H100 --budget 100 --seeds 42,43,44,45,46 --blis-seed 45 --rate 125 --num-requests 1000 --model qwen/qwen3-14b --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-ablation/blis45.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-ablation/blis45.json"
+      - name: "bracket-k1-rate125-blis46"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter5.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware H100 --budget 100 --seeds 42,43,44,45,46 --blis-seed 46 --rate 125 --num-requests 1000 --model qwen/qwen3-14b --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-ablation/blis46.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-ablation/blis46.json"
+
+  - arm_id: "h-control-negative"
+    conditions:
+      - name: "tpe-rate100-blis42"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && python3 search_blis_iter5.py --strategy tpe --hardware H100 --budget 100 --seeds 42,43,44,45,46 --blis-seed 42 --rate 100 --num-requests 1000 --model qwen/qwen3-14b --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-control-negative/results.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-5/results/h-control-negative/results.json"

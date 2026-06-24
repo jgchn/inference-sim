@@ -1,0 +1,72 @@
+[
+  {
+    "id": "RP-C2-1",
+    "statement": "In BLIS at moderate request rates (rate=50, qwen3-14b/H100), the multi-objective Pareto problem (maximize throughput, minimize latency) is degenerate: the highest-TP configuration simultaneously achieves both maximum throughput and minimum latency. No genuine tradeoff exists between parallelism tiers at these rates.",
+    "confidence": "high",
+    "regime": "rate=50 req/s, qwen3-14b, H100, 200 requests, num_requests=200; likely generalizes to any rate below the saturation point of the dominant tier (TP=8/1-inst at rate=50 is far from saturation based on e2e_p99=4719ms << timeout).",
+    "evidence": ["iteration-1-h-main"],
+    "contradicts": [],
+    "extraction_iteration": 1,
+    "mechanism": "At rate=50 on H100, TP=8/1-inst processes all requests with short queuing delays (e2e_p99=4719ms, while TP=1/1-inst reaches 51400ms). With 8 GPUs dedicated to a single instance, both throughput (raw compute) and latency (time-per-step) scale proportionally with TP. Lower-TP multi-instance configs (e.g., TP=4/2-inst) have lower per-GPU parallelism AND need routing overhead. The key: at moderate load, TP=8/1-inst is BOTH the fastest server (highest tokens/step) AND the least loaded (handles requests most quickly), so it wins on all objectives simultaneously. Genuine tradeoffs emerge only at rates where TP=8/1-inst saturates.",
+    "applicability_bounds": "Holds when: (1) rate is below TP=8/1-inst saturation point, (2) single-node constraint forces max TP to 8. May NOT hold at very high rates (rate >> 100 req/s) where TP=8/1-inst approaches its throughput ceiling and per-request latency increases — at that point, lower-TP multi-instance configs may offer lower latency at reduced throughput, creating genuine Pareto tradeoffs.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-C2-2",
+    "statement": "Phase 1 tier ranking in BLIS (identifying dominant TP×instances parallelism configurations by throughput) is perfectly stable across workload seeds. The same top-3 tiers are identified regardless of whether seed is 42, 123, 456, 789, or 1024.",
+    "confidence": "high",
+    "regime": "rate=50 req/s, qwen3-14b, H100, Phase 1 budget=15 evals, top_k=3",
+    "evidence": ["iteration-1-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 1,
+    "mechanism": "TP tier throughput is determined by GPU compute capacity (number of GPUs × GPU memory bandwidth), not by workload request-length distribution. Different seeds change individual request lengths but preserve the statistical distribution mean, so aggregate throughput at each tier remains stable. The Phase 1 max-throughput profile (fcfs, max_running=256, max_tokens=8192) further reduces workload sensitivity by maximizing throughput headroom.",
+    "applicability_bounds": "Holds for distribution workload with moderate request length variance. May not hold for extreme workload presets (e.g., multidoc with very long prompts) where chunked prefill and KV cache capacity become bottlenecks — those scenarios were not tested in this iteration.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-C2-3",
+    "statement": "At low request rates (rate=5 req/s), BLIS secondary knobs (scheduler, max_running, max_tokens, block_size, routing, admission, preemption) have ZERO effect on metrics within a fixed parallelism tier. All secondary knob combinations produce identical tokens_per_sec and e2e_p99_ms.",
+    "confidence": "high",
+    "regime": "rate=5 req/s, qwen3-14b, H100, any TP×instances tier",
+    "evidence": ["iteration-1-h-control-negative"],
+    "contradicts": [],
+    "extraction_iteration": 1,
+    "mechanism": "At rate=5, the system is completely arrival-rate-limited: requests arrive so slowly that they are served immediately without queuing (no batching dynamics, no scheduling pressure). In this regime, the effective batch size is always 1, so max_running, max_tokens, and scheduler are irrelevant. Block size doesn't matter because KV cache is never under pressure. Routing policy is irrelevant because there's no load to balance. The only performance-determining factor is per-GPU compute speed (i.e., TP tier).",
+    "applicability_bounds": "Holds when rate << per-tier processing capacity (arrival rate much lower than throughput ceiling). Breaks down when rate approaches the saturation point of the tier (typically rate >> 10 × num_instances for typical workloads). For secondary knobs to matter, rate must be high enough to create queuing dynamics.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-C2-4",
+    "statement": "Hypervolume (HV) is an insensitive metric for comparing search strategies when the Pareto problem is effectively single-objective (dominated by one extreme point). In degenerate cases, strategies with very different budget allocations (random 9% vs hierarchical 33% on the dominant tier) achieve identical HV once any strategy discovers the global maximum.",
+    "confidence": "high",
+    "regime": "2D Pareto (throughput, latency) when one configuration dominates all others in both objectives",
+    "evidence": ["iteration-1-h-main"],
+    "contradicts": [],
+    "extraction_iteration": 1,
+    "mechanism": "The 2D hypervolume is dominated by the extreme point (maximum throughput + minimum latency corner). Once found, this point alone accounts for nearly all achievable HV. With 500 evals and ~9% probability of hitting the dominant tier per uniform random sample, the expected number of dominant-tier samples is ~45 — more than enough to find the maximum. Hierarchical search allocates ~163 to the dominant tier, but the marginal benefit of additional dominant-tier evals is zero once the maximum is found.",
+    "applicability_bounds": "Applies when Pareto problem degenerates to a single dominant point. For genuine multi-objective problems with diverse Pareto fronts, hypervolume correctly discriminates between strategies. The 'degenerate' condition should be diagnosed BEFORE designing experiments using HV as the comparison metric.",
+    "superseded_by": null,
+    "category": "methodology",
+    "status": "active"
+  },
+  {
+    "id": "RP-C2-5",
+    "statement": "For BLIS Pareto search experiments to demonstrate genuine multi-objective tradeoffs between parallelism tiers, the request rate must be high enough to saturate the dominant tier (TP=8/1-inst). Based on campaign-2 iteration-1 data, rate=50 produces a degenerate Pareto problem; the required rate is likely rate >> 100 req/s (potentially 200-500 req/s based on campaign-1 findings that throughput peaks occur at rate=500 for H100/qwen3-14b).",
+    "confidence": "medium",
+    "regime": "qwen3-14b, H100, single-node 8-GPU constraint",
+    "evidence": ["iteration-1-h-main", "iteration-1-h-control-negative"],
+    "contradicts": [],
+    "extraction_iteration": 1,
+    "mechanism": "At rate=50, TP=8/1-inst e2e_p99=4719ms (relatively low latency), indicating it is far from queuing saturation. For TP=8/1-inst to exhibit high latency (creating space for lower-TP tiers to be non-dominated on the latency objective), the queue must be non-empty most of the time. This requires arrival rate > service rate, which for TP=8/1-inst at tokens_per_sec=14232 corresponds to approximately rate >> 50-100 req/s (depending on average output length). Campaign-1 tested up to rate=500 for single-objective optimization — those high-rate regimes are the candidates for genuine Pareto tradeoffs.",
+    "applicability_bounds": "The exact saturation rate depends on model (qwen3-14b), hardware (H100), and workload (distribution preset with ~500 output tokens). Different models, hardware, or workloads will shift the saturation point. This principle generalizes as: test rate >> throughput_ceiling / avg_output_tokens to ensure the dominant tier is saturated.",
+    "superseded_by": null,
+    "category": "experimental-design",
+    "status": "active"
+  }
+]

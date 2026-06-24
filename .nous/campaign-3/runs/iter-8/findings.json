@@ -1,0 +1,33 @@
+{
+  "iteration": 8,
+  "bundle_ref": "runs/iter-8/bundle.yaml",
+  "arms": [
+    {
+      "arm_type": "h-robustness",
+      "predicted": "Both models at rate=75 will have higher Pareto density than at rate=50: Qwen density > 4.5% (~6.06%), Llama density > 5.33%. Rate-increases-density pattern (RP-10) is model-independent.",
+      "observed": "Qwen rate=75: 109/1800 Pareto-optimal = 6.06% density (vs 4.5% at rate=50, HV=6.292e10). Llama rate=75: 87/1800 = 4.83% density (vs 5.33% at rate=50, HV=8.512e10). Llama density DECREASED with rate, contradicting RP-10.",
+      "status": "PARTIALLY_CONFIRMED",
+      "error_type": "regime",
+      "diagnostic_note": "RP-10 (density increases with rate) holds for Qwen but fails for Llama. Llama's higher throughput ceiling changes the queueing dynamics differently: at rate=75, Llama processes requests fast enough that load-intensive configs maintain dominance more strongly, CONCENTRATING rather than expanding the Pareto frontier. The rate-increases-density mechanism is NOT architecture-independent as predicted."
+    },
+    {
+      "arm_type": "h-main",
+      "predicted": "Qwen3-14B at rate=75 (expected density ~6.06%) will show a NEGATIVE convergence gap: random search reaches 95% HV before NSGA-II (random faster by 10+ evals). Higher density reduces NSGA-II advantage per RP-11/RP-12.",
+      "observed": "Qwen rate=75 density=6.06%. NSGA-II reaches 95% HV at eval ~129.2, Random reaches 95% at eval ~160.2. Gap = +31.0 evals (NSGA-II faster). NSGA-II final HV=6.117e10 (97.22%), Random final HV=6.124e10 (97.33%). Prediction was REFUTED: gap is strongly positive, not negative.",
+      "status": "REFUTED",
+      "error_type": "direction",
+      "diagnostic_note": "Counter to RP-11/RP-12: higher density at rate=75 (6.06%) corresponds to a LARGER positive gap (+31.0) vs rate=50 (4.5%, gap=+4.6). Higher load at rate=75 creates sharper KV stress dominance boundaries that give NSGA-II's crossover operator more exploitable gradient structure. The landscape structure change (sharper gradients from higher queueing pressure) dominates over the density effect. Density is a model-and-regime-dependent correlate, not the causal mechanism."
+    },
+    {
+      "arm_type": "h-ablation",
+      "predicted": "Llama-3.1-8B at rate=75 will show a NEGATIVE convergence gap with magnitude comparable to or larger than -22.9 evals. All four data points will fall on a monotonically decreasing density→gap curve.",
+      "observed": "Llama rate=75 density=4.83%. NSGA-II reaches 95% HV at eval ~119.1, Random reaches 95% at eval ~93.8. Gap = -25.3 evals (random faster). NSGA-II final HV=8.362e10 (98.24%), Random final HV=8.347e10 (98.07%). Gap direction confirmed but four-point monotone curve test FAILED: Qwen at 6.06% density has gap=+31.0, not more negative than Qwen at 4.5% (+4.6).",
+      "status": "PARTIALLY_CONFIRMED",
+      "error_type": "regime",
+      "diagnostic_note": "Gap direction for Llama at rate=75 is correctly negative (-25.3 vs -22.9 at rate=50). However the cross-model test fails: the Qwen points (density 4.5%→6.06%, gap +4.6→+31.0) move in the OPPOSITE direction from what a universal density→gap predictor would require. Model architecture is confirmed as an independent variable: Qwen consistently shows positive gaps (NSGA-II advantages), Llama consistently shows negative gaps (random advantages), regardless of density level. The 4 data points cannot be described by a single density→gap curve."
+    }
+  ],
+  "experiment_valid": true,
+  "discrepancy_analysis": "The primary research question — whether Pareto density is a universal predictor of the NSGA-II vs random convergence gap — is REFUTED. Three distinct failures: (1) RP-10 does not hold for Llama (density decreases from 5.33% to 4.83% at rate=75), (2) Qwen at higher density (6.06%) shows a LARGER NSGA-II advantage (+31 evals) not a smaller one, directly inverting RP-11/RP-12, (3) the four (density, gap) data points do not form a monotonically decreasing curve. Model architecture is an independent factor: Qwen consistently favors NSGA-II, Llama consistently favors random, at both rate=50 and rate=75 and regardless of their density values. The confound in iter-7 (two models at same rate) was that model-driven and rate-driven density changes produce different landscape structures. The mechanism producing a density value matters as much as the value itself.",
+  "dominant_component_pct": null
+}

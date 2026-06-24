@@ -1,0 +1,353 @@
+[
+  {
+    "config": {
+      "tp": 8,
+      "num_instances": 1,
+      "scheduler": "reverse-priority",
+      "max_num_running_reqs": 256,
+      "max_num_scheduled_tokens": 8192,
+      "long_prefill_token_threshold": 0,
+      "block_size_in_tokens": 16,
+      "routing_policy": "round-robin",
+      "routing_scorers": null,
+      "admission_policy": "always-admit",
+      "preemption_policy": "priority",
+      "gpu_memory_utilization": 0.9
+    },
+    "objectives": [
+      -37.01500625368531,
+      25.089029999999998,
+      8.0
+    ],
+    "metrics": {
+      "responses_per_sec": 37.01500625368531,
+      "ttft_p99_ms": 25.089029999999998
+    },
+    "eval_num": 1,
+    "generation": 0
+  },
+  {
+    "config": {
+      "tp": 1,
+      "num_instances": 3,
+      "scheduler": "reverse-priority",
+      "max_num_running_reqs": 512,
+      "max_num_scheduled_tokens": 2048,
+      "long_prefill_token_threshold": 0,
+      "block_size_in_tokens": 16,
+      "routing_policy": "weighted",
+      "routing_scorers": "precise-prefix-cache:2,queue-depth:1,kv-utilization:1",
+      "admission_policy": "tier-shed",
+      "preemption_policy": "fcfs",
+      "gpu_memory_utilization": 0.95
+    },
+    "objectives": [
+      -16.990804202967663,
+      59.34857,
+      3.0
+    ],
+    "metrics": {
+      "responses_per_sec": 16.990804202967663,
+      "ttft_p99_ms": 59.34857
+    },
+    "eval_num": 17,
+    "generation": 0
+  },
+  {
+    "config": {
+      "tp": 4,
+      "num_instances": 1,
+      "scheduler": "priority-fcfs",
+      "max_num_running_reqs": 256,
+      "max_num_scheduled_tokens": 8192,
+      "long_prefill_token_threshold": 4096,
+      "block_size_in_tokens": 16,
+      "routing_policy": "round-robin",
+      "routing_scorers": null,
+      "admission_policy": "always-admit",
+      "preemption_policy": "fcfs",
+      "gpu_memory_utilization": 0.9
+    },
+    "objectives": [
+      -29.742327936766383,
+      35.31626,
+      4.0
+    ],
+    "metrics": {
+      "responses_per_sec": 29.742327936766383,
+      "ttft_p99_ms": 35.31626
+    },
+    "eval_num": 34,
+    "generation": 0
+  },
+  {
+    "config": {
+      "tp": 2,
+      "num_instances": 1,
+      "scheduler": "sjf",
+      "max_num_running_reqs": 512,
+      "max_num_scheduled_tokens": 2048,
+      "long_prefill_token_threshold": 0,
+      "block_size_in_tokens": 32,
+      "routing_policy": "round-robin",
+      "routing_scorers": null,
+      "admission_policy": "always-admit",
+      "preemption_policy": "priority",
+      "gpu_memory_utilization": 0.9
+    },
+    "objectives": [
+      -19.994888506702146,
+      62.20221,
+      2.0
+    ],
+    "metrics": {
+      "responses_per_sec": 19.994888506702146,
+      "ttft_p99_ms": 62.20221
+    },
+    "eval_num": 54,
+    "generation": 1
+  },
+  {
+    "config": {
+      "tp": 1,
+      "num_instances": 1,
+      "scheduler": "reverse-priority",
+      "max_num_running_reqs": 512,
+      "max_num_scheduled_tokens": 2048,
+      "long_prefill_token_threshold": 0,
+      "block_size_in_tokens": 16,
+      "routing_policy": "round-robin",
+      "routing_scorers": null,
+      "admission_policy": "always-admit",
+      "preemption_policy": "priority",
+      "gpu_memory_utilization": 0.95
+    },
+    "objectives": [
+      -10.933524433846799,
+      12790.71312,
+      1.0
+    ],
+    "metrics": {
+      "responses_per_sec": 10.933524433846799,
+      "ttft_p99_ms": 12790.71312
+    },
+    "eval_num": 105,
+    "generation": 2
+  },
+  {
+    "config": {
+      "tp": 1,
+      "num_instances": 3,
+      "scheduler": "priority-fcfs",
+      "max_num_running_reqs": 512,
+      "max_num_scheduled_tokens": 8192,
+      "long_prefill_token_threshold": 0,
+      "block_size_in_tokens": 16,
+      "routing_policy": "round-robin",
+      "routing_scorers": null,
+      "admission_policy": "always-admit",
+      "preemption_policy": "fcfs",
+      "gpu_memory_utilization": 0.95
+    },
+    "objectives": [
+      -17.208584495492143,
+      61.022870000000005,
+      3.0
+    ],
+    "metrics": {
+      "responses_per_sec": 17.208584495492143,
+      "ttft_p99_ms": 61.022870000000005
+    },
+    "eval_num": 150,
+    "generation": 2
+  },
+  {
+    "config": {
+      "tp": 2,
+      "num_instances": 1,
+      "scheduler": "priority-fcfs",
+      "max_num_running_reqs": 512,
+      "max_num_scheduled_tokens": 4096,
+      "long_prefill_token_threshold": 0,
+      "block_size_in_tokens": 16,
+      "routing_policy": "round-robin",
+      "routing_scorers": null,
+      "admission_policy": "always-admit",
+      "preemption_policy": "priority",
+      "gpu_memory_utilization": 0.85
+    },
+    "objectives": [
+      -19.9948837091565,
+      61.41912,
+      2.0
+    ],
+    "metrics": {
+      "responses_per_sec": 19.9948837091565,
+      "ttft_p99_ms": 61.41912
+    },
+    "eval_num": 194,
+    "generation": 3
+  },
+  {
+    "config": {
+      "tp": 1,
+      "num_instances": 1,
+      "scheduler": "priority-fcfs",
+      "max_num_running_reqs": 512,
+      "max_num_scheduled_tokens": 4096,
+      "long_prefill_token_threshold": 2048,
+      "block_size_in_tokens": 16,
+      "routing_policy": "round-robin",
+      "routing_scorers": null,
+      "admission_policy": "always-admit",
+      "preemption_policy": "priority",
+      "gpu_memory_utilization": 0.95
+    },
+    "objectives": [
+      -10.933463706870166,
+      12783.72391,
+      1.0
+    ],
+    "metrics": {
+      "responses_per_sec": 10.933463706870166,
+      "ttft_p99_ms": 12783.72391
+    },
+    "eval_num": 297,
+    "generation": 5
+  },
+  {
+    "config": {
+      "tp": 1,
+      "num_instances": 1,
+      "scheduler": "priority-fcfs",
+      "max_num_running_reqs": 512,
+      "max_num_scheduled_tokens": 2048,
+      "long_prefill_token_threshold": 1024,
+      "block_size_in_tokens": 16,
+      "routing_policy": "round-robin",
+      "routing_scorers": null,
+      "admission_policy": "always-admit",
+      "preemption_policy": "priority",
+      "gpu_memory_utilization": 0.95
+    },
+    "objectives": [
+      -10.936182497589172,
+      12797.10618,
+      1.0
+    ],
+    "metrics": {
+      "responses_per_sec": 10.936182497589172,
+      "ttft_p99_ms": 12797.10618
+    },
+    "eval_num": 327,
+    "generation": 6
+  },
+  {
+    "config": {
+      "tp": 1,
+      "num_instances": 1,
+      "scheduler": "priority-fcfs",
+      "max_num_running_reqs": 512,
+      "max_num_scheduled_tokens": 4096,
+      "long_prefill_token_threshold": 2048,
+      "block_size_in_tokens": 32,
+      "routing_policy": "round-robin",
+      "routing_scorers": null,
+      "admission_policy": "always-admit",
+      "preemption_policy": "priority",
+      "gpu_memory_utilization": 0.95
+    },
+    "objectives": [
+      -10.92340239341359,
+      12748.11738,
+      1.0
+    ],
+    "metrics": {
+      "responses_per_sec": 10.92340239341359,
+      "ttft_p99_ms": 12748.11738
+    },
+    "eval_num": 452,
+    "generation": 9
+  },
+  {
+    "config": {
+      "tp": 1,
+      "num_instances": 1,
+      "scheduler": "sjf",
+      "max_num_running_reqs": 512,
+      "max_num_scheduled_tokens": 8192,
+      "long_prefill_token_threshold": 0,
+      "block_size_in_tokens": 16,
+      "routing_policy": "round-robin",
+      "routing_scorers": null,
+      "admission_policy": "always-admit",
+      "preemption_policy": "priority",
+      "gpu_memory_utilization": 0.95
+    },
+    "objectives": [
+      -11.006978005790508,
+      13580.85045,
+      1.0
+    ],
+    "metrics": {
+      "responses_per_sec": 11.006978005790508,
+      "ttft_p99_ms": 13580.85045
+    },
+    "eval_num": 485,
+    "generation": 9
+  },
+  {
+    "config": {
+      "tp": 1,
+      "num_instances": 1,
+      "scheduler": "sjf",
+      "max_num_running_reqs": 512,
+      "max_num_scheduled_tokens": 4096,
+      "long_prefill_token_threshold": 1024,
+      "block_size_in_tokens": 16,
+      "routing_policy": "round-robin",
+      "routing_scorers": null,
+      "admission_policy": "always-admit",
+      "preemption_policy": "priority",
+      "gpu_memory_utilization": 0.95
+    },
+    "objectives": [
+      -11.00518522508102,
+      13574.822269999999,
+      1.0
+    ],
+    "metrics": {
+      "responses_per_sec": 11.00518522508102,
+      "ttft_p99_ms": 13574.822269999999
+    },
+    "eval_num": 542,
+    "generation": 10
+  },
+  {
+    "config": {
+      "tp": 1,
+      "num_instances": 3,
+      "scheduler": "reverse-priority",
+      "max_num_running_reqs": 512,
+      "max_num_scheduled_tokens": 8192,
+      "long_prefill_token_threshold": 0,
+      "block_size_in_tokens": 32,
+      "routing_policy": "weighted",
+      "routing_scorers": "precise-prefix-cache:2,queue-depth:1,kv-utilization:1",
+      "admission_policy": "always-admit",
+      "preemption_policy": "priority",
+      "gpu_memory_utilization": 0.95
+    },
+    "objectives": [
+      -17.186088109155307,
+      59.38769,
+      3.0
+    ],
+    "metrics": {
+      "responses_per_sec": 17.186088109155307,
+      "ttft_p99_ms": 59.38769
+    },
+    "eval_num": 544,
+    "generation": 10
+  }
+]

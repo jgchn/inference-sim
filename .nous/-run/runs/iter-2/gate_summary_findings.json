@@ -1,0 +1,11 @@
+{
+  "gate_type": "findings",
+  "summary": "All four arms of Iteration 2 confirmed their hypotheses, validating that the Bracket K=1 search strategy works correctly on L40S hardware (a new GPU target) and is robust across workload seeds on H100. The bracket approach identified the optimal TP=4/2-instance configuration in just 3 evaluations on L40S, while flat TPE search failed to find the optimum in 4 out of 5 seeds within a 100-evaluation budget \u2014 a >33\u00d7 speedup that significantly exceeded the predicted \u22655\u00d7.",
+  "key_points": [
+    "h-main CONFIRMED: Bracket K=1 on L40S correctly selects TP=4/2inst on all 5 search seeds in exactly 3 evals, matching prediction precisely despite L40S having only a 2.1% margin between TP=4 and TP=8 (Phase 1 scores: TP4=0.1097 vs TP8=0.1074).",
+    "h-robustness CONFIRMED: 25/25 (blis_seed \u00d7 search_seed) combinations on H100 correctly select TP=4/2inst with evals_to_best=3, with TP=4 margins ranging 7.6\u20139.5% across workload seeds \u2014 demonstrating bracket reliability across workload variation.",
+    "h-control-negative CONFIRMED: Min-profile-only bracket on L40S selects wrong winner (TP=2/4inst) on all 5 seeds, achieving best score 0.0917 \u2014 16.2% below the global best of 0.1097, validating that the max-profile design is essential.",
+    "h-ablation CONFIRMED with magnitude surprise: Flat TPE on L40S was far worse than predicted \u2014 median evals_to_best=101 (effectively never converges) vs predicted ~26. Only 1/5 seeds found the optimum within budget. This reveals a non-linear effect: the 2.1% TP margin on L40S doesn't just slow TPE \u2014 it makes it unreliable, while bracket K=1 remains deterministically correct.",
+    "Key new insight: TP margin size has a qualitative (not just quantitative) effect on search reliability. Below some threshold (between H100's 7.6% and L40S's 2.1%), black-box optimization cannot reliably distinguish the optimal TP, while bracket's structured max-profile evaluation is immune to this effect."
+  ]
+}

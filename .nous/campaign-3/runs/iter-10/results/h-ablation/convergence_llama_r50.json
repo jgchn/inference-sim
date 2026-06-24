@@ -1,0 +1,64 @@
+{
+  "model": "meta-llama/llama-3.1-8b-instruct",
+  "rate": 50,
+  "algorithm_params": {
+    "pop_size": 40,
+    "n_gens": 4,
+    "budget": 200,
+    "checkpoint_interval": 40,
+    "nsga2_seed": 42,
+    "random_seed": 43
+  },
+  "exhaustive_hv": 77403837551.23578,
+  "exhaustive_pareto_size": 96,
+  "exhaustive_total_configs": 1800,
+  "exhaustive_density": 0.05333333333333334,
+  "target_hv": 73533645673.67398,
+  "nsga2_checkpoints": [
+    [
+      40,
+      68310323139.56295
+    ],
+    [
+      80,
+      73629506093.30923
+    ],
+    [
+      120,
+      75392396607.79356
+    ],
+    [
+      160,
+      77058546858.63911
+    ],
+    [
+      200,
+      77200596651.65808
+    ]
+  ],
+  "random_checkpoints": [
+    [
+      40,
+      70914123869.41637
+    ],
+    [
+      80,
+      72479317661.18695
+    ],
+    [
+      120,
+      73593958669.5252
+    ],
+    [
+      160,
+      75122927808.96935
+    ],
+    [
+      200,
+      76427535047.26608
+    ]
+  ],
+  "nsga2_95pct_eval": 79.2791342544987,
+  "random_95pct_eval": 117.83560822183841,
+  "gap": 38.55647396733971
+}

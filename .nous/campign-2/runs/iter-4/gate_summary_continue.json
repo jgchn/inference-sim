@@ -1,0 +1,9 @@
+{
+  "gate_type": "continue",
+  "summary": "Iteration 4 confirmed that batch=512 is required for correct tier ranking across hardware and rate regimes, while batch=128 fails in at least 2 of 5 tested conditions. TPE Phase 2 converged far faster than expected (2\u20133 evaluations vs. the predicted \u226420), and the A100-SXM tier competition was revealed as a genuine near-tie zone sensitive to workload seed.",
+  "key_points": [
+    "Lean Phase 1 (batch=128) is unreliable: it correctly identifies the top tier on H100 rate=5000 (TP=4/2 wins by 0.8%) but fails on H100 rate=500 (picks TP=2/4 instead of TP=8/1, causing a 24% unrecoverable deficit) and on A100-SXM at rates \u22652000 (picks TP=4/2 instead of TP=8/1). Standard Phase 1 (batch=512) achieved 16/18 correct tier identifications across all conditions and seeds.",
+    "TPE Phase 2 is dramatically faster than LHS: TPE reached 95% of within-tier optimal in 2\u20133 evaluations (vs. 5\u201316 for LHS), and final scores matched or exceeded reference optima (seed=42: 0.176474, seeds 123/456: 0.178+). The batch=512 lever is so dominant that TPE's surrogate model learns it within the first few startup trials, while LHS only hits batch=512 ~20% of the time.",
+    "A100-SXM harbors a genuine tie zone at rates \u22652000: TP=4/2 and TP=8/1 are within 0.1\u20131.0% of each other, and workload seed 456 flips the winner to TP=4/2 \u2014 meaning standard Phase 1 is not perfectly seed-robust on A100-SXM. Next iteration should (a) characterize the exact H100 crossover rate between 500 and 2000 req/s where the optimal tier switches from TP=8/1 to TP=4/2, and (b) test whether averaging across seeds or a lightweight multi-seed Phase 1 probe can resolve tie-zone ambiguity on A100-SXM."
+  ]
+}

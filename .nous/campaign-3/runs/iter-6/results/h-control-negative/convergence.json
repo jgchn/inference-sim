@@ -1,0 +1,42 @@
+{
+  "arm": "h-control-negative",
+  "rate": 100,
+  "algorithm": "random",
+  "total_evals": 200,
+  "exhaustive_hv": 65197799999.99999,
+  "final_hv": 63442800000.0,
+  "final_hv_pct": 97.30819138069077,
+  "final_pareto_size": 28,
+  "convergence": [
+    {
+      "eval": 40,
+      "hv": 56043000000.0,
+      "pareto_size": 17,
+      "hv_pct": 85.95842190994176
+    },
+    {
+      "eval": 80,
+      "hv": 60744600000.0,
+      "pareto_size": 17,
+      "hv_pct": 93.16970818033738
+    },
+    {
+      "eval": 120,
+      "hv": 61657200000.0,
+      "pareto_size": 21,
+      "hv_pct": 94.56944866237819
+    },
+    {
+      "eval": 160,
+      "hv": 61934400000.0,
+      "pareto_size": 25,
+      "hv_pct": 94.9946163827614
+    },
+    {
+      "eval": 200,
+      "hv": 63442800000.0,
+      "pareto_size": 28,
+      "hv_pct": 97.30819138069077
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "iteration": 5,
+  "bundle_ref": "runs/iter-5/bundle.yaml",
+  "arms": [
+    {
+      "arm_type": "h-main",
+      "predicted": "At nreq=2000, lean Phase 1 (batch=128) identifies TP=4/2 as optimal in at least 16 of 18 condition×seed combinations (>=89% agreement with standard Phase 1).",
+      "observed": "Lean Phase 1 (batch=128) agrees with standard Phase 1 (batch=512) in only 6/18 conditions (33.3%). On H100 at all rates (500, 2000, 5000) and seeds (42, 123, 456), lean consistently selects TP=2/4 while standard selects TP=4/2 (7/9 H100 disagreements). On A100-SXM, lean agrees in 3/9 conditions. The two cases where standard Phase 1 also picks TP=2/4 (H100-r500-s456: 0.195000 vs 0.194888, H100-r2000-s456: 0.196563 vs 0.195085) are within 0.1% — performance ties. The batch=512 requirement is NOT eliminated by nreq=2000: batch size continues to affect the TP=4/2 vs TP=2/4 ranking due to effective cluster batch capacity (instances × max_batch). At batch=128: TP=2/4 has 4×128=512 effective capacity vs TP=4/2's 2×128=256, giving TP=2/4 a 2× advantage that persists in steady state. At batch=512, both configurations exceed queue demand (~75 rps) and TP=4/2's compute efficiency dominates.",
+      "status": "REFUTED",
+      "error_type": "direction",
+      "diagnostic_note": "The predicted mechanism (batch=512 compensating for short simulation) is only partially correct. At nreq=2000, the TP=8/1 transient artifact IS eliminated (lean never picks TP=8/1 at nreq=2000). But a new batch-capacity effect distinguishes TP=4/2 from TP=2/4: per-instance batch size multiplied by instance count creates a 2× effective capacity advantage for TP=2/4 at batch=128 that disappears at batch=512. This is NOT a transient artifact but a genuine steady-state capacity difference."
+    },
+    {
+      "arm_type": "h-control-negative",
+      "predicted": "At nreq=250, tier rankings are inconsistent: lean Phase 1 selects a different tier than nreq=2000 reference in at least 9/18 conditions (>=50%). TP=8/1 will be artificially favored.",
+      "observed": "At nreq=250 with batch=512, tier rankings disagree with the nreq=2000 reference in 18/18 conditions (100%). TP=8/1 wins every single condition at nreq=250 with batch=512. At nreq=250 with batch=128, TP=8/1 wins 12/18 conditions (67%) — the 6 agreements are cases where TP=4/2 barely edges TP=8/1 at batch=128 because single-instance batch capacity advantage is neutralized. The control negative prediction is strongly confirmed: the transient regime systematically favors TP=8/1.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "The mechanism is confirmed: at nreq=250, batch=512 on TP=8/1 allows single-instance processing of up to 512 concurrent tokens, which dominates during the transient queue-building phase. The 18/18 disagreement (100%) exceeds the predicted 50% threshold. Noteworthy: at nreq=250 batch=128 vs batch=512, multi-instance tiers show identical scores (batch=128 and batch=512 results are the same for TP=1/8, TP=2/4, TP=4/2 at nreq=250) — only TP=8/1 benefits from larger batch size in the transient, because multi-instance configs are not batch-limited during the transient."
+    },
+    {
+      "arm_type": "h-ablation",
+      "predicted": "nreq is the dominant factor: {batch=128, nreq=2000} matches {batch=512, nreq=2000} but {batch=512, nreq=500} selects TP=8/1. Specifically, all nreq=2000 configs select TP=4/2.",
+      "observed": "nreq IS dominant for the TP=8/1 vs multi-instance distinction: {batch=512, nreq=500} picks TP=8/1 in all 3 seeds (matching iter-4 reference), while {batch=128, nreq=2000} and {batch=512, nreq=2000} both pick multi-instance (TP=2/4 or TP=4/2). However, {batch=128, nreq=2000} picks TP=2/4 in all 3 seeds, while {batch=512, nreq=2000} picks TP=4/2 in 2/3 seeds and TP=2/4 in 1 seed (tied). The prediction that b128/nreq=2000 matches b512/nreq=2000 is wrong in 2/3 seeds. The correct conclusion: nreq determines whether TP=8/1 or multi-instance wins; batch size determines which multi-instance tier (TP=4/2 vs TP=2/4) is selected.",
+      "status": "PARTIALLY_CONFIRMED",
+      "error_type": "magnitude",
+      "diagnostic_note": "The ablation correctly identifies nreq as the dominant factor for the TP=8/1 vs multi-instance boundary. Both {b128,nreq=2000} and {b512,nreq=2000} pick multi-instance (unlike {b512,nreq=500} which picks TP=8/1). But the prediction overstated the equivalence of b128 and b512 at nreq=2000: batch size continues to matter within the multi-instance cluster. b128/nreq500 (seed=42) picks TP=2/4 while b512/nreq500 picks TP=8/1 — showing BOTH nreq and batch effects compound."
+    },
+    {
+      "arm_type": "h-robustness",
+      "predicted": "Transition from TP=8/1 to TP=4/2 dominant occurs between nreq=500 and nreq=1000. nreq=750 is in the tie zone (within 2%), nreq>=1000 selects TP=4/2.",
+      "observed": "Transition confirmed to occur exactly between nreq=500 and nreq=750 (batch=512, seed=42, H100, rate=500). At nreq=500: TP=8/1 wins (0.162349 vs 0.150143, gap 8%). At nreq=750: TP=4/2 wins (0.163075 vs 0.159988, gap 2%) — this IS the predicted tie zone. At nreq=1000: TP=4/2 wins by 8343 points (0.178063 vs 0.169720). At nreq=1500: TP=4/2 wins by 7587 points. At nreq=2000: TP=4/2 wins by 11443 points. The transition threshold nreq=750 is within the predicted nreq=500-1000 range.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "Prediction accuracy: the transition occurs at nreq=750 (not nreq=1000 as the midpoint estimate suggested, but within the predicted range). The nreq=750 margin of +0.003 (2%) is exactly the 'within 2%' tie zone predicted. The monotonic convergence of TP=4/2 score vs TP=8/1 score from nreq=1000 onward confirms the predicted mechanism."
+    }
+  ],
+  "experiment_valid": true,
+  "discrepancy_analysis": "The central hypothesis that lean Phase 1 (batch=128) at nreq=2000 would match standard Phase 1 (batch=512) is refuted. The core mechanism (nreq confound causing TP=8/1 artifacts) is confirmed, but batch size has a second, independent effect: it controls the TP=4/2 vs TP=2/4 distinction via effective cluster batch capacity (instances × per-instance limit). At batch=128, TP=2/4 (4 instances, 4×128=512 effective) outperforms TP=4/2 (2 instances, 2×128=256 effective) even in steady state. At batch=512, both exceed queue demand (~75 rps × service time) and TP=4/2's compute efficiency dominates. The RP-C2-5 batch=512 requirement remains valid at nreq=2000, but for a different reason than originally described.",
+  "dominant_component_pct": null
+}

@@ -1,0 +1,72 @@
+[
+  {
+    "id": "RP-1",
+    "statement": "Multi-objective search algorithm comparison (NSGA-II vs random) requires both a non-trivial Pareto frontier AND a sparse Pareto-optimal configuration set. In BLIS's corrected 6-parameter 4-objective space, Pareto density dropped to ~4.5% at rate=50 req/s (creating a large 91-eval convergence speed gap), but INCREASES at higher load rates (6.06% at rate=75, 6.89% at rate=100). Higher Pareto density reduces random search's disadvantage, shrinking the convergence gap to 48-57 evals at rate=75-100. The density threshold guidance remains valid (>5% = weaker NSGA-II advantage), but the density itself is NOT monotonically decreasing with load — higher load creates new Pareto-optimal cost-performance tradeoff regions rather than concentrating the frontier.",
+    "confidence": "high",
+    "regime": "BLIS 6-parameter 4-objective space (tp, inst, scheduler, batch, kv_blocks, block_size), rates 50-100 req/s, budget 200 evals on 1800-config space",
+    "evidence": ["iteration-5-h-main", "iteration-6-h-robustness", "iteration-6-h-main", "iteration-6-h-ablation"],
+    "contradicts": [],
+    "extraction_iteration": 6,
+    "mechanism": "At higher arrival rates, two effects compete: (1) more configs become KV-stressed (which would remove them from the Pareto set), and (2) the throughput ceiling rises (best achievable rps increases from ~26 at rate=50 to ~32 at rate=100), creating new high-throughput Pareto-optimal configs AND new low-cost throughput-limited Pareto-optimal configs (tp=1 with compute-limited throughput becomes Pareto-optimal as the lowest-cost option). Effect (2) dominates, increasing Pareto density with load.",
+    "applicability_bounds": "Applies to BLIS with rate=50-100 req/s on H100 hardware with qwen/qwen3-14b. May not hold for models where the throughput ceiling does not scale with rate (e.g., very long generation sequences where all configs are always throughput-limited). Density relationship to rate should be re-verified for other models (iter-7 candidate).",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-2",
+    "statement": "Before running a search algorithm comparison on BLIS, validate BOTH objective diversity AND Pareto set density. The density threshold guidance (>20% = algorithms equivalent, 5-20% = moderate NSGA-II advantage, <5% = decisive NSGA-II advantage) was calibrated at rate=50 req/s. At higher rates (75-100 req/s), Pareto density is typically 6-7% even with block_size as a co-variate, placing the comparison in the 'moderate NSGA-II advantage' regime (~2x difference in final HV gap: 1.46-2.12% vs 4.9% at rate=50). NSGA-II retains a convergence SPEED advantage (reaches 95% of exhaustive HV ~50-60 evals before random at rates 75-100), but the final HV gap narrows significantly as random search benefits from higher density.",
+    "confidence": "high",
+    "regime": "BLIS corrected 6-parameter space, rates 50-100 req/s on H100 hardware, budget 200 evals",
+    "evidence": ["iteration-5-h-main", "iteration-6-h-main", "iteration-6-h-control-negative", "iteration-6-h-ablation"],
+    "contradicts": [],
+    "extraction_iteration": 6,
+    "mechanism": "Higher arrival rate increases Pareto density by expanding the throughput frontier. At rate=50, only KV-efficient configs are Pareto-optimal. At rate=75-100, throughput-limited low-cost configs (tp=1) also become Pareto-optimal, and additional mid-range configs populate new tradeoff regions created by the higher throughput ceiling. Higher density = more expected Pareto-optimal hits per random eval = random search more competitive.",
+    "applicability_bounds": "Calibrated on qwen/qwen3-14b, H100. The specific density values (4.5% at rate=50, 6-7% at rate=75-100) are model and hardware specific. The threshold guidance principle (density > 5% → weaker NSGA-II advantage) should generalize, but the mapping from load rate to density may not.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-10",
+    "statement": "In BLIS, Pareto density in the 6-parameter 4-objective space INCREASES with arrival rate (not decreases). At rate=50: 4.5% density (81 Pareto-optimal configs), at rate=75: 6.06% (109 configs), at rate=100: 6.89% (124 configs). Higher arrival rates expand the Pareto frontier by opening new throughput-vs-cost tradeoff regions rather than concentrating it. The effect is monotonic: each rate increase adds more configs to the Pareto set than it removes.",
+    "confidence": "high",
+    "regime": "BLIS 6-parameter corrected space (tp, inst, scheduler, batch, kv_blocks, block_size), H100 hardware, qwen/qwen3-14b, rates 50-100 req/s",
+    "evidence": ["iteration-6-h-robustness", "iteration-6-h-ablation", "iteration-5-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 6,
+    "mechanism": "Two competing effects at higher rates: (1) more configs become KV-stressed (would reduce Pareto set), (2) throughput ceiling rises (best achievable rps increases from ~26 to ~32 rps), which opens new tradeoff points. Effect (2) dominates because: (a) compute-limited tp=1 configs (0 preemptions, best GPU-efficiency in certain cost-performance tradeoffs) become Pareto-optimal as the only configs that don't require 2+ GPUs but still deliver some throughput, (b) the higher throughput ceiling differentiates high-TP configs that were previously indistinguishable. Net result: higher rate = larger Pareto set = higher density.",
+    "applicability_bounds": "Established for rates 50-100 req/s with 200 requests per simulation run. May not hold for extreme rates where all configs are throughput-limited (density might plateau or decrease). Also may not hold for models with much larger KV footprint where KV-stress is universally binding even at low rates.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-11",
+    "statement": "NSGA-II's convergence speed advantage over random search DECREASES with higher arrival rates in BLIS, and is non-monotonic across the rate=75 and rate=100 points. Convergence gap (evals to 95% of exhaustive HV): rate=50: 91 evals, rate=100: 57 evals, rate=75: 48 evals. The final HV gap also decreases: rate=50: 4.9%, rate=75: 2.12%, rate=100: 1.46%. Despite decreasing advantage, NSGA-II remains faster at reaching 95% of exhaustive HV across all tested rates (103 evals at rate=100, 112 at rate=75, vs ~160 for random at both rates), confirming portability of NSGA-II's direction-finding advantage.",
+    "confidence": "medium",
+    "regime": "BLIS 6-parameter 4-objective corrected space, pop=40, 4 gens, budget=200, rates 50-100 req/s",
+    "evidence": ["iteration-5-h-main", "iteration-6-h-main", "iteration-6-h-ablation"],
+    "contradicts": [],
+    "extraction_iteration": 6,
+    "mechanism": "Higher Pareto density at higher rates (RP-10) makes random search more competitive per eval (more expected Pareto hits per random sample). NSGA-II's exploitation advantage is most pronounced at low density (rate=50: 4.5%) because its crossover of good parents reliably produces offspring in the sparse 'safe band'. At higher density (6-7%), random sampling is also likely to hit Pareto-optimal regions, narrowing NSGA-II's lead. The non-monotonicity (rate=75 gap < rate=100 gap) suggests qualitative landscape differences across rates, not just quantitative density scaling.",
+    "applicability_bounds": "Based on single seeds (BLIS is deterministic, so seed=42 for evals, NSGA-II RNG seed=42, random RNG seed=43). The convergence gap values are estimates via interpolation between 40-eval checkpoints (±20 evals). Non-monotonicity at rate=75 could be specific to this landscape — treat the ordering rate=75 < rate=100 as 'within noise' rather than a strong claim until validated with additional rate points.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-3",
+    "statement": "In BLIS at rate=50 req/s with qwen/qwen3-14b on H100, the batch size threshold for tier-optimal performance is approximately max_num_running_reqs >= 256. Configs with batch < 256 show severely degraded TTFT (queueing-dominated regime), while batch >= 256 unlocks near-optimal TTFT for the GPU tier. This makes ~60% of within-tier configs (batch={256,512} out of {32,64,128,256,512}) Pareto-optimal within their GPU tier. This threshold has not been verified at rates > 50 req/s; at rate=100, the higher throughput demand may raise the effective threshold.",
+    "confidence": "medium",
+    "regime": "rate=50 req/s. Rate=100 behavior untested for batch threshold specifically.",
+    "evidence": ["iteration-4-h-main", "iteration-5-h-main"],
+    "contradicts": [],
+    "extraction_iteration": 6,
+    "mechanism": "Batch size determines maximum concurrent requests in execution. Under KV stress, smaller batches mean more requests queue behind KV-blocked slots. At rate=100, higher arrival rate means the queueing effect is exacerbated, potentially raising the threshold further.",
+    "applicability_bounds": "Established at rate=50. Rate=100 behavior for batch threshold is an open question for iter-7.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  }
+]

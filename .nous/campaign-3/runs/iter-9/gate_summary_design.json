@@ -1,0 +1,11 @@
+{
+  "gate_type": "design",
+  "summary": "Iteration 9 tests whether NSGA-II's convergence advantage over random search is causally driven by a sharp KV-memory threshold cliff in the fitness landscape. We measure Neighbor Dominance Rate (NDR) per parameter axis and compare NSGA-II vs random convergence gaps at rate=100 for Qwen3-14B (cliff present), Llama-3.1-8B (weaker cliff), and a cliff-free Qwen subspace (kv_blocks fixed at 10000).",
+  "key_points": [
+    "Robustness arm: Expects Qwen NDR > Llama NDR at rate=100, with kv_blocks being the highest per-axis NDR contributor for Qwen (confirming the structural sharpness mechanism from RP-14). Pareto density predicted at 5-8% for both models.",
+    "Main arm: Predicts Qwen NSGA-II convergence gap >= +31 evals (NSGA-II reaches 95% exhaustive HV faster than random), because rate=100 intensifies the KV cliff (122x TTFT ratio) giving crossover a stronger directional signal on the kv_blocks gene.",
+    "Ablation arm: Predicts Llama convergence gap remains negative (~-25 evals, random wins), because Llama's faster throughput disperses dominance relationships across axes, making no single gene reliably exploitable by crossover.",
+    "Negative control: With kv_blocks fixed at 10000 (cliff removed), Qwen's convergence gap should drop to ~0 or negative \u2014 directly confirming that the KV cliff is the causal mechanism behind NSGA-II's advantage. If NSGA-II still wins without the cliff, the landscape-structure hypothesis needs revision.",
+    "Key refutation criteria: If Qwen NDR <= Llama NDR, or kv_blocks is not the top-axis contributor, or the cliff-free subspace still shows strong NSGA-II advantage, the KV-cliff-as-causal-mechanism theory is wrong."
+  ]
+}

@@ -1,0 +1,72 @@
+[
+  {
+    "id": "RP-C2-6",
+    "statement": "At rate=2000 (H100, qwen3-14b), hierarchical Phase 1 search with max-throughput profile (batch=512, tokens=8192) reaches 95% of optimal throughput in exactly 14 evaluations regardless of workload seed. The number is deterministic: TP=4/2 is at index 13 in VALID_TP_INSTANCES ordering, and Phase 1 evaluates all tiers sequentially.",
+    "confidence": "high",
+    "regime": "rate=2000, qwen3-14b/H100, hierarchical Phase 1 with fixed VALID_TP_INSTANCES ordering",
+    "evidence": ["iteration-2-h-main", "iteration-2-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 2,
+    "mechanism": "VALID_TP_INSTANCES = [(tp=1,ni=1..8), (tp=2,ni=1..4), (tp=4,ni=1), (tp=4,ni=2), (tp=8,ni=1)]. TP=4/2 is at index 13 (0-based), so it is the 14th evaluation. With batch=512 (Phase 1 max-throughput profile), TP=4/2 gives 40,392 tok/s > 95% threshold of 38,373. The 14-eval determinism holds across seeds because Phase 1 uses a fixed secondary profile — only the BLIS workload varies, but the TP=4/2 advantage is structural at rate=2000.",
+    "applicability_bounds": "Applies when: (1) rate is high enough to create queue pressure in single-instance deployments (rate >> 500 req/s for qwen3-14b/H100), (2) the Phase 1 profile uses batch=512 (lower batch values may incorrectly rank TP=8/1 above TP=4/2). Does NOT apply at rate=50 where TP=8/1 dominates and is at index 14 (last), requiring 15 evals.",
+    "superseded_by": null,
+    "category": "search",
+    "status": "active"
+  },
+  {
+    "id": "RP-C2-7",
+    "statement": "Hierarchical search with fixed VALID_TP_INSTANCES tier ordering is structurally disadvantaged in regimes where the optimal tier has the highest TP (evaluated last in Phase 1). At rate=50, TP=8/1 (the optimal tier) is at the last position, making hierarchical the slowest strategy (15 evals) while random and NSGA-II can get lucky earlier.",
+    "confidence": "high",
+    "regime": "rate=50 (low saturation, TP=8/1 dominates), hierarchical search",
+    "evidence": ["iteration-2-h-control-negative"],
+    "contradicts": [],
+    "extraction_iteration": 2,
+    "mechanism": "VALID_TP_INSTANCES is ordered by increasing TP level: TP=1 (8 tiers), TP=2 (4 tiers), TP=4 (2 tiers), TP=8 (1 tier). At low rates where the single-instance high-TP configuration dominates, Phase 1 always finds the optimal tier at eval 15 (the last one). Random search finds TP=8/1 with probability 1/15 per trial, typically in ~10 trials. An adaptive Phase 1 ordering (e.g., evaluate highest-TP tiers first) would eliminate this weakness.",
+    "applicability_bounds": "Applies when the optimal tier is at a late position in the fixed VALID_TP_INSTANCES evaluation order. For high-rate regimes (rate=2000) where TP=4/2 is optimal (eval 14), the disadvantage is minimal (14 vs ~37 expected for random). The fix is to randomize or reverse-order Phase 1 evaluation.",
+    "superseded_by": null,
+    "category": "search",
+    "status": "active"
+  },
+  {
+    "id": "RP-C2-8",
+    "statement": "The true fraction of BLIS configurations above 95% of optimal throughput at rate=2000 is approximately 2.67% (2304/86400), not 0.017% as estimated from the single optimal config. This is because multiple tiers (TP=4/2 and TP=8/1) with batch=512 all meet the threshold, giving ~2304 qualifying configs across the full secondary-knob space.",
+    "confidence": "high",
+    "regime": "rate=2000, qwen3-14b/H100, 95% threshold of 40,392 tok/s",
+    "evidence": ["iteration-2-h-main"],
+    "contradicts": ["bundle prediction of 0.017% and 150+ evals for random search"],
+    "extraction_iteration": 2,
+    "mechanism": "The 95% threshold (38,373 tok/s) is met by both TP=4/2/batch=512 (~40,392) and TP=8/1/batch=512 (~38,591). Each tier has ~1152 qualifying secondary-knob combinations (any scheduler, tokens, prefill, block_size, routing, admission, preemption with batch=512). Total: 2×1152 = 2304 out of ~86,400 total configs = 2.67%. Random search with p=2.67% has expected evals = 37, consistent with observed 64 evals (within 2 standard deviations for geometric distribution).",
+    "applicability_bounds": "Applies to the specific 95% threshold relative to the known optimal. If the threshold is raised (e.g., 99%), the qualifying set shrinks to only TP=4/2/batch=512 with specific secondary knobs, making the search harder.",
+    "superseded_by": null,
+    "category": "search",
+    "status": "active"
+  },
+  {
+    "id": "RP-C2-9",
+    "statement": "NSGA-II (Optuna NSGAIISampler, population_size=20) does not provide reliable convergence speed advantages over hierarchical search for BLIS configuration optimization. Its apparent advantage at a single seed (evals_to_95pct=8 vs hierarchical=14) is explained by lucky random warmup sampling, not systematic evolutionary advantage.",
+    "confidence": "medium",
+    "regime": "rate=2000, qwen3-14b/H100, NSGA-II with population_size=20, seed=42",
+    "evidence": ["iteration-2-h-main"],
+    "contradicts": [],
+    "extraction_iteration": 2,
+    "mechanism": "NSGAIISampler's first population_size=20 trials are effectively random sampling. With p=2.67% of qualifying configs, P(hit threshold within 8 trials) ~19%. NSGA-II at seed=42 was in the lucky 19%. The evolutionary phase (after 20 trials) does not offer substantial advantage because: (1) the objective landscape has a clear batch-size dominant axis that random search already covers, and (2) the population diversity is quickly dominated by TP=4/2 high-batch configs. To confirm, NSGA-II should be run with multiple seeds; expected mean evals_to_95pct ~37 (same as random) or slightly better.",
+    "applicability_bounds": "Applies to NSGAIISampler with population_size=20 and seed=42. May differ for other seeds or population sizes. Multi-seed evaluation needed to confirm median/mean convergence speed.",
+    "superseded_by": null,
+    "category": "search",
+    "status": "active"
+  },
+  {
+    "id": "RP-C2-2",
+    "statement": "Phase 1 tier ranking in BLIS (identifying dominant TP×instances parallelism configurations by throughput) is perfectly stable across workload seeds. The same top-3 tiers are identified regardless of whether seed is 42, 123, or 456.",
+    "confidence": "high",
+    "regime": "rate=2000, qwen3-14b/H100, Phase 1 with batch=512 max-throughput profile",
+    "evidence": ["iteration-1-h-robustness", "iteration-2-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 2,
+    "mechanism": "The top-3 tier ranking (TP=4/2 > TP=8/1 > TP=2/4) at rate=2000 is structurally determined by queue dynamics: TP=4/2 distributes 2000 req/s across 2 instances (1000 req/s each), reducing scheduling delay from 6794ms (single-instance TP=8) to 142ms. This queue-pressure advantage is independent of workload seed which only affects request length distribution, not the queueing fundamental.",
+    "applicability_bounds": "Confirmed at rate=2000. RP-C2-2 was originally established at rate=50; now confirmed also at rate=2000. The stability holds across seeds at both rates, suggesting it is a robust property of BLIS queue dynamics.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  }
+]

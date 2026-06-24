@@ -1,0 +1,580 @@
+diff --git a/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-1/inputs/search_common.py b/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-1/inputs/search_common.py
+new file mode 100644
+index 00000000..db50ee25
+--- /dev/null
++++ b/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-1/inputs/search_common.py
+@@ -0,0 +1,255 @@
++"""
++Common parameter space definition, constraint validation, and evaluation logic
++for BLIS multi-objective configuration search.
++"""
++
++import json
++import os
++import random
++import subprocess
++import tempfile
++import time
++from pathlib import Path
++
++# Worktree directory where blis binary lives and where we can write temp files
++# inputs/ is at: .nous/campaign-3/runs/iter-1/inputs/ — 6 parents up = repo root
++BLIS_DIR = Path(__file__).parent.parent.parent.parent.parent.parent / ".nous-experiments" / "iter-1-01b1b82a"
++BLIS_BIN = BLIS_DIR / "blis"
++
++# Discrete parameter values
++PARAMS = {
++    "tp": [1, 2, 4, 8],
++    "num_instances": [1, 2, 3, 4, 5, 6, 7, 8],  # filtered by TP constraint
++    "scheduler": ["fcfs", "priority-fcfs", "sjf", "reverse-priority"],
++    "max_num_running_reqs": [32, 64, 128, 256, 512],
++    "max_num_scheduled_tokens": [2048, 4096, 8192],
++    "long_prefill_token_threshold": [0, 1024, 2048, 4096],
++    "block_size_in_tokens": [16, 32],
++    "routing_policy": ["round-robin", "least-loaded", "weighted"],
++    "routing_scorer_config": [
++        "precise-prefix-cache:2,queue-depth:1,kv-utilization:1",
++        "queue-depth:1,kv-utilization:1",
++        "precise-prefix-cache:2,load-balance:1",
++        "load-balance:1,kv-utilization:1",
++    ],
++    "admission_policy": ["always-admit", "tier-shed"],
++    "preemption_policy": ["fcfs", "priority"],
++    "gpu_memory_utilization": [0.85, 0.9, 0.95],
++}
++
++# Fixed parameters
++FIXED = {
++    "model": "qwen/qwen3-14b",
++    "hardware": "H100",
++    "latency_model": "trained-physics",
++    "num_requests": 100,
++    "rate": 20,
++    "seed": 42,
++}
++
++# Reference point for hypervolume (worst possible + margin)
++HV_REF = (0.0, 20000.0)  # (rps worst, ttft_p99 worst)
++
++# Temp directory for metrics output (must be inside worktree)
++METRICS_TMPDIR = BLIS_DIR / ".search_tmp"
++
++
++def ensure_tmp_dir():
++    METRICS_TMPDIR.mkdir(exist_ok=True)
++
++
++def is_valid_config(cfg):
++    """Check all constraints for a config dict."""
++    tp = cfg["tp"]
++    n = cfg["num_instances"]
++    lptt = cfg["long_prefill_token_threshold"]
++    mnst = cfg["max_num_scheduled_tokens"]
++    rp = cfg["routing_policy"]
++    rs = cfg["routing_scorer_config"]
++
++    # TP * instances <= 8
++    if tp * n > 8:
++        return False
++
++    # long_prefill_token_threshold < max_num_scheduled_tokens (or 0 = disabled)
++    if lptt != 0 and lptt >= mnst:
++        return False
++
++    # routing_scorer_config only valid when routing_policy == weighted
++    if rp != "weighted" and rs is not None:
++        return False
++
++    return True
++
++
++def random_valid_config(rng=None):
++    """Sample a uniformly random valid configuration."""
++    if rng is None:
++        rng = random
++    while True:
++        tp = rng.choice(PARAMS["tp"])
++        max_instances = 8 // tp
++        n = rng.randint(1, max_instances)
++        scheduler = rng.choice(PARAMS["scheduler"])
++        mnrr = rng.choice(PARAMS["max_num_running_reqs"])
++        mnst = rng.choice(PARAMS["max_num_scheduled_tokens"])
++
++        # long_prefill: pick from valid values (0 or < mnst)
++        valid_lptt = [v for v in PARAMS["long_prefill_token_threshold"] if v == 0 or v < mnst]
++        lptt = rng.choice(valid_lptt)
++
++        bs = rng.choice(PARAMS["block_size_in_tokens"])
++        rp = rng.choice(PARAMS["routing_policy"])
++        rs = rng.choice(PARAMS["routing_scorer_config"]) if rp == "weighted" else None
++        ap = rng.choice(PARAMS["admission_policy"])
++        pp = rng.choice(PARAMS["preemption_policy"])
++        gmu = rng.choice(PARAMS["gpu_memory_utilization"])
++
++        cfg = {
++            "tp": tp,
++            "num_instances": n,
++            "scheduler": scheduler,
++            "max_num_running_reqs": mnrr,
++            "max_num_scheduled_tokens": mnst,
++            "long_prefill_token_threshold": lptt,
++            "block_size_in_tokens": bs,
++            "routing_policy": rp,
++            "routing_scorer_config": rs,
++            "admission_policy": ap,
++            "preemption_policy": pp,
++            "gpu_memory_utilization": gmu,
++        }
++        return cfg  # constraint already guaranteed by construction
++
++
++def config_to_cmd(cfg, metrics_path):
++    """Build the blis run command for a config."""
++    cmd = [
++        str(BLIS_BIN),
++        "run",
++        "--model", FIXED["model"],
++        "--hardware", FIXED["hardware"],
++        "--latency-model", FIXED["latency_model"],
++        "--num-requests", str(FIXED["num_requests"]),
++        "--rate", str(FIXED["rate"]),
++        "--seed", str(FIXED["seed"]),
++        "--tp", str(cfg["tp"]),
++        "--num-instances", str(cfg["num_instances"]),
++        "--scheduler", cfg["scheduler"],
++        "--max-num-running-reqs", str(cfg["max_num_running_reqs"]),
++        "--max-num-scheduled-tokens", str(cfg["max_num_scheduled_tokens"]),
++        "--long-prefill-token-threshold", str(cfg["long_prefill_token_threshold"]),
++        "--block-size-in-tokens", str(cfg["block_size_in_tokens"]),
++        "--preemption-policy", cfg["preemption_policy"],
++        "--gpu-memory-utilization", str(cfg["gpu_memory_utilization"]),
++        "--metrics-path", str(metrics_path),
++    ]
++    # Only add routing/admission for multi-instance
++    if cfg["num_instances"] > 1:
++        cmd += ["--routing-policy", cfg["routing_policy"]]
++        if cfg["routing_policy"] == "weighted" and cfg["routing_scorer_config"]:
++            cmd += ["--routing-scorer-config", cfg["routing_scorer_config"]]
++        cmd += ["--admission-policy", cfg["admission_policy"]]
++    return cmd
++
++
++_eval_counter = 0
++
++
++def evaluate(cfg):
++    """Run BLIS for a config and return (rps, ttft_p99) or None on failure."""
++    global _eval_counter
++    _eval_counter += 1
++    ensure_tmp_dir()
++    metrics_path = METRICS_TMPDIR / f"eval_{_eval_counter}_{os.getpid()}.json"
++    cmd = config_to_cmd(cfg, metrics_path)
++    try:
++        result = subprocess.run(
++            cmd,
++            capture_output=True,
++            text=True,
++            timeout=30,
++            cwd=str(BLIS_DIR),
++        )
++        if result.returncode != 0:
++            return None
++        with open(metrics_path) as f:
++            data = json.load(f)
++        return (data["responses_per_sec"], data["ttft_p99_ms"])
++    except Exception:
++        return None
++    finally:
++        try:
++            metrics_path.unlink(missing_ok=True)
++        except Exception:
++            pass
++
++
++def pareto_front(points):
++    """
++    Compute Pareto front from list of (rps, ttft_p99) tuples.
++    Maximizing rps, minimizing ttft_p99.
++    Returns list of non-dominated points.
++    """
++    dominated = set()
++    n = len(points)
++    for i in range(n):
++        if i in dominated:
++            continue
++        for j in range(n):
++            if i == j or j in dominated:
++                continue
++            # j dominates i if j is at least as good on all objectives and strictly better on one
++            # Better: higher rps AND lower ttft_p99
++            if points[j][0] >= points[i][0] and points[j][1] <= points[i][1]:
++                if points[j][0] > points[i][0] or points[j][1] < points[i][1]:
++                    dominated.add(i)
++                    break
++    return [points[i] for i in range(n) if i not in dominated]
++
++
++def hypervolume_2d(front, ref=HV_REF):
++    """
++    Compute 2D hypervolume indicator for a Pareto front.
++    Maximizing objective 0 (rps), minimizing objective 1 (ttft_p99).
++    ref = (rps_min, ttft_p99_max) — the worst reference point.
++
++    Hypervolume = area dominated by front but not by reference point.
++    We maximize rps (obj0) and minimize ttft_p99 (obj1).
++    Transform: maximize obj0, maximize (-obj1).
++    ref in transformed space: (ref[0], -ref[1]) = (0, -20000)
++    """
++    if not front:
++        return 0.0
++    # Transform to maximization problem
++    # obj0: rps (maximize), obj1: -ttft_p99 (maximize, since we minimize ttft_p99)
++    transformed = [(p[0], -p[1]) for p in front]
++    ref_t = (ref[0], -ref[1])  # (0, 20000) in maximization space
++
++    # Filter dominated by reference
++    valid = [(x, y) for x, y in transformed if x > ref_t[0] and y > ref_t[1]]
++    if not valid:
++        return 0.0
++
++    # Sort by first objective descending
++    valid.sort(key=lambda p: p[0], reverse=True)
++
++    hv = 0.0
++    prev_y = ref_t[1]
++    for x, y in valid:
++        if y > prev_y:
++            hv += (x - ref_t[0]) * (y - prev_y)
++            prev_y = y
++    return hv
++
++
++def config_key(cfg):
++    """Hashable key for deduplication."""
++    return (
++        cfg["tp"], cfg["num_instances"], cfg["scheduler"],
++        cfg["max_num_running_reqs"], cfg["max_num_scheduled_tokens"],
++        cfg["long_prefill_token_threshold"], cfg["block_size_in_tokens"],
++        cfg["routing_policy"], cfg["routing_scorer_config"],
++        cfg["admission_policy"], cfg["preemption_policy"],
++        cfg["gpu_memory_utilization"],
++    )
+diff --git a/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-1/inputs/search_nsga2.py b/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-1/inputs/search_nsga2.py
+new file mode 100644
+index 00000000..b64c47ba
+--- /dev/null
++++ b/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-1/inputs/search_nsga2.py
+@@ -0,0 +1,313 @@
++"""
++h-main: NSGA-II evolutionary search over BLIS configuration space.
++Population size=50, 10 generations, 500 total evaluations.
++Discrete crossover/mutation operators, constraint-aware offspring generation.
++"""
++
++import json
++import random
++import sys
++import time
++from copy import deepcopy
++from pathlib import Path
++
++sys.path.insert(0, str(Path(__file__).parent))
++from search_common import (
++    PARAMS, random_valid_config, evaluate, pareto_front, hypervolume_2d,
++    config_key, is_valid_config, HV_REF
++)
++
++RESULTS_DIR = Path(__file__).parent.parent / "results" / "h-main"
++POP_SIZE = 50
++N_GENERATIONS = 10
++SEED = 42000
++MUTATION_RATE = 0.2
++
++
++def non_dominated_sort(pop_with_obj):
++    """
++    Sort population into Pareto fronts (NSGA-II non-dominated sorting).
++    pop_with_obj: list of (cfg, (rps, ttft_p99))
++    Returns list of fronts (each front is list of indices).
++    """
++    n = len(pop_with_obj)
++    dominated_by = [0] * n  # domination count
++    dominates = [[] for _ in range(n)]  # whom i dominates
++    fronts = [[]]
++
++    for i in range(n):
++        for j in range(n):
++            if i == j:
++                continue
++            ri, ti = pop_with_obj[i][1]
++            rj, tj = pop_with_obj[j][1]
++            # j dominates i: j >= i on all objectives and strictly better on one
++            # maximize rps, minimize ttft
++            if rj >= ri and tj <= ti and (rj > ri or tj < ti):
++                dominated_by[i] += 1
++            elif ri >= rj and ti <= tj and (ri > rj or ti < tj):
++                dominates[i].append(j)
++
++        if dominated_by[i] == 0:
++            fronts[0].append(i)
++
++    i = 0
++    while fronts[i]:
++        next_front = []
++        for p in fronts[i]:
++            for q in dominates[p]:
++                dominated_by[q] -= 1
++                if dominated_by[q] == 0:
++                    next_front.append(q)
++        i += 1
++        fronts.append(next_front)
++
++    return [f for f in fronts if f]
++
++
++def crowding_distance(front_indices, pop_with_obj):
++    """Compute crowding distance for individuals in a front."""
++    n = len(front_indices)
++    if n <= 2:
++        return {idx: float('inf') for idx in front_indices}
++
++    distances = {idx: 0.0 for idx in front_indices}
++    objectives = [(pop_with_obj[idx][1][0], pop_with_obj[idx][1][1]) for idx in front_indices]
++
++    for obj_i in range(2):
++        # Sort by this objective
++        sorted_front = sorted(range(n), key=lambda k: objectives[k][obj_i])
++        obj_vals = [objectives[sorted_front[k]][obj_i] for k in range(n)]
++        obj_range = obj_vals[-1] - obj_vals[0]
++        if obj_range == 0:
++            continue
++
++        distances[front_indices[sorted_front[0]]] = float('inf')
++        distances[front_indices[sorted_front[-1]]] = float('inf')
++
++        for k in range(1, n - 1):
++            distances[front_indices[sorted_front[k]]] += (
++                (obj_vals[k + 1] - obj_vals[k - 1]) / obj_range
++            )
++
++    return distances
++
++
++def tournament_select(pop_with_obj, fronts, crowd_dist, rng):
++    """Binary tournament selection by rank then crowding distance."""
++    n = len(pop_with_obj)
++    # Build rank and distance maps
++    rank = {}
++    for r, front in enumerate(fronts):
++        for idx in front:
++            rank[idx] = r
++
++    candidates = [rng.randrange(n), rng.randrange(n)]
++    a, b = candidates
++    if rank[a] < rank[b]:
++        return pop_with_obj[a][0]
++    elif rank[b] < rank[a]:
++        return pop_with_obj[b][0]
++    else:
++        if crowd_dist.get(a, 0) >= crowd_dist.get(b, 0):
++            return pop_with_obj[a][0]
++        else:
++            return pop_with_obj[b][0]
++
++
++def crossover(p1, p2, rng):
++    """Uniform discrete crossover between two parent configs."""
++    child = {}
++    for key in p1:
++        child[key] = p1[key] if rng.random() < 0.5 else p2[key]
++    return child
++
++
++def mutate(cfg, rng):
++    """Randomly mutate one parameter of the config."""
++    child = deepcopy(cfg)
++    param = rng.choice(list(PARAMS.keys()))
++
++    if param == "tp":
++        child["tp"] = rng.choice(PARAMS["tp"])
++    elif param == "num_instances":
++        max_n = 8 // child["tp"]
++        child["num_instances"] = rng.randint(1, max_n)
++    elif param == "scheduler":
++        child["scheduler"] = rng.choice(PARAMS["scheduler"])
++    elif param == "max_num_running_reqs":
++        child["max_num_running_reqs"] = rng.choice(PARAMS["max_num_running_reqs"])
++    elif param == "max_num_scheduled_tokens":
++        child["max_num_scheduled_tokens"] = rng.choice(PARAMS["max_num_scheduled_tokens"])
++    elif param == "long_prefill_token_threshold":
++        valid = [v for v in PARAMS["long_prefill_token_threshold"]
++                 if v == 0 or v < child["max_num_scheduled_tokens"]]
++        child["long_prefill_token_threshold"] = rng.choice(valid)
++    elif param == "block_size_in_tokens":
++        child["block_size_in_tokens"] = rng.choice(PARAMS["block_size_in_tokens"])
++    elif param == "routing_policy":
++        child["routing_policy"] = rng.choice(PARAMS["routing_policy"])
++    elif param == "routing_scorer_config":
++        if child["routing_policy"] == "weighted":
++            child["routing_scorer_config"] = rng.choice(PARAMS["routing_scorer_config"])
++    elif param == "admission_policy":
++        child["admission_policy"] = rng.choice(PARAMS["admission_policy"])
++    elif param == "preemption_policy":
++        child["preemption_policy"] = rng.choice(PARAMS["preemption_policy"])
++    elif param == "gpu_memory_utilization":
++        child["gpu_memory_utilization"] = rng.choice(PARAMS["gpu_memory_utilization"])
++
++    return child
++
++
++def repair(cfg, rng):
++    """Fix constraint violations in a config after crossover/mutation."""
++    # TP * instances <= 8
++    max_n = 8 // cfg["tp"]
++    if cfg["num_instances"] > max_n:
++        cfg["num_instances"] = rng.randint(1, max_n)
++
++    # long_prefill constraint
++    if cfg["long_prefill_token_threshold"] != 0:
++        if cfg["long_prefill_token_threshold"] >= cfg["max_num_scheduled_tokens"]:
++            valid = [v for v in PARAMS["long_prefill_token_threshold"]
++                     if v == 0 or v < cfg["max_num_scheduled_tokens"]]
++            cfg["long_prefill_token_threshold"] = rng.choice(valid)
++
++    # scorer config only valid for weighted routing
++    if cfg["routing_policy"] != "weighted":
++        cfg["routing_scorer_config"] = None
++
++    return cfg
++
++
++def run():
++    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
++    rng = random.Random(SEED)
++    t_start = time.time()
++    total_evals = 0
++    generation_hv = []
++
++    print(f"[nsga2] Starting NSGA-II: pop={POP_SIZE}, gen={N_GENERATIONS}", flush=True)
++
++    # Initialize population
++    print(f"[nsga2] Initializing population...", flush=True)
++    population = []  # list of (cfg, (rps, ttft_p99))
++    seen = set()
++    while len(population) < POP_SIZE:
++        cfg = random_valid_config(rng)
++        key = config_key(cfg)
++        if key in seen:
++            continue
++        seen.add(key)
++        obj = evaluate(cfg)
++        total_evals += 1
++        if obj is None:
++            continue
++        population.append((cfg, obj))
++
++    print(f"[nsga2] Population initialized ({total_evals} evals)", flush=True)
++
++    # Record gen 0 hypervolume
++    front0 = pareto_front([p[1] for p in population])
++    hv0 = hypervolume_2d(front0, HV_REF)
++    generation_hv.append({"generation": 0, "evals": total_evals, "hv": hv0, "front_size": len(front0)})
++    print(f"[nsga2] Gen 0: hv={hv0:.4f}, front_size={len(front0)}", flush=True)
++
++    for gen in range(1, N_GENERATIONS + 1):
++        # Build fronts and crowding distances for selection
++        fronts = non_dominated_sort(population)
++        crowd_dist = {}
++        for front in fronts:
++            cd = crowding_distance(front, population)
++            crowd_dist.update(cd)
++
++        # Generate offspring
++        offspring = []
++        attempts = 0
++        while len(offspring) < POP_SIZE and attempts < POP_SIZE * 20:
++            attempts += 1
++            p1 = tournament_select(population, fronts, crowd_dist, rng)
++            p2 = tournament_select(population, fronts, crowd_dist, rng)
++
++            child = crossover(p1, p2, rng)
++            if rng.random() < MUTATION_RATE:
++                child = mutate(child, rng)
++            child = repair(child, rng)
++
++            if not is_valid_config(child):
++                continue
++            key = config_key(child)
++            if key in seen:
++                continue
++            seen.add(key)
++
++            obj = evaluate(child)
++            total_evals += 1
++            if obj is None:
++                continue
++            offspring.append((child, obj))
++
++        # Combine parent + offspring, select next generation
++        combined = population + offspring
++        combined_fronts = non_dominated_sort(combined)
++
++        next_pop = []
++        for front in combined_fronts:
++            if len(next_pop) + len(front) <= POP_SIZE:
++                for idx in front:
++                    next_pop.append(combined[idx])
++            else:
++                # Fill remaining with highest crowding distance
++                cd = crowding_distance(front, combined)
++                remaining = POP_SIZE - len(next_pop)
++                sorted_front = sorted(front, key=lambda i: cd.get(i, 0), reverse=True)
++                for idx in sorted_front[:remaining]:
++                    next_pop.append(combined[idx])
++                break
++
++        population = next_pop
++
++        front_pts = pareto_front([p[1] for p in population])
++        hv = hypervolume_2d(front_pts, HV_REF)
++        generation_hv.append({"generation": gen, "evals": total_evals, "hv": hv, "front_size": len(front_pts)})
++        print(f"[nsga2] Gen {gen}: hv={hv:.4f}, front_size={len(front_pts)}, total_evals={total_evals}", flush=True)
++
++    elapsed = time.time() - t_start
++
++    # Final Pareto front
++    all_points = [p[1] for p in population]
++    final_front = pareto_front(all_points)
++    final_hv = hypervolume_2d(final_front, HV_REF)
++
++    summary = {
++        "arm": "h-main",
++        "method": "nsga2",
++        "pop_size": POP_SIZE,
++        "n_generations": N_GENERATIONS,
++        "total_evals": total_evals,
++        "pareto_front_size": len(final_front),
++        "hypervolume": final_hv,
++        "hypervolume_ref": list(HV_REF),
++        "elapsed_s": elapsed,
++        "generation_hypervolume": generation_hv,
++        "pareto_front": sorted(final_front, key=lambda p: p[0]),
++        "all_points": [[p[1][0], p[1][1]] for p in population],
++        "best_rps": max(p[1][0] for p in population) if population else 0,
++        "best_ttft": min(p[1][1] for p in population) if population else 0,
++    }
++
++    out_path = RESULTS_DIR / "summary.json"
++    with open(out_path, "w") as f:
++        json.dump(summary, f, indent=2)
++
++    print(f"\n[nsga2] Done. {total_evals} evals in {elapsed:.1f}s")
++    print(f"[nsga2] Final Pareto front: {len(final_front)} points, hypervolume={final_hv:.4f}")
++    print(f"[nsga2] Best rps={summary['best_rps']:.2f}, best ttft_p99={summary['best_ttft']:.1f}ms")
++    print(f"[nsga2] Generation HV progression: {[g['hv'] for g in generation_hv]}")
++    print(f"[nsga2] Results written to {out_path}")
++    return summary
++
++
++if __name__ == "__main__":
++    run()

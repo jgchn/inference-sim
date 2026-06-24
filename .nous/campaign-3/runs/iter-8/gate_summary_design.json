@@ -1,0 +1,10 @@
+{
+  "gate_type": "design",
+  "summary": "This iteration tests whether Pareto density (% of configs on the Pareto frontier) is a universal predictor of the NSGA-II vs random search convergence gap, regardless of whether density variation comes from model architecture or arrival rate. We run exhaustive + algorithmic search on two new conditions (Qwen3-14B at rate=75, Llama-3.1-8B at rate=75) to add two more data points to the density\u2192gap relationship established in prior iterations.",
+  "key_points": [
+    "h-robustness: Predicts both models at rate=75 will have higher Pareto density than at rate=50 (Qwen >4.5%, Llama >5.33%), confirming that increased arrival rate universally expands Pareto frontiers via queueing pressure \u2014 diagnostic checks whether Llama's faster processing means rate=75 isn't stressful enough.",
+    "h-main: Predicts Qwen3-14B at rate=75 (expected ~6.06% density) will show a NEGATIVE convergence gap (random reaches 95% HV before NSGA-II by 10+ evals), reversing the +4.6 eval gap seen at rate=50 \u2014 refuted if NSGA-II is still faster, suggesting sharper gradient structure at higher load.",
+    "h-ablation: Predicts Llama-3.1-8B at rate=75 will also show a negative gap (comparable to its rate=50 gap of -22.9 evals), and that all four data points (2 models \u00d7 2 rates) will lie on a single monotonically decreasing density\u2192gap curve \u2014 confirming density as the sole predictor independent of model or rate.",
+    "Confirmation criteria: All four (density, gap) points should be monotonically decreasing; density increases at rate=75 for both models; gap sign flips or becomes more negative as density crosses ~5-6%. Refutation: if model identity is an independent predictor (points don't align on one curve) or if density doesn't increase for Llama at rate=75."
+  ]
+}

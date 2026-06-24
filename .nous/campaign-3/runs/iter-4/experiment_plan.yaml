@@ -1,0 +1,49 @@
+metadata:
+  iteration: 4
+  bundle_ref: "runs/iter-4/bundle.yaml"
+  description: >
+    Tests whether removing non-differentiating parameters from the search space
+    amplifies NSGA-II's convergence speed advantage over random search.
+    Reduced space: 5 params (900 configs). Full space: 9 params (25200 configs).
+    Reference point (0, 50000, 9, 11000). Objectives: max rps, min ttft_p99, min gpu_count, min total_kv_blocks.
+
+setup:
+  - cmd: "go build -o blis main.go"
+    description: "Build blis binary in worktree"
+
+arms:
+  - arm_id: "h-robustness"
+    conditions:
+      - name: "exhaustive-900-seed42"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-4-e8e26794 && BLIS_BIN=$(pwd)/blis python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-4/inputs/search_exhaustive.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-4/results/h-robustness/pareto_front.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-4/inputs/search_exhaustive.py"
+        description: "Exhaustive sweep of all 900 reduced-space configs. Fixed: block_size=16, routing=round-robin, gpu_mem=0.9. Swept: tp=[1,2,4,8], num_instances=range(1,8//tp+1), scheduler=[fcfs,sjf], max_num_running_reqs=[32,64,128,256,512], total_kv_blocks=[2000,3000,4000,5000,7500,10000]."
+
+  - arm_id: "h-main"
+    conditions:
+      - name: "nsga2-reduced-pop40-gen4-seed42"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-4-e8e26794 && BLIS_BIN=$(pwd)/blis python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-4/inputs/search_nsga2_reduced.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-4/results/h-main/pareto_front.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-4/inputs/search_nsga2_reduced.py"
+        description: "NSGA-II on reduced 5-param space. pop=40, 4 generations (40 init + 4x40 = 200 total evals). Crossover: uniform per-gene p=0.5. Mutation: 15% per-gene. Track HV every 40 evals vs exhaustive reference HV."
+
+  - arm_id: "h-control-negative"
+    conditions:
+      - name: "random-reduced-200evals-seed42"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-4-e8e26794 && BLIS_BIN=$(pwd)/blis python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-4/inputs/search_random_reduced.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-4/results/h-control-negative/pareto_front.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-4/inputs/search_random_reduced.py"
+        description: "Uniform random search on reduced 5-param space. 200 evals, seed=42. Track HV every 40 evals vs exhaustive reference HV."
+
+  - arm_id: "h-ablation"
+    conditions:
+      - name: "nsga2-full-pop40-gen4-seed42"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-4-e8e26794 && BLIS_BIN=$(pwd)/blis python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-4/inputs/search_nsga2_full.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-4/results/h-ablation/pareto_front.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-4/inputs/search_nsga2_full.py"
+        description: "NSGA-II on full 9-param space (25200 configs). pop=40, 4 generations, 200 total evals. Full space adds block_size=[16,32], routing_policy=[round-robin,least-loaded,weighted], routing_scorers=[4 options], gpu_memory_utilization=[0.85,0.9,0.95]. Crossover: uniform per-gene p=0.5. Mutation: 15% per-gene."

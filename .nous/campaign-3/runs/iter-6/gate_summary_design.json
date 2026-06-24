@@ -1,0 +1,9 @@
+{
+  "gate_type": "design",
+  "summary": "We are testing whether NSGA-II's convergence advantage over random search (established at arrival rate=50 in iteration 5) generalizes to higher load intensities (rate=100) and whether the advantage grows monotonically with load. This iteration runs exhaustive sweeps and algorithm comparisons at rate=75 and rate=100 to characterize how saturation pressure reshapes the Pareto landscape and algorithm performance.",
+  "key_points": [
+    "Four arms: (1) h-robustness: exhaustive sweep at rate=100 to measure Pareto density (predicted \u22644.5%, down from 4.5% at rate=50) and confirm the front concentrates in high-TP + block_size=32 configs; (2) h-main: NSGA-II vs random at rate=100, predicting NSGA-II reaches 95% exhaustive HV within 200 evals with \u226560-eval convergence gap and \u22654.9% final HV gap over random; (3) h-control-negative: random at rate=100 predicted to plateau at 91-95% HV within 200 evals; (4) h-ablation: rate=75 intermediate point to confirm monotonic relationship between load intensity and NSGA-II advantage.",
+    "Confirmation criteria: Pareto density at rate=100 \u2264 4.5%, NSGA-II convergence gap \u2265 60 evals at rate=100, rate=75 gap falls between rate=50 (~91 evals) and rate=100 values, and random fails to reach 95% HV within budget at rate=100.",
+    "Key refutation signals: If Pareto density INCREASES at rate=100 (new tradeoff dimensions emerge), if convergence gap shrinks (landscape becomes 'binary' with no exploitable gradients), or if rate=75 produces a non-monotonic result \u2014 any of these would challenge the causal model that higher load \u2192 sparser Pareto front \u2192 larger directed-search advantage."
+  ]
+}

@@ -1,0 +1,38 @@
+metadata:
+  iteration: 4
+  bundle_ref: "runs/iter-4/bundle.yaml"
+
+setup:
+  - cmd: "go build -o blis main.go"
+    description: "Build BLIS binary in worktree"
+  - cmd: "git apply /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-4/patches/h-main.patch"
+    description: "Apply search_blis_iter9.py patch"
+
+arms:
+  - arm_id: "h-main"
+    conditions:
+      - name: "a100-bracket-k1-seed42"
+        cmd: "python3 search_blis_iter9.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware A100-SXM --blis-seeds 42 --seeds 42,43,44,45,46 --rate 500 --num-requests 1000 --model qwen/qwen3-14b --budget 100 --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-4/results/h-main/a100_bracket_k1.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-4/results/h-main/a100_bracket_k1.json"
+        inputs: []
+
+  - arm_id: "h-robustness"
+    conditions:
+      - name: "a100-multi-seed-bracket-k1"
+        cmd: "python3 search_blis_iter9.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware A100-SXM --blis-seeds 42,43,44,45,46 --seeds 42,43,44,45,46 --rate 500 --num-requests 1000 --model qwen/qwen3-14b --budget 100 --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-4/results/h-robustness/a100_multi_seed.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-4/results/h-robustness/a100_multi_seed.json"
+        inputs: []
+
+  - arm_id: "h-ablation"
+    conditions:
+      - name: "a100-tpe-tight-margin-seed42"
+        cmd: "python3 search_blis_iter9.py --strategy tpe --hardware A100-SXM --blis-seeds 42 --seeds 42,43,44,45,46 --rate 500 --num-requests 1000 --model qwen/qwen3-14b --budget 100 --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-4/results/h-ablation/a100_tpe_tight.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-4/results/h-ablation/a100_tpe_tight.json"
+        inputs: []
+
+  - arm_id: "h-control-negative"
+    conditions:
+      - name: "a100-tpe-wide-margin-seed46"
+        cmd: "python3 search_blis_iter9.py --strategy tpe --hardware A100-SXM --blis-seeds 46 --seeds 42,43,44,45,46 --rate 500 --num-requests 1000 --model qwen/qwen3-14b --budget 100 --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-4/results/h-control-negative/a100_tpe_wide.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-4/results/h-control-negative/a100_tpe_wide.json"
+        inputs: []

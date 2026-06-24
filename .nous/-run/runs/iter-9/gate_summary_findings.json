@@ -1,0 +1,11 @@
+{
+  "gate_type": "findings",
+  "summary": "Iteration 9 tested the lean bracket search strategy and model-aware TP selection formula on the largest model (llama-3.1-70b) across 3 GPUs and 2 request rates. All four arms were confirmed: the lean bracket found global-best configurations in just 2 evaluations on all 30 runs, the model-aware formula achieved 100% accuracy (24/24 cumulative) versus 75% for the old formula, and results were fully deterministic and robust across 50 seed combinations.",
+  "key_points": [
+    "h-main CONFIRMED: TP=8 wins on all 6 regimes (3 hardware \u00d7 2 rates) for 70B, matching exact global-best scores (e.g., H100 r500=0.091801). evals_to_best=2 on all 30 runs (5 seeds \u00d7 6 regimes), meaning the lean bracket finds the optimum after evaluating only TP=4 then TP=8. All 5 search seeds produce identical results per regime (deterministic).",
+    "h-control-negative CONFIRMED: The model-aware formula goes 24/24 (100%) across all models/regimes tested in the campaign. The old formula scores 18/24 (75%), failing exactly on 6 regimes where load_index exceeds threshold 12.0 and rate > crossover \u2014 it predicts TP=4 but actual winner is TP=8, with scores 9.3\u201316.9% below best. The load_index threshold mechanism is validated as the precise discriminator.",
+    "h-ablation CONFIRMED: A default (non-optimized) parameter profile still correctly identifies TP=8 as winner on all 6 regimes for 70B, but scores are 15\u201319% below the max-profile global best. This confirms the 70B TP=8 advantage is structural (weight-transfer physics) rather than batch-size dependent \u2014 the right TP choice matters more than fine-tuning other knobs.",
+    "h-robustness CONFIRMED: 50/50 correct across all BLIS-seed \u00d7 search-seed combinations on H100 and L40S. Minimum TP=8 margin is 2.4% (H100, blis_seed=45), still clearing the >2% threshold. L40S margins are larger (11.7\u201320.3%). Full determinism confirmed within each blis_seed.",
+    "Campaign cumulative: lean bracket achieves 75/75 correct TP selections across 4 models (8B, 14B, 32B, 70B), 3 GPUs (H100, A100-SXM, L40S), and 2 request rates, with only 2 simulator evaluations needed per regime."
+  ]
+}

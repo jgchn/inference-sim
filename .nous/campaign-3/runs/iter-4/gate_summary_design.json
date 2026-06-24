@@ -1,0 +1,9 @@
+{
+  "gate_type": "design",
+  "summary": "This experiment tests whether removing 4 non-differentiating parameters (routing, block_size, gpu_memory_utilization, and redundant batch sizes) from the BLIS search space \u2014 shrinking it from ~25,200 to 900 configurations \u2014 makes NSGA-II converge measurably faster than random search, by ensuring every crossover/mutation event modifies a fitness-relevant gene.",
+  "key_points": [
+    "Four arms: (1) Exhaustive sweep of all 900 reduced-space configs to establish ground-truth Pareto front and measure its density (predicted 8-25%), (2) NSGA-II on reduced space (predicted to hit 95% of exhaustive HV by eval=80), (3) Random search on reduced space (predicted to hit 95% HV only at eval\u2265160), (4) NSGA-II on full 9-param space as ablation (predicted 95% HV at eval=120, matching iter-3).",
+    "Confirmation criteria: NSGA-II on reduced space reaches \u226593% exhaustive hypervolume at eval=80 while random reaches \u226488% \u2014 a convergence gap larger than the 40-eval difference observed in iteration 3. The exhaustive Pareto front should span 4 GPU-count tiers with genuine within-tier tradeoffs from kv_blocks cliff effects.",
+    "Key risks to monitor: If Pareto density exceeds 25% or the 900-config space is small enough that 200 random samples (22% coverage) trivially find most Pareto points, the convergence gap will be negligible \u2014 diagnostics include checking batch-size collapse and whether kv_blocks intermediate values are always dominated."
+  ]
+}

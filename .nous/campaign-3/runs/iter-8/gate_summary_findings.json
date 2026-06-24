@@ -1,0 +1,11 @@
+{
+  "gate_type": "findings",
+  "summary": "The central hypothesis that Pareto density universally predicts whether NSGA-II or random search converges faster is REFUTED. Model architecture is the dominant factor: Qwen3-14B consistently favors NSGA-II (gaps of +4.6 and +31.0 evals) while Llama-3.1-8B consistently favors random search (gaps of -22.9 and -25.3 evals), regardless of density level or request rate.",
+  "key_points": [
+    "h-main REFUTED: At Qwen rate=75 (density 6.06%), NSGA-II reached 95% HV 31 evals faster than random \u2014 prediction was that random would be faster by 10+ evals due to high density reducing NSGA-II's advantage.",
+    "h-robustness PARTIALLY CONFIRMED: RP-10 (density increases with rate) held for Qwen (4.5%\u21926.06%) but failed for Llama (5.33%\u21924.83%), showing the pattern is model-dependent not universal.",
+    "h-ablation PARTIALLY CONFIRMED: Llama at rate=75 correctly showed random beating NSGA-II by 25.3 evals, but the four data points across both models cannot form a single density\u2192gap curve \u2014 Qwen's gap moved in the opposite direction from what the theory predicts.",
+    "Key insight: The four (density, gap) data points cluster by MODEL not by density value. Qwen always shows positive gaps (NSGA-II wins), Llama always shows negative gaps (random wins). Architecture creates fundamentally different optimization landscape structures that dominate over density effects.",
+    "Practical implication for BLIS optimization: Algorithm selection (NSGA-II vs random) should be conditioned on model architecture and landscape structure, not on a single summary statistic like Pareto density."
+  ]
+}

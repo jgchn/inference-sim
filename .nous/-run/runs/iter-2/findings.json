@@ -1,0 +1,41 @@
+{
+  "iteration": 2,
+  "bundle_ref": "runs/iter-2/bundle.yaml",
+  "arms": [
+    {
+      "arm_type": "h-main",
+      "predicted": "Bracket K=1 on L40S hard llama achieves 5/5 Phase 1 correct identification of TP=4/2inst on all 5 search seeds. evals_to_best=3 on all seeds, matching the H100/A100 result despite L40S's tighter TP margin (2.1%). Phase 1 max-profile scores: TP=1=0.0673, TP=2=0.0898, TP=4=0.1097, TP=8=0.1074. The 1% threshold (0.99*0.109668=0.108571) is crossed at eval 3.",
+      "observed": "5/5 search seeds (42-46) correctly select TP=4/2inst. Phase 1 max-profile scores (identical across all search seeds since bracket is deterministic): TP1=0.0673, TP2=0.0898, TP4=0.1097, TP8=0.1074. evals_to_best=3 on all 5 seeds. best_score=0.109668 on all 5 seeds. Wall time: ~22-25s per seed at ~250ms/eval on L40S.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "Exact match to prediction. Phase 1 scores match probed values precisely. The 2.1% TP=4 vs TP=8 margin on L40S is sufficient for correct Phase 1 identification. The bracket max profile correctly discriminates despite the tight margin."
+    },
+    {
+      "arm_type": "h-robustness",
+      "predicted": "Bracket K=1 on H100 hard llama achieves 5/5 Phase 1 correct identification of TP=4/2inst at EACH of 5 blis_seeds (42-46), for 25/25 total. evals_to_best=3 at each blis_seed. TP=4 margins: seed=42 7.6%, seed=43 9.1%, seed=44 7.6%, seed=45 9.5%, seed=46 9.1%. All Phase 1 TP=4 scores exceed the 1% threshold (0.207103).",
+      "observed": "25/25 (blis_seed x search_seed) combinations correctly select TP=4/2inst. Phase 1 TP4 max-profile scores per blis_seed: seed=42: 0.2089, seed=43: 0.2128, seed=44: 0.2101, seed=45: 0.2184, seed=46: 0.2161. All exceed threshold 0.207103. evals_to_best=3 on all 25 runs. Per-seed best scores: seed=42=0.209195, seed=43=0.212830, seed=44=0.211395, seed=45=0.218440, seed=46=0.216795. Phase 2 TPE finds better configs than Phase 1 for seeds 43-46, confirming Phase 2 adds value beyond Phase 1.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "Perfect match. 25/25 correct with evals_to_best=3 at every (blis_seed, search_seed). Seeds 43-46 find actual best scores above the seed=42 global best (0.209195), confirming that using seed=42 as threshold baseline is conservative. H100's 7.6-9.5% TP=4 margin provides robust buffer against workload variation."
+    },
+    {
+      "arm_type": "h-control-negative",
+      "predicted": "Bracket-min-only (K=1, min profile: mr=32, mt=2048, pf=0) on L40S hard llama selects the WRONG Phase 1 winner (TP=2/4inst) on 5/5 seeds. Phase 2 TPE within TP=2/4inst is trapped, achieving best_score below 1% threshold (0.108571).",
+      "observed": "5/5 seeds select TP=2/4inst (wrong winner). Phase 1 min-profile scores: TP1=0.0428, TP2=0.0475, TP4=0.0468, TP8=0.0425. evals_to_best=101 (never found) on all 5 seeds. Best scores: 0.091693 (seeds 42-45), 0.091638 (seed 46). All below threshold 0.108571. Phase 2 TPE confined to TP=2/4inst reaches maximum ~0.0917, 16.2% below the L40S global best.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "Exact match to prediction. TP=2/4inst winner on L40S (not TP=1/8inst as on H100) confirms hardware-specific failure mode of min profile. The non-monotonic ranking (TP2>TP4>TP1>TP8) at mr=32 differs from H100's ranking and reflects L40S's low bandwidth making TP=1 per-request latency slow enough that 8 instances still can't compensate."
+    },
+    {
+      "arm_type": "h-ablation",
+      "predicted": "Flat TPE on L40S hard llama finds the global best with higher median evals_to_best than bracket K=1. Based on RP-10, flat TPE achieves median ~26 evals on H100 hard. On L40S with tighter margins, TPE may take longer. Bracket K=1's evals_to_best=3 should represent at least a 5x improvement.",
+      "observed": "Flat TPE evals_to_best per seed: seed=42: 101 (never, best=0.107375), seed=43: 101 (never, best=0.108304), seed=44: 68 (best=0.109668), seed=45: 101 (never, best=0.108304), seed=46: 101 (never, best=0.108304). Median evals_to_best=101. Only 1/5 seeds finds the global best within budget=100. Bracket K=1 median=3, representing >33x improvement. L40S tight margin (2.1%) makes TPE unable to reliably distinguish TP=4 from TP=8 across the full fitness distribution.",
+      "status": "CONFIRMED",
+      "error_type": "magnitude",
+      "diagnostic_note": "Direction strongly confirmed but magnitude understated: prediction extrapolated ~26 evals from H100 data but L40S's tight 2.1% margin makes TPE fail to converge in 4/5 seeds entirely. The >33x speedup exceeds the predicted >=5x. New quantitative finding: at 2.1% TP margin on L40S, flat TPE cannot reliably identify the optimal TP within budget=100, while bracket K=1 succeeds deterministically in 3 evals."
+    }
+  ],
+  "experiment_valid": true,
+  "discrepancy_analysis": "All 4 arms confirmed. h-ablation shows a magnitude deviation: flat TPE on L40S is even worse than predicted (median evals_to_best=101, 4/5 seeds fail vs expected ~26 evals). This discrepancy reveals that TP margin size has a strong non-linear effect on TPE convergence reliability: the 2.1% L40S margin vs 7.6% H100 margin is not just quantitatively smaller but qualitatively changes whether TPE can reliably identify the optimal TP at all. Bracket K=1's hardware-agnostic max-profile Phase 1 is immune to this effect since it directly evaluates all TP candidates at maximum batch capacity.",
+  "dominant_component_pct": null
+}

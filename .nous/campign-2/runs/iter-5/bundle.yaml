@@ -1,0 +1,100 @@
+metadata:
+  iteration: 5
+  family: "simulation-duration-confound"
+  research_question: "Is num_requests (simulation duration) the primary confound in Phase 1 tier ranking, making batch=512 unnecessary when nreq>=2000?"
+
+arms:
+  - type: h-main
+    prediction: >
+      At nreq=2000, lean Phase 1 (batch=128) identifies TP=4/2 as optimal in at least
+      16 of 18 condition×seed combinations (6 conditions × 3 seeds). The tier selection
+      matches standard Phase 1 (batch=512, nreq=2000) across all rates (500, 2000, 5000)
+      and both hardware (H100, A100-SXM). The margin between TP=4/2 and the second-place
+      tier will be >=3% consistently across seeds.
+    mechanism: >
+      At nreq=2000, the simulation runs long enough (arrival_duration = nreq/rate = 0.4-4s)
+      for the request queue to reach steady state. In steady state, TP=4/2 (two instances)
+      has marginally higher aggregate throughput (~75 rps cluster vs ~73 rps for TP=8/1)
+      AND dramatically better p99 TTFT (load balanced across instances, scheduling delay
+      ~45ms vs ~5500ms for saturated single-instance). Both the throughput and latency
+      advantages favor TP=4/2 regardless of batch size, because the queue-building mechanism
+      (rate >> capacity) saturates both batch=128 and batch=512 identically when the simulation
+      is long enough. The batch=512 requirement from RP-C2-5 was compensating for short
+      simulations where batch capacity was the binding constraint rather than steady-state
+      queue dynamics.
+    diagnostic: >
+      If lean Phase 1 disagrees with standard in specific conditions, check whether those
+      conditions have genuinely different steady-state behavior at batch=128 vs batch=512
+      (i.e., batch capacity IS the bottleneck even in steady state). This would indicate
+      the mechanism is not purely a transient artifact. Check by comparing responses_per_sec
+      between batch=128 and batch=512 at nreq=2000: if they differ significantly, batch
+      capacity still matters in steady state for that condition.
+
+  - type: h-control-negative
+    prediction: >
+      At nreq=250 (deeply transient regime), tier rankings are inconsistent: lean Phase 1
+      selects a different tier than the nreq=2000 reference in at least 9 of 18 condition×seed
+      combinations (>=50% disagreement). The disagreement is systematic: single-instance
+      configs (TP=8/1) will be artificially favored because their faster per-request speed
+      dominates before queues reach equilibrium.
+    mechanism: >
+      At nreq=250, the arrival window is nreq/rate = 0.05-0.5 seconds depending on rate.
+      System capacity is ~75 rps, so only ~4-38 requests have been COMPLETED by the end
+      of the arrival window. The queue is still building, and the p99 latency reflects
+      the transient (growing queue) rather than the equilibrium. During this transient,
+      TP=8/1's faster token generation (ITL=10ms vs 21ms for TP=4/2) means earlier
+      requests complete faster, artificially inflating its throughput metric. The
+      throughput formula (completed/total_sim_time) is biased toward configs that finish
+      the tail request faster when total requests are small.
+    diagnostic: >
+      If nreq=250 still gives correct rankings in most conditions, the settling time
+      is faster than hypothesized. Check whether the queue reaches steady state faster
+      than expected by examining scheduling_delay distribution (if p99 delay is already
+      at equilibrium even with short sim, the hypothesis is wrong).
+
+  - type: h-ablation
+    prediction: >
+      In the orthogonal test (H100 rate=500), nreq is the dominant factor: {batch=128,
+      nreq=2000} produces the same tier winner as {batch=512, nreq=2000} in all 3 seeds,
+      while {batch=512, nreq=500} produces a DIFFERENT tier winner. Specifically,
+      {batch=512, nreq=500} will select TP=8/1 (matching iter-4's "correct" reference)
+      while all nreq=2000 configs select TP=4/2.
+    mechanism: >
+      At nreq=500 (rate=500), the simulation runs for 1 second of arrivals. The system
+      capacity is ~75 rps, so only ~75 of 500 requests complete during the arrival window.
+      The remaining ~425 drain over ~5.7s with a declining queue. TP=8/1's faster
+      per-token speed (ITL=10ms) gives it an edge during drain: its tail request completes
+      sooner, producing higher measured rps (62.7 vs 55.7 for TP=4/2). But at nreq=2000,
+      the drain phase is proportionally smaller relative to the steady-state phase, and
+      TP=4/2's dual-instance capacity advantage (75.1 vs 73.6 rps cluster) dominates.
+      Batch size (128 vs 512) is irrelevant at these queue depths because both exceed
+      the actual concurrent batch occupancy in steady state.
+    diagnostic: >
+      If {batch=512, nreq=500} also picks TP=4/2 (contradicting iter-4 data), verify
+      seed=42 produces the same result as iter-4 to rule out environment changes.
+      If {batch=128, nreq=2000} disagrees with {batch=512, nreq=2000}, check
+      responses_per_sec directly: if batch=128 genuinely limits throughput at this
+      queue depth, the capacity difference explains it.
+
+  - type: h-robustness
+    prediction: >
+      The transition from TP=8/1-dominant to TP=4/2-dominant occurs between nreq=500
+      and nreq=1000 on H100 rate=500 (batch=512, seed=42). Specifically: nreq=500
+      selects TP=8/1, nreq=750 is within 2% (tie zone), and nreq>=1000 consistently
+      selects TP=4/2. The transition threshold scales inversely with how quickly the
+      queue reaches equilibrium.
+    mechanism: >
+      The system capacity is ~75 rps. At rate=500, queue fills at 425 req/s. The
+      steady-state queue depth is (rate - capacity) × service_time ≈ 425 × 7s = 2975
+      requests. This equilibrium is approached exponentially. The transition occurs
+      when enough requests have experienced the full steady-state queue that p99
+      metrics reflect equilibrium rather than transient. This happens when
+      total_requests >> requests_processed_during_transient. With capacity=75 rps
+      and transient lasting ~1-2s, approximately 75-150 requests complete during
+      transient. When total_requests >= 10× this value (~750-1500), the transient
+      is negligible in the metric distribution.
+    diagnostic: >
+      If the transition occurs at a different nreq than predicted, plot score vs nreq
+      for both TP=8/1 and TP=4/2 to find the exact crossover. Check whether the
+      crossover point shifts with rate (it should: higher rates have faster queue
+      buildup and shorter transients).

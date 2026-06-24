@@ -1,0 +1,58 @@
+[
+  {
+    "id": "RP-28",
+    "statement": "Lean bracket (TP={4,8}, max-profile only, budget=2, no Phase 2) achieves within 1% of global best across all tested regimes, now including 4 workload presets (chatbot, contentgen, summarization, multidoc) on both H100 and A100-SXM. Extended to 16 workload-preset regimes x 5 seeds = 80 additional runs (40 H100 + 40 A100-SXM), all correct. Total validated runs: 75 (prior) + 80 (iter-10) = 155/155.",
+    "confidence": "high",
+    "regime": "qwen3-14b on H100 and A100-SXM, 1000 requests, rate=100 and rate=500, all 4 workload presets (chatbot/contentgen/summarization/multidoc) plus prior default workload results",
+    "evidence": ["iteration-10-h-main", "iteration-10-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 10,
+    "mechanism": "Lean bracket evaluates both TP=4/2inst and TP=8/1inst with max-profile secondary params (mr=512, mt=8192, pf=4096), then picks the higher scorer. This is workload-agnostic: the algorithm directly measures both TP options under compute-saturated conditions, so no formula or workload metadata is needed. The TP winner shifts with prompt token distribution because longer prompts increase prefill compute per request (sim/latency/roofline.go:291-351), shifting the effective crossover rate. Lean bracket captures this automatically regardless of workload shape.",
+    "applicability_bounds": "Confirmed for qwen3-14b on H100 and A100-SXM. Prior validation covers 4 models (qwen3-14b, llama-3.1-8b, qwen3-32b, llama-3.1-70b) and 3 hardware (H100, A100-SXM, L40S) but only with default workload. Workload preset validation currently only covers qwen3-14b on H100 and A100-SXM. The workload-agnostic property should generalize to other models/hardware by the same mechanism.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-33",
+    "statement": "The TP winner in lean bracket is workload-dependent: workloads with longer prompt token distributions shift the effective TP crossover rate lower (or eliminate it entirely). On H100 qwen3-14b with prompt mean >= 1024 (contentgen, summarization, multidoc), TP=4/2inst wins at ALL tested rates including rate=100. On H100 with prompt mean <= 512 (chatbot avg=256, distribution avg=512), the rate-dependent crossover (RP-24, ~125 req/s) still applies. On A100-SXM, multidoc (avg=10240) shows TP=8 winning at all rates due to KV cache capacity constraints at TP=4/2inst, not prefill compute.",
+    "confidence": "high",
+    "regime": "qwen3-14b on H100 and A100-SXM, 1000 requests, rate=100 and rate=500, workload presets chatbot/contentgen/summarization/multidoc",
+    "evidence": ["iteration-10-h-main", "iteration-10-h-robustness", "iteration-10-probe-data"],
+    "contradicts": [],
+    "extraction_iteration": 10,
+    "mechanism": "Longer prompts increase prefill compute per request. At TP=8/1inst, a single instance must serialize all prefills; at TP=4/2inst, two instances process prefills in parallel. With prompt mean >= 1024, the prefill cost dominates enough that TP=4/2inst wins regardless of arrival rate on H100 (sim/latency/roofline.go:291-351). For multidoc on A100-SXM (avg=10240 tokens, max output=20480), KV cache requirements overwhelm TP=4/2inst on lower-effective-memory hardware, reversing the winner. The crossover rate from RP-24 (~125 H100, ~196 A100-SXM) is therefore specific to the default/chatbot workload and should be treated as workload-conditional.",
+    "applicability_bounds": "Empirically validated for qwen3-14b on H100 and A100-SXM. The prompt-length threshold for 'always TP=4' on H100 is between 512 (distribution, crossover exists) and 1024 (contentgen, no crossover). The KV cache capacity mechanism for multidoc on A100-SXM is hardware-specific (lower effective VRAM per instance at TP=4/2inst). May generalize to other models and hardware with similar architectural properties.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-27",
+    "statement": "The model-size-aware formula (load_index = params_B / bandwidth_TB_s; if load_index > 12: predict TP=8 always; else: predict via 400/BW crossover) achieves 24/24 (100%) accuracy on the 4-model x 3-hardware x 2-rate test grid with default workload. However, formula accuracy drops to 5/8 (62.5%) on H100 workload presets and 4/8 (50%) on A100-SXM workload presets. The formula is workload-blind: it has no input for prompt token distribution. Long-prompt workloads (prompt mean >= 1024) shift the effective crossover rate below 100 req/s on H100, causing the formula to predict TP=8 at rate=100 while actual winner is TP=4. On A100-SXM, an additional failure mode exists: very long prompts (multidoc avg=10240) cause TP=4/2inst to underperform due to KV cache capacity at high arrival rates, which the formula cannot model.",
+    "confidence": "high",
+    "regime": "qwen3-14b, H100 and A100-SXM, 1000 requests, rate=100 and rate=500, all 4 workload presets",
+    "evidence": ["iteration-7-validation", "iteration-8-validation", "iteration-10-h-control-negative"],
+    "contradicts": [],
+    "extraction_iteration": 10,
+    "mechanism": "The formula computes crossover_rate = 400 / bandwidth and compares rate vs crossover_rate. It has no parameter for prompt token distribution. For workloads with prompt mean >= 1024, the effective crossover rate drops below the formula's predicted value, causing systematic misprediction at rate=100 (where rate < formula_crossover but actual winner is still TP=4). Extending the formula would require a prompt_tokens_mean parameter and a revised crossover equation that accounts for prefill compute scaling.",
+    "applicability_bounds": "Formula maintains 100% accuracy only on default workload (prompt mean ~512) and for large models where no crossover exists (load_index > 12, i.e., 70B models). For real-world deployments with diverse workloads, lean bracket (which directly evaluates both TP options) is more reliable than the formula.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-24",
+    "statement": "The TP winner in bracket K=1 Phase 1 is rate-dependent: TP=8/1inst wins at low arrival rates, TP=4/2inst wins at high arrival rates. This transition exists on ALL tested hardware (H100, A100-SXM). On H100, the crossover is at ~125 req/s. On A100-SXM, the crossover is at ~200 req/s. UPDATED iter-10: This rate-dependent crossover is WORKLOAD-CONDITIONAL — it applies only to workloads with short prompt distributions (prompt mean <= 512, i.e., chatbot and distribution). For workloads with prompt mean >= 1024 (contentgen, summarization, multidoc), TP=4/2inst wins at ALL tested rates on H100 (no crossover exists). The crossover rate scales inversely with memory bandwidth AND inversely with prompt token mean.",
+    "confidence": "high",
+    "regime": "qwen3-14b on H100 and A100-SXM, workloads: chatbot (mean=256), distribution (mean=512), contentgen (mean=1024), summarization (mean=4096), multidoc (mean=10240)",
+    "evidence": ["iteration-5-crossover", "iteration-6-crossover", "iteration-10-h-main", "iteration-10-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 10,
+    "mechanism": "Rate-dependent crossover emerges from the interplay between arrival rate (queue saturation effects) and TP-level parallelism. With longer prompts, the prefill compute cost per request increases, which means TP=4/2inst's parallelism advantage (two instances processing prefills simultaneously) becomes sufficient to win even at low rates. The crossover rate is effectively a function of three variables: hardware bandwidth, model size, AND prompt token distribution.",
+    "applicability_bounds": "Empirically validated for qwen3-14b on H100 and A100-SXM. Prompt-length crossover threshold on H100 is between 512 and 1024 tokens. Exception: multidoc on A100-SXM shows TP=8 winning at all rates (KV cache capacity mechanism overrides prefill compute mechanism).",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  }
+]

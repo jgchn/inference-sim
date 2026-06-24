@@ -1,0 +1,32 @@
+metadata:
+  iteration: 1
+  bundle_ref: "runs/iter-1/bundle.yaml"
+  description: "Configuration search efficiency comparison: Random vs TPE vs LHS for BLIS 86,400-config space"
+
+setup:
+  - cmd: "go build -o blis main.go"
+    description: "Build BLIS binary"
+  - cmd: "git apply /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-1/patches/h-main.patch"
+    description: "Apply search_blis.py patch (creates the search script)"
+
+arms:
+  - arm_id: "h-main"
+    conditions:
+      - name: "all-strategies-budget100-all-seeds"
+        cmd: "python3 search_blis.py --strategy all --budget 100 --seeds 42,43,44,45,46 --blis-seeds 42 --num-requests 200 --rate 50 --hardware H100 --model qwen/qwen3-14b --checkpoints 50,100 --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-1/results/h-main/all_strategies_b100.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-1/results/h-main/all_strategies_b100.json"
+        description: "Full 10D search: compare random, TPE, LHS at budget=100 across 5 seeds (rate=50, H100)"
+
+  - arm_id: "h-control-negative"
+    conditions:
+      - name: "random-tpe-restricted-budget30-all-seeds"
+        cmd: "python3 search_blis.py --strategy random,tpe --budget 30 --seeds 42,43,44,45,46 --blis-seeds 42 --num-requests 200 --rate 50 --hardware H100 --model qwen/qwen3-14b --restricted-space --checkpoints 10,20,30 --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-1/results/h-control-negative/restricted_b30.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-1/results/h-control-negative/restricted_b30.json"
+        description: "Restricted 2D space (TP + num_instances only, 15 combos): random vs TPE at budget=30"
+
+  - arm_id: "h-robustness"
+    conditions:
+      - name: "random-tpe-rate200-budget100-all-seeds"
+        cmd: "python3 search_blis.py --strategy random,tpe --budget 100 --seeds 42,43,44,45,46 --blis-seeds 42 --num-requests 200 --rate 200 --hardware H100 --model qwen/qwen3-14b --checkpoints 50,100 --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-1/results/h-robustness/rate200_b100.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-1/results/h-robustness/rate200_b100.json"
+        description: "Full 10D search at rate=200 high load: random vs TPE at budget=100"

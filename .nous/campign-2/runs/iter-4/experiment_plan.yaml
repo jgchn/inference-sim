@@ -1,0 +1,37 @@
+metadata:
+  iteration: 4
+  bundle_ref: "runs/iter-4/bundle.yaml"
+  description: "Phase 1 batch-sensitivity experiment — does batch=512 vs batch=128 in Phase 1 critically determine tier-ranking correctness?"
+
+setup:
+  - cmd: "go build -o blis main.go"
+    description: "Build BLIS binary in worktree"
+
+arms:
+  - arm_id: "h-main"
+    conditions:
+      - name: "lean-tpe-H100-rate5000-seeds42,123,456"
+        cmd: >
+          python3 search_blis_iter4_c2.py
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-4/results/h-main/h-main.json"
+
+  - arm_id: "h-control-negative"
+    conditions:
+      - name: "lean-tpe-H100-rate500-seeds42,123,456"
+        cmd: >
+          python3 search_blis_iter4_c2.py
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-4/results/h-control-negative/h-control-negative.json"
+
+  - arm_id: "h-ablation"
+    conditions:
+      - name: "lean-lhs-H100-rate5000-seeds42,123,456"
+        cmd: >
+          python3 search_blis_iter4_c2.py
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-4/results/h-ablation/h-ablation.json"
+
+  - arm_id: "h-robustness"
+    conditions:
+      - name: "robustness-all-regimes-seeds42,123,456"
+        cmd: >
+          python3 search_blis_iter4_c2.py
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campign-2/runs/iter-4/results/h-robustness/h-robustness.json"

@@ -1,0 +1,3 @@
+Validation passes. 
+
+**Summary:** Iteration 5 designs a corrected search space experiment that includes `block_size_in_tokens` as a searchable parameter (1800 configs, 6 genes), fixing iter-4's erroneous exclusion. The three-way interaction (tp × kv_blocks × block_size) should amplify NSGA-II's crossover advantage over random search. Four arms: exhaustive ground truth, NSGA-II at budget=200, random at budget=200, and a budget=100 ablation testing whether halving the budget disproportionately hurts random. Key prediction: convergence speed gap > 60 evals (vs iter-4's 47-eval gap) due to the three-way interaction and lower coverage ratio (11.1% vs 22%).

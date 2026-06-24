@@ -1,0 +1,11 @@
+{
+  "gate_type": "design",
+  "summary": "We are testing whether doubling the search space from 900 to 1800 configurations (by adding block_size_in_tokens as a searchable parameter) amplifies NSGA-II's convergence advantage over random search beyond the 47-evaluation gap observed in iteration 4. This exploits a hypothesized three-way interaction (tp \u00d7 kv_blocks \u00d7 block_size) that gives NSGA-II's crossover operator exploitable structure that random search cannot leverage.",
+  "key_points": [
+    "Experiment 1 (h-robustness): Exhaustive sweep of all 1800 configs to establish ground-truth Pareto front; predicts Pareto density drops to 15-22% (from iter-4's 26.4%) because block_size=32 configs dominate block_size=16 at same kv_blocks, while reference HV exceeds iter-4's 5.2962e+10.",
+    "Experiment 2 (h-main): NSGA-II vs random search at budget=200 (11.1% coverage); predicts NSGA-II reaches 95% HV >60 evals before random (exceeding iter-4's 47-eval gap), with >97% HV at eval=200 vs <95% for random.",
+    "Experiment 3 (h-control-negative): Random search alone at budget=200; predicts failure to reach 95% HV before eval=180, confirming that 11.1% coverage is insufficient without guided search.",
+    "Experiment 4 (h-ablation): Both algorithms at budget=100 (5.6% coverage); predicts the HV gap exceeds 5% of exhaustive reference, demonstrating NSGA-II's advantage scales inversely with budget-to-space ratio.",
+    "Key refutation signals: If Pareto density exceeds 26%, block_size may not create meaningful dominance relationships. If random reaches 95% HV before eval=160, the space is too easy regardless of algorithm. If the NSGA-II gap shrinks below iter-4's 47 evals, the binary block_size variable (50% random discovery rate) may be too simple for crossover to exploit."
+  ]
+}

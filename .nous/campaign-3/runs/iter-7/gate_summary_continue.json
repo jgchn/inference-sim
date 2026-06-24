@@ -1,0 +1,11 @@
+{
+  "gate_type": "continue",
+  "summary": "Iteration 7 tested whether NSGA-II's convergence speed advantage over random search transfers to a different model (Llama-3.1-8B vs Qwen3-14B). The core finding is that NSGA-II's final solution quality does transfer (99.87% vs 98.21% of exhaustive hypervolume), but its speed advantage does not \u2014 random search reached 95% of exhaustive HV at ~eval 91 while NSGA-II needed ~eval 114, a reversal from the Qwen result where NSGA-II was faster by ~91 evals.",
+  "key_points": [
+    "NSGA-II quality advantage is portable: NSGA-II achieved 99.87% of exhaustive HV (7.754e10) vs random search's 98.21% on Llama-3.1-8B, a 1.66 percentage-point final advantage consistent with Qwen results.",
+    "Speed advantage reversed on Llama: Random search reached the 95% HV threshold ~22.9 evals BEFORE NSGA-II on Llama (eval ~91 vs ~114), whereas on Qwen at the same rate, NSGA-II was faster by ~91 evals. The culprit is Pareto density: Llama's frontier is 5.33% of the 1800-config space vs Qwen's 4.5%, meaning random sampling hits Pareto-optimal configs frequently enough to outpace NSGA-II's early exploration.",
+    "Llama's higher throughput ceiling (31.67 req/s vs ~26 req/s for Qwen) produced a 32% larger exhaustive hypervolume (7.754e10 vs 5.857e10), confirming the model architecture difference is real and measurable.",
+    "Infrastructure integrity confirmed: Qwen re-verification (h-ablation) reproduced the exact eval=40 checkpoint value (87.4%) from iteration 5, confirming the BLIS binary and Qwen config are unchanged. A code change in offspring generation (single vs paired) explains why the Qwen convergence gap within iteration 7 (4.6 evals) differs from the iteration-5 value (~91 evals).",
+    "Still unknown: whether Pareto density alone quantitatively predicts the NSGA-II speed advantage across different models and rates. Iteration 8 should test this by checking if the density\u2192gap relationship holds as a formula \u2014 e.g., does density above ~5% reliably predict random search wins the speed race, while below ~5% NSGA-II wins?"
+  ]
+}

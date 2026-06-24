@@ -1,0 +1,89 @@
+{
+  "iteration": 4,
+  "bundle_ref": "runs/iter-4/bundle.yaml",
+  "arms": [
+    {
+      "arm_type": "h-robustness",
+      "predicted": "Exhaustive sweep of 900 reduced-space configs will produce Pareto density 8-25% (72-225 non-dominated), spanning at least 4 GPU-count tiers with genuine within-tier tradeoffs.",
+      "observed": "900/900 configs evaluated in 68.8s. Pareto front: 238/900 = 26.4% density. Exhaustive reference HV = 5.2962e+10. Pareto front spans 4 GPU tiers (gpu_count 1,2,4,8). Within-tier tradeoffs confirmed: kv_blocks cliff interaction and batch scheduling bottleneck create distinct Pareto points per tier.",
+      "status": "PARTIALLY_CONFIRMED",
+      "error_type": "magnitude",
+      "diagnostic_note": "Density 26.4% is just above the predicted 8-25% range. Slight over-prediction likely from batch={128,256,512} being less redundant than expected. Qualitative prediction (non-trivial search difficulty, multi-tier coverage) is confirmed.",
+      "metadata": {
+        "exhaustive_reference_hv": 5.2962e10,
+        "pareto_density_pct": 26.4,
+        "total_configs": 900,
+        "pareto_size": 238,
+        "wall_time_s": 68.8
+      }
+    },
+    {
+      "arm_type": "h-main",
+      "predicted": "NSGA-II on reduced space reaches 95% of exhaustive HV at least 80 evaluations before random. At eval=80: NSGA-II >= 93%, random <= 88%. Convergence gap larger than iter-3's 40-eval gap.",
+      "observed": "NSGA-II reaches 95% of exhaustive HV (5.2962e+10) at eval=117 (interpolated). Random reaches 95% at eval=164 (interpolated). Gap: 47 evals. At eval=80: NSGA-II=91.2% (predicted >=93%), random=88.6% (predicted <=88%). Convergence trajectory: eval=40: 84.7%, 80: 91.2%, 120: 95.3%, 160: 96.5%, 200: 97.8%. Final HV=5.1804e+10 (97.8% of exhaustive). Pareto front: 96 solutions at eval=200.",
+      "status": "PARTIALLY_CONFIRMED",
+      "error_type": "magnitude",
+      "diagnostic_note": "Directional effect confirmed: NSGA-II converges faster than random (47-eval gap vs iter-3's 40-eval gap). Gap DID increase with reduced space. However, gap is 47 evals, not 80 as predicted. At eval=80, NSGA-II was 91.2% not >=93%. Reduced space 22% coverage (200/900) and 26.4% Pareto density allow random to cover adequate Pareto front faster than predicted, capping the gap.",
+      "metadata": {
+        "final_hv": 5.1804e10,
+        "final_hv_pct_of_exhaustive": 97.8,
+        "pareto_size_at_200": 96,
+        "eval_95pct_of_exhaustive_interpolated": 117,
+        "convergence": [
+          {"eval": 40, "hv": 4.4873e10, "pct_of_exhaustive": 84.7},
+          {"eval": 80, "hv": 4.8278e10, "pct_of_exhaustive": 91.2},
+          {"eval": 120, "hv": 5.0486e10, "pct_of_exhaustive": 95.3},
+          {"eval": 160, "hv": 5.1121e10, "pct_of_exhaustive": 96.5},
+          {"eval": 200, "hv": 5.1804e10, "pct_of_exhaustive": 97.8}
+        ]
+      }
+    },
+    {
+      "arm_type": "h-control-negative",
+      "predicted": "Random search reaches 95% of exhaustive HV at eval=160 or later. Final HV within 3% of exhaustive but below NSGA-II's final.",
+      "observed": "Random reaches 95% of exhaustive at eval=164 (interpolated). Convergence: eval=40: 84.7%, 80: 88.6%, 120: 91.0%, 160: 94.9%, 200: 96.1%. Final HV=5.0873e+10 (96.1% of exhaustive). NSGA-II final (97.8%) exceeds random final (96.1%). At eval=40, random and NSGA-II have identical HV (4.4873e+10), confirming uniform initialization diverges only after evolution.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "Random reaches 95% at eval=164 (>160 as predicted). Final HV is 3.9% below exhaustive (slightly outside 'within 3%' prediction but qualitatively accurate). Identical HV at eval=40 between NSGA-II and random confirms both start from same uniform random point.",
+      "metadata": {
+        "final_hv": 5.0873e10,
+        "final_hv_pct_of_exhaustive": 96.1,
+        "eval_95pct_of_exhaustive_interpolated": 164,
+        "convergence": [
+          {"eval": 40, "hv": 4.4873e10, "pct_of_exhaustive": 84.7},
+          {"eval": 80, "hv": 4.6931e10, "pct_of_exhaustive": 88.6},
+          {"eval": 120, "hv": 4.8186e10, "pct_of_exhaustive": 91.0},
+          {"eval": 160, "hv": 5.0243e10, "pct_of_exhaustive": 94.9},
+          {"eval": 200, "hv": 5.0873e10, "pct_of_exhaustive": 96.1}
+        ]
+      }
+    },
+    {
+      "arm_type": "h-ablation",
+      "predicted": "NSGA-II full space reaches 95% of its own final HV at eval=120. Full-space NSGA-II converges to its ceiling slower than reduced-space NSGA-II converges to exhaustive.",
+      "observed": "NSGA-II full reaches 95% of its own ceiling (5.8494e+10) at eval=71 — FASTER than predicted eval=120. More critically: full-space NSGA-II HV EXCEEDS the reduced-space exhaustive Pareto front (5.6611e+10 at eval=80 = 106.9% of reduced exhaustive). Root cause: block_size=32 (assumed non-differentiating) is HIGHLY differentiating for tp=8. At tp=8,inst=1,batch=512,kv=3000: block_size=16 -> rps=21.35, ttft_p99=2323ms, 107 preemptions; block_size=32 -> rps=26.28, ttft_p99=25ms, 0 preemptions. block_size doubles effective KV token capacity (3000 x 32=96k vs 3000 x 16=48k tokens), eliminating preemptions entirely for this GPU tier.",
+      "status": "REFUTED",
+      "error_type": "regime",
+      "diagnostic_note": "Secondary criterion refuted: full-space NSGA-II converges to a higher ceiling faster than reduced-space NSGA-II. The assumption that block_size_in_tokens is non-differentiating was incorrect for high-TP configurations. total_kv_blocks specifies block COUNT, not tokens; block_size multiplies the effective token capacity. Fixing block_size=16 in the reduced space inadvertently constrained tp=8 configs below their stress-free threshold (48k vs 96k tokens at kv=3000).",
+      "metadata": {
+        "full_space_final_hv": 5.8494e10,
+        "eval_95pct_of_own_ceiling_interpolated": 71,
+        "block_size_validation": {
+          "tp": 8, "inst": 1, "batch": 512, "kv_blocks": 3000,
+          "block_size_16": {"rps": 21.35, "ttft_p99_ms": 2323, "preemptions": 107},
+          "block_size_32": {"rps": 26.28, "ttft_p99_ms": 25, "preemptions": 0}
+        },
+        "convergence": [
+          {"eval": 40, "hv": 5.2137e10, "pct_of_own": 89.1, "pct_of_reduced_exhaustive": 98.4},
+          {"eval": 80, "hv": 5.6611e10, "pct_of_own": 96.8, "pct_of_reduced_exhaustive": 106.9},
+          {"eval": 120, "hv": 5.7363e10, "pct_of_own": 98.1, "pct_of_reduced_exhaustive": 108.3},
+          {"eval": 160, "hv": 5.8436e10, "pct_of_own": 99.9, "pct_of_reduced_exhaustive": 110.3},
+          {"eval": 200, "hv": 5.8494e10, "pct_of_own": 100.0, "pct_of_reduced_exhaustive": 110.4}
+        ]
+      }
+    }
+  ],
+  "experiment_valid": true,
+  "discrepancy_analysis": "Primary finding: block_size_in_tokens is NOT non-differentiating for high-TP configs. It multiplies effective KV token capacity (blocks x block_size), creating a dramatic qualitative transition at tp=8 (107 preemptions -> 0, ttft 2323ms -> 25ms with block_size 16->32 at kv=3000). This was missed in earlier probing because probing focused on tp=2,inst=2 where KV stress patterns differ. The convergence speed gap for NSGA-II vs random on reduced space increased from ~40 evals (iter-3) to ~47 evals (iter-4), confirming the crossover efficiency mechanism but at smaller magnitude than predicted. The high Pareto density (26.4%) and 22% budget-to-space coverage ratio limit the maximum achievable gap at budget=200.",
+  "dominant_component_pct": null
+}

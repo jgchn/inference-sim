@@ -1,0 +1,9 @@
+{
+  "gate_type": "design",
+  "summary": "We are testing whether adding total_kv_blocks as a searchable parameter (creating non-linear interactions with TP/replicas) makes the BLIS optimization problem genuinely harder \u2014 hard enough that NSGA-II shows a measurable convergence speed advantage over random search. This is iteration 3 of a campaign investigating whether structured search algorithms provide value over random sampling on this simulator.",
+  "key_points": [
+    "Main hypothesis (h-main): NSGA-II with pop=40 on a 4-objective space (rps\u2191, ttft_p99\u2193, gpu_count\u2193, kv_blocks\u2193) reaches 95% of final hypervolume by eval=80, while random search needs eval=120-160. The mechanism is that KV blocks interact non-linearly with TP/instance splits (e.g., tp=4,i=1 at blocks=5000 causes 77 preemptions, but tp=2,i=2 with same blocks has zero stress), giving crossover an exploitable structure.",
+    "Control experiments: (1) Negative control \u2014 random search with 200 evals on the same 4-objective space should converge later but eventually reach within 5% of NSGA-II's final hypervolume. (2) Robustness control \u2014 NSGA-II on the original 3-objective space (1M blocks, no KV parameter) should saturate by eval=40, confirming the 3-obj problem is trivially easy and that any difficulty in the 4-obj version comes from the blocks\u00d7TP interaction.",
+    "Confirmation criteria: NSGA-II discovers \u226530% more non-dominated solutions than random at eval=80, AND achieves 95% HV ~40-80 evals earlier. Refutation diagnostics include checking if >40% of random samples are non-dominated (problem too easy), if crossover generates excessive infeasible offspring (TP*inst>8 repairs), or if the reference point (0, 50000, 9, 11000) makes HV insensitive to frontier differences."
+  ]
+}

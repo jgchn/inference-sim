@@ -1,0 +1,11 @@
+{
+  "gate_type": "continue",
+  "summary": "Iteration 8 confirmed that the lean bracket search algorithm (2 evaluations, ~0.5s) reliably finds the globally optimal configuration across all tested hardware (H100, A100-SXM, L40S) and all three models including the new 32B model, achieving 45/45 perfect results. The simple bandwidth-based formula (RP-27) is now shown to be unreliable for larger models, and micro-evaluations (<1000 requests) cannot substitute for full evaluations when queuing dynamics determine the winner.",
+  "key_points": [
+    "Lean bracket fully validated: 45/45 regime\u00d7seed combinations (25 for qwen3-32b across 5 regimes, 20 for L40S across 4 regimes) achieved exactly the global best score, confirming algorithm generality across all 3 hardware platforms and all 3 tested models without any modification.",
+    "RP-27 formula (crossover = 400/bandwidth) is model-size-blind and fails for 32B models: it predicts TP=4 wins at rates above ~119 req/s on H100, but the actual 32B crossover is ~350 req/s; on A100-SXM and L40S, no crossover exists at all for 32B. Formula accuracy drops to 83.3% (15/18) on the test matrix \u2014 three failures all involve TP=4 predictions where TP=8 actually dominates.",
+    "Micro-evaluation is fundamentally broken for TP-winner identification: at 100 requests, TP=8 wins by 16\u201338% in all 4 regimes where 1000-request evaluation correctly selects TP=4, because queue saturation effects (the mechanism that makes 2-instance TP=4 competitive) require \u22651000 requests of sustained load to manifest.",
+    "Key unknowns heading into iteration 9: (1) whether a model-size-aware crossover formula (e.g., crossover \u221d model_params / bandwidth) can be derived from the 3-model \u00d7 3-hardware dataset; (2) whether lean bracket still works and what the crossover looks like for a 70B model on H100; (3) whether Phase 2 (TPE routing optimization) adds meaningful value for qwen3-32b on H100 at rate=500.",
+    "Suggested next iteration: fit a two-variable crossover model using all accumulated data (8B, 14B, 32B across H100/A100-SXM/L40S) to generalize TP prediction, then validate on llama-3.1-70b as an out-of-sample test; if the formula holds, implement it as a zero-eval analytical predictor with lean bracket as a fallback."
+  ]
+}

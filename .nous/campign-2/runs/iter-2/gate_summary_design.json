@@ -1,0 +1,11 @@
+{
+  "gate_type": "design",
+  "summary": "We are testing whether a hierarchical search strategy (first identify the best TP/instance tier, then optimize within it) converges to 95% of optimal throughput faster than random search or NSGA-II when searching BLIS's 71,040-config space at a challenging request rate (rate=2000) where the optimal configuration (TP=4, 2 replicas) is non-obvious due to queue bottleneck effects.",
+  "key_points": [
+    "h-main (rate=2000): Predicts hierarchical search reaches 95% of optimal (38,373 tok/s) in ~20 evaluations vs ~150+ for random and ~40+ for NSGA-II, because Phase 1 directly measures per-tier throughput under queue pressure and correctly identifies TP=4/2 over the intuitive-but-bottlenecked TP=8/1.",
+    "h-control-negative (rate=50): All strategies should converge within 50 evals with <2x difference, since TP=8/1 trivially dominates and secondary knobs are irrelevant at low load \u2014 this validates that the hierarchical advantage is specific to the hard regime, not an artifact.",
+    "h-robustness (rate=2000, seeds 42/123/456): Phase 1 should consistently rank TP=4/2 as the top tier across seeds with CV<30% in convergence speed, confirming the advantage is structural (queue splitting) not workload-dependent.",
+    "Confirmation criteria: hierarchical converges \u22653x faster than random at rate=2000 AND the speed advantage collapses to <2x at rate=50. Refutation: if random consistently finds good configs in <50 evals at rate=2000, or if NSGA-II beats hierarchical, the decomposition approach adds no value.",
+    "Implementation: A new script (search_pareto_iter2.py) implements all three strategies with convergence-curve tracking, replacing iteration 1's hypervolume-only metric with evals_to_95pct as the primary comparison metric."
+  ]
+}

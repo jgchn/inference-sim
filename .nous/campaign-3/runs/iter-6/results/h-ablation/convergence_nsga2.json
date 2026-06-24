@@ -1,0 +1,44 @@
+{
+  "arm": "h-ablation",
+  "rate": 75,
+  "algorithm": "nsga2",
+  "pop_size": 40,
+  "n_gens": 4,
+  "total_evals": 200,
+  "exhaustive_hv": 62917200000.0,
+  "final_hv": 62569799999.99999,
+  "final_hv_pct": 99.44784574011557,
+  "final_pareto_size": 68,
+  "convergence": [
+    {
+      "eval": 40,
+      "hv": 54531000000.0,
+      "pareto_size": 16,
+      "hv_pct": 86.67105338444813
+    },
+    {
+      "eval": 80,
+      "hv": 56669400000.0,
+      "pareto_size": 13,
+      "hv_pct": 90.06980603078331
+    },
+    {
+      "eval": 120,
+      "hv": 60532199999.99999,
+      "pareto_size": 26,
+      "hv_pct": 96.20930365623389
+    },
+    {
+      "eval": 160,
+      "hv": 60978600000.0,
+      "pareto_size": 39,
+      "hv_pct": 96.91880757567088
+    },
+    {
+      "eval": 200,
+      "hv": 62569799999.99999,
+      "pareto_size": 68,
+      "hv_pct": 99.44784574011557
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "gate_type": "continue",
+  "summary": "Iteration 7 validated a 50x search budget reduction: pruning TP=1 and TP=2 from Phase 1 and skipping Phase 2 entirely ('lean bracket') stays within 1% of the global best score on all four tested regimes (H100 and A100-SXM at low and high arrival rates), using only 2 BLIS evaluations per search instead of 100. The key mechanism \u2014 that max-profile saturates compute so bandwidth-per-GPU determines the TP winner, making TP=4 and TP=8 structurally dominant \u2014 was confirmed both positively (all regimes within threshold) and negatively (switching to min-profile caused a 57% score collapse). What remains open is whether lean bracket holds on L40S hardware, for larger models (>14B), and whether a zero-evaluation analytical formula can predict the TP winner without running BLIS at all.",
+  "key_points": [
+    "Lean bracket confirmed on all 4 regimes: H100 rate=500 (gap=0.68%), H100 rate=100 (gap=0.00%), A100-SXM rate=500 (gap=0.38%), A100-SXM rate=100 (gap=0.00%) \u2014 all below the 1% acceptance threshold, with perfect determinism across 5 search seeds per regime.",
+    "TP=2 structural exclusion is rate-independent: probed at rates 100\u20135000 on H100, TP=2 remains 11\u201312% below the winner at every point \u2014 meaning pruning TP=1 and TP=2 is safe across all practical arrival rates, not just the originally tested conditions.",
+    "Phase 2 maximum improvement across all iterations is 0.71% (A100-SXM rate=200, weighted routing), always within the 1% tolerance \u2014 confirming that skipping Phase 2 costs negligible accuracy while saving ~98 evaluations.",
+    "Mechanism validated by negative control: min-profile (max_running=32) inverts the TP ranking and drops the best score 57% below the lean bracket result, proving lean bracket's correctness depends specifically on the max-profile compute-saturation regime.",
+    "Workload seed variance discovered: blis_seed=42 reference scores (e.g., 0.178063 on H100 rate=500) are not universal \u2014 seeds 43\u201346 yield scores up to 5% higher (0.188345), meaning per-seed global bests should be computed independently for rigorous robustness reporting.",
+    "Next iteration candidates: (1) zero-evaluation analytical TP prediction using crossover_rate \u2248 400/bandwidth_TB_s, eliminating even the 2 remaining Phase 1 evals; (2) lean bracket validation on L40S and for larger models (qwen3-32b); (3) packaging lean bracket as a native 'blis search' CLI subcommand."
+  ]
+}

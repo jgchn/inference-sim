@@ -1,0 +1,33 @@
+{
+  "iteration": 3,
+  "bundle_ref": "runs/iter-3/bundle.yaml",
+  "arms": [
+    {
+      "arm_type": "h-main",
+      "predicted": "NSGA-II with population=40 on the 4-objective space will reach 95% of its final 4D hypervolume by generation 2 (eval=80), while random search will not reach 95% until eval=120-160. NSGA-II will discover at least 30% more non-dominated solutions than random at eval=80.",
+      "observed": "NSGA-II reached 95% of its own final HV (5.8095e+10) at eval=120, not eval=80. Convergence: eval=40: 81.1%, eval=80: 91.8%, eval=120: 98.1%, eval=160: 99.8%, eval=200: 100%. Using NSGA-II final as shared reference (threshold=5.5190e+10): NSGA-II reaches 95% at eval=120, random reaches 95% at eval=160 — a 40-eval (1 generation) gap. NSGA-II achieves +4.4% better final HV (5.8095e+10 vs 5.5646e+10) and 100% more Pareto solutions (46 vs 23 at eval=200). At eval=80: NSGA-II PF=21 vs random PF=19 — only 10.5% difference, below the predicted 30%.",
+      "status": "PARTIALLY_CONFIRMED",
+      "error_type": "magnitude",
+      "diagnostic_note": "Convergence speed gap exists but is shifted: 40 evals later than predicted (eval=120 vs eval=80 for NSGA-II). The quality advantage is real (+4.4% final HV, 2x Pareto solutions) but manifests as final quality rather than convergence speed. 4-obj Pareto density for NSGA-II is 23% (vs >60% for 3-obj), confirming the problem is genuinely harder. NSGA-II crossover advantage is diluted by non-differentiating parameters (routing, block_size, gpu_mem) which add search surface without informative gradients."
+    },
+    {
+      "arm_type": "h-control-negative",
+      "predicted": "Random search will reach 95% of its final hypervolume later than NSGA-II (approximately eval=120-160 vs eval=80). Random will achieve final HV within 5% of NSGA-II final by eval=200.",
+      "observed": "Random reached 95% of its own final HV (5.5646e+10) at eval=120 — at the lower end of the predicted range. Convergence: eval=40: 89.5%, eval=80: 93.9%, eval=120: 98.9%. Final HV = 5.5646e+10, which is 95.8% of NSGA-II final — within 5% as predicted. Pareto density = 11.5% (23/200), well below the 40% threshold. Using NSGA-II final as shared reference, random reaches 95% at eval=160 (40 evals after NSGA-II at eval=120). The convergence gap predicted (random slower than NSGA-II) exists on the shared reference but is absent on own-final reference.",
+      "status": "PARTIALLY_CONFIRMED",
+      "error_type": "magnitude",
+      "diagnostic_note": "The 'random converges equally fast' scenario was triggered: on own-final reference, both algorithms reach 95% at eval=120. However, random's final HV ceiling is ~4.4% lower than NSGA-II, so on the shared reference there IS a 40-eval gap. The 11.5% Pareto density shows the 4-obj problem is not trivially easy for random, but 200 evals is sufficient for random to cover most critical (tp, blocks) sweet spots. The diagnostic check passed: density < 40%, yet random still converged nearly as fast."
+    },
+    {
+      "arm_type": "h-robustness",
+      "predicted": "NSGA-II on the original 3-objective space (1M blocks) with budget=200 will reach 95% of final HV within the first generation (eval=40), confirming that the 3-objective problem remains trivially easy.",
+      "observed": "HV = 6.7130e+06 at eval=40, unchanged through eval=200 — 100% of final HV reached at the very first checkpoint. Pareto density grew from 32.5% (13/40 at eval=40) to 65% (130/200 at eval=200) while HV remained constant. All configs with different TP/scheduler/batch/routing variants achieve the same hypervolume-level Pareto coverage because no KV stress exists at 1M blocks. 3-obj Pareto density (65%) vs 4-obj Pareto density (~12-23%) confirms that adding kv_blocks as a 4th parameter genuinely increases problem difficulty.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "The 3-obj problem is even easier than predicted: not just 95% at eval=40 but 100%. The constant HV from eval=40 to eval=200 despite growing Pareto front (13→130 solutions) confirms RP-1/RP-2: the objective-space frontier is fully covered by the initial random population. The 65% Pareto density provides the strongest evidence that the 3-obj problem lacks the differentiation needed to challenge any search algorithm."
+    }
+  ],
+  "experiment_valid": true,
+  "discrepancy_analysis": "The primary prediction (NSGA-II reaches 95% at eval=80, random at eval=120-160) was off by one generation: both algorithms reach 95% of their own final HV at eval=120. Using a shared reference (NSGA-II final), a 40-eval gap exists (eval=120 vs eval=160) — confirming a real but smaller-than-predicted advantage. The quality advantage is genuine (+4.4% HV, 2x Pareto solutions) but expresses as final quality improvement rather than faster convergence. The 3-obj robustness arm behaved exactly as predicted. The fundamental insight stands: adding kv_blocks creates real search difficulty (density 65%→12%), but 200 evals is sufficient for random search to find most key configurations in the 4-obj space, limiting NSGA-II's convergence speed advantage.",
+  "dominant_component_pct": null
+}

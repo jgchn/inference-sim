@@ -1,0 +1,58 @@
+[
+  {
+    "id": "RP-24",
+    "statement": "The TP winner in bracket K=1 Phase 1 is rate-dependent: TP=8/1inst wins at low arrival rates, TP=4/2inst wins at high arrival rates. This transition exists on ALL tested hardware (H100, A100-SXM). On H100, the crossover is at ~125 req/s. On A100-SXM, the crossover is at ~200 req/s. The crossover rate scales inversely with memory bandwidth: H100 (3.35 TB/s) ~125, A100-SXM (2.039 TB/s) ~200. At the crossover rate, TP4 and TP8 score identically to 4 decimal places.",
+    "confidence": "high",
+    "regime": "qwen3-14b, H100 and A100-SXM hardware, 1000 requests, rates 100-500 req/s",
+    "evidence": ["iteration-5-h-main", "iteration-5-h-ablation", "iteration-6-h-main", "iteration-6-h-ablation"],
+    "contradicts": [],
+    "extraction_iteration": 6,
+    "mechanism": "At low arrival rates (rate=100), per-request latency dominates and TP=8/1inst pools all 8 GPUs' bandwidth/compute, yielding lower per-request latency than TP=4/2inst. As rate increases, request concurrency matters more and TP=4/2inst (2 instances) gains a throughput advantage from parallel request handling. The crossover point depends on hardware bandwidth: higher bandwidth (H100) means TP=8's bandwidth pooling advantage diminishes sooner (at lower rates), while lower bandwidth (A100-SXM) means the advantage persists to higher rates.",
+    "applicability_bounds": "Validated for max-profile (mr=512) configs. Rate-dependent transition is model-independent on H100 and A100-SXM. L40S llama shows crossover at ~450; L40S qwen shows no crossover (TP=8 always wins). Only validated for qwen3-14b and llama-3.1-8b-instruct models.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-25",
+    "statement": "Bracket K=1 hierarchical search correctly adapts to rate-dependent TP winner transitions without any algorithm modification, across all tested hardware platforms (H100 and A100-SXM). At low rates (TP=8 wins), achieves 25/25 Phase 1 correctness with evals_to_best=4. At crossover rate (~200 on A100-SXM), achieves 5/5 evals_to_best=3 because TP=4 at position 3 clears the 1% threshold before TP=8 is evaluated. The algorithm is rate-regime and hardware-agnostic.",
+    "confidence": "high",
+    "regime": "H100 and A100-SXM hardware, qwen3-14b and llama-3.1-8b-instruct models, rates 100-500 req/s",
+    "evidence": ["iteration-5-h-main", "iteration-5-h-ablation", "iteration-6-h-main", "iteration-6-h-ablation", "iteration-6-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 6,
+    "mechanism": "The bracket max-profile (mr=512, mt=8192, pf=4096) evaluates each TP level under the compute-saturated regime where TP differences are maximally expressed. The 1% threshold mechanism naturally adapts: whichever TP level achieves the highest max-profile score and exceeds the threshold first determines evals_to_best. At crossover, both TP4 and TP8 score identically, but TP4 at position 3 triggers early termination — a property of the threshold mechanism, not a regime-specific tuning.",
+    "applicability_bounds": "Validated for 5 search seeds x up to 5 blis_seeds (25 combinations). Cross-hardware portability confirmed between H100 and A100-SXM. L40S not tested at low rates. Only validated with budget=100.",
+    "superseded_by": null,
+    "category": "algorithm",
+    "status": "active"
+  },
+  {
+    "id": "RP-26",
+    "statement": "At low arrival rates (rate=100), flat TPE converges dramatically faster than at high rates: median evals_to_best=6 on A100-SXM qwen3-14b (rate=100) vs median=26 on A100-SXM qwen3-14b (rate=500, from RP-22). The monotonic TP fitness landscape at rate=100 (TP1<TP2<TP4<TP8) provides clean signal for TPE's surrogate model. Despite this, bracket K=1 (evals_to_best=4 deterministically) still outperforms flat TPE (median=6) by 33%. Confirmed on both H100 (iter-5) and A100-SXM (iter-6).",
+    "confidence": "high",
+    "regime": "A100-SXM and H100, qwen3-14b, rate=100, 1000 requests",
+    "evidence": ["iteration-5-h-control-negative", "iteration-6-h-control-negative"],
+    "contradicts": [],
+    "extraction_iteration": 6,
+    "mechanism": "At rate=100, the TP fitness landscape is strictly monotonic (each higher TP level always scores better), giving TPE's Gaussian process surrogate a clean gradient to follow. At rate=500, TP=4>TP=8 creates a non-monotonic surface that requires more samples to identify the optimum. The wide variance in TPE evals_to_best at rate=100 (1-18) vs bracket's deterministic 4 shows that even on easy landscapes, sampling-based methods have high variance while bracket is fully deterministic.",
+    "applicability_bounds": "TPE median=6 is faster than rate=500 (median=26) but bracket K=1 median=4 still wins. Bracket advantage of 33% at rate=100 is smaller than at rate=500 (bracket always 3-4 vs TPE median=26). Both methods reliably find global best at rate=100.",
+    "superseded_by": null,
+    "category": "algorithm",
+    "status": "active"
+  },
+  {
+    "id": "RP-27",
+    "statement": "The rate-dependent TP winner transition (TP=8 at low rates, TP=4 at high rates) is universal across hardware platforms but the crossover rate scales inversely with memory bandwidth. Validated: H100 (3.35 TB/s) crossover ~125 req/s; A100-SXM (2.039 TB/s) crossover ~200 req/s; L40S (0.864 TB/s) crossover ~450 req/s for llama (no crossover for qwen). The relationship is approximately: crossover_rate ∝ 1/bandwidth. Lower bandwidth means TP=8's bandwidth pooling advantage persists to higher rates.",
+    "confidence": "medium",
+    "regime": "qwen3-14b and llama-3.1-8b-instruct, H100/A100-SXM/L40S hardware, 1000 requests, max-profile (mr=512)",
+    "evidence": ["iteration-5-h-main", "iteration-5-h-ablation", "iteration-6-h-main", "iteration-6-h-ablation", "handoff-probing"],
+    "contradicts": [],
+    "extraction_iteration": 6,
+    "mechanism": "TP=8 pools the bandwidth of 8 GPUs; TP=4/2inst provides only 4 GPUs per request but with 2 parallel slots. At low rates, each request needs maximum bandwidth for fast completion. At high rates, maximum throughput requires concurrent handling. The crossover point is where per-request bandwidth benefit (TP=8) and parallel throughput benefit (TP=4/2inst) balance. Higher hardware bandwidth shifts this crossover to lower rates because the bandwidth pooling advantage is smaller relative to the concurrency advantage.",
+    "applicability_bounds": "Crossover rate values are empirically determined for specific models. Exact functional form (linear vs nonlinear) not validated. L40S qwen shows no crossover — possibly because model is bandwidth-heavy enough that TP=8 advantage never disappears within practical rate ranges. Confidence medium because exact crossover rates were probed at coarse granularity (25 req/s intervals).",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  }
+]

@@ -1,0 +1,41 @@
+{
+  "iteration": 5,
+  "bundle_ref": "runs/iter-5/bundle.yaml",
+  "arms": [
+    {
+      "arm_type": "h-robustness",
+      "predicted": "Exhaustive sweep of 1800 configs produces Pareto density 15-22% (lower than iter-4's 26.4%). Reference HV will exceed iter-4's reduced-space exhaustive (5.2962e+10).",
+      "observed": "Exhaustive HV: 5.857e+10 (exceeds iter-4's 5.296e+10 as predicted). Pareto density: 4.5% (81/1800) — MUCH lower than predicted 15-22% range. The Pareto front contracted dramatically at eval ~1120 when tp=2 configs began appearing, dominating many tp=1 Pareto points. Block_size=32 configs at low kv_blocks dominate block_size=16 configs at the same kv_blocks level, creating stronger-than-expected cascading dominance. HV trajectory: 1.68e+10 at eval 40, rising to 5.86e+10 at eval 1800, with a major jump at eval 1000-1120 (tp=2 configs) and another at eval 1480-1600 (tp=4 and tp=8 configs).",
+      "status": "PARTIALLY_CONFIRMED",
+      "error_type": "magnitude",
+      "diagnostic_note": "HV exceeded iter-4's as predicted. Pareto density direction confirmed (lower than 26.4%) but magnitude off by 3-5x (4.5% actual vs 15-22% predicted). The block_size=32 interaction creates stronger dominance than anticipated: not only does bs=32 at kv_blocks=X dominate bs=16 at kv_blocks=X, but bs=32 at lower kv_blocks also dominates bs=16 at higher kv_blocks when performance is similar. Combined with the tp-tier dominance structure (higher-tp configs dominate lower-tp at same gpu_count via rps), the 4D Pareto front is extremely sparse. The 81 Pareto-optimal configs are concentrated in a narrow band: high-TP (tp=4 and tp=8) with optimal (block_size=32, kv_blocks) combinations plus batch>=256."
+    },
+    {
+      "arm_type": "h-main",
+      "predicted": "NSGA-II on the 1800-config corrected space reaches 95% of exhaustive HV more than 60 evaluations before random search (exceeding iter-4's 47-eval gap). At eval=200, NSGA-II achieves >97% of exhaustive HV. The final HV gap (NSGA-II minus random, as % of exhaustive) exceeds iter-4's 1.7% gap.",
+      "observed": "NSGA-II convergence: eval 40=87.4%, eval 80=92.0%, eval 120=96.1%, eval 160=98.2%, eval 200=99.2%. NSGA-II crosses 95% at approximately eval 109 (interpolating between 92.0% at eval 80 and 96.1% at eval 120). Final HV: 5.811e+10 (99.2% of exhaustive). Final gap vs random: 99.2% - 94.3% = 4.9% of exhaustive (vs iter-4's 1.7%). All three predictions confirmed: gap > 60 evals (actual ~91 evals since random never reaches 95%), >97% at eval 200 (actual 99.2%), and final gap > 1.7% (actual 4.9%).",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "NSGA-II's crossover exploits the 3-way interaction (tp × kv_blocks × block_size) effectively. Starting from a random population at eval 40 (87.4%, same as random since same seed/distribution), NSGA-II rapidly improves through generations: +4.6% from gen1, +4.1% from gen2, +2.1% from gen3, +1.0% from gen4. The exploitation of (tp=8, block_size=32, kv_blocks low) as the dominant combination drove rapid HV improvement. By eval 120, NSGA-II has already found configurations in the concentrated Pareto region."
+    },
+    {
+      "arm_type": "h-control-negative",
+      "predicted": "Random search fails to reach 95% of exhaustive HV within 200 evaluations (or reaches it only in the final 20 evals, at eval>180). Final HV at eval=200 is 93-95% of exhaustive.",
+      "observed": "Random convergence: eval 40=87.4%, eval 80=90.8%, eval 120=92.6%, eval 160=94.2%, eval 200=94.3%. Random NEVER reaches 95% within 200 evals (final: 94.3%). The convergence plateaus between eval 160 and 200 (only +0.1%), indicating diminishing returns as additional coverage no longer discovers new Pareto-optimal configs at 11.1% budget. Final HV: 5.524e+10 (94.3% of exhaustive). Both predictions confirmed: random fails to reach 95% within 200 evals, and final HV (94.3%) is within the predicted 93-95% range.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "With 4.5% Pareto density and 11.1% budget coverage, random discovery probability per eval is low but non-trivial. The plateau at 94.3% represents a ceiling where additional random evals are unlikely to find the remaining ~5.7% of HV without targeted search near the sparse Pareto-optimal band. The same-seed start (eval 40: 87.4% for both random and NSGA-II) confirms the identical initialization distribution."
+    },
+    {
+      "arm_type": "h-ablation",
+      "predicted": "At budget=100, NSGA-II final HV exceeds random final HV by >5% of exhaustive reference. NSGA-II achieves >90% at eval=100, random achieves <85% at eval=100.",
+      "observed": "NSGA-II (pop=20, 4 gens): eval 20=81.7%, eval 40=86.5%, eval 60=90.6%, eval 80=94.1%, eval 100=95.0%. Random (100 evals, seed=43): eval 20=72.6%, eval 40=84.9%, eval 60=85.1%, eval 80=88.0%, eval 100=91.9%. Final gap: 95.0% - 91.9% = 3.1% of exhaustive HV (predicted >5%). NSGA-II exceeds 90% as predicted (actual 95.0%). Random exceeds 85% contrary to prediction (actual 91.9%).",
+      "status": "PARTIALLY_CONFIRMED",
+      "error_type": "magnitude",
+      "diagnostic_note": "Direction confirmed: NSGA-II > random at budget=100. But the gap (3.1%) is smaller than predicted (>5%). Random at budget=100 achieved 91.9%, significantly better than the predicted <85%. The 4.5% Pareto density means each random eval has a ~4.5% chance of finding a Pareto-optimal config, and with 100 evals, random expects ~4-5 hits from the 81 Pareto-optimal configs — enough to achieve ~90% HV coverage if the hits are in high-impact regions. Pop=20 for NSGA-II may also limit diversity, but the 4 generations were enough to reach 95.0%. The gap at budget=100 (3.1%) is smaller than at budget=200 (4.9%), suggesting diminishing returns from the evolutionary advantage at lower budgets when the initial random population is already well-placed."
+    }
+  ],
+  "experiment_valid": true,
+  "discrepancy_analysis": "Primary success criteria confirmed with stronger-than-predicted results: NSGA-II reaches 95% of exhaustive HV at ~eval 109 while random never reaches 95% within 200 evals (gap > 60 evals, vs predicted 47 evals). Secondary criteria also confirmed: 99.2% at eval=200 vs predicted >97%. Main discrepancy: Pareto density (4.5% actual vs 15-22% predicted) was dramatically lower due to stronger block_size dominance cascades than modeled. The h-ablation gap (3.1%) fell short of the predicted 5% threshold, as random at budget=100 benefited from the concentrated nature of the Pareto front (high-value configs are accessible from diverse starting points when the Pareto band is so narrow). The convergence gap amplification (47 evals → ~91 evals) substantially exceeds the predicted '>60 eval' threshold, confirming that block_size inclusion amplifies the algorithm advantage when the corrected space is used.",
+  "dominant_component_pct": 4.5
+}

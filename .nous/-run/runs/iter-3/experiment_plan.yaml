@@ -1,0 +1,32 @@
+metadata:
+  iteration: 3
+  bundle_ref: "runs/iter-3/bundle.yaml"
+
+setup:
+  - cmd: "go build -o /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-3-4c8b8825/blis /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-3-4c8b8825/main.go"
+  - cmd: "git apply /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-3/patches/h-main.patch"
+
+arms:
+  - arm_id: "h-main"
+    conditions:
+      - name: "l40s_qwen_bracket_k1"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-3-4c8b8825 && python3 search_blis_iter8.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware L40S --budget 100 --seeds 42,43,44,45,46 --blis-seeds 42 --rate 500 --num-requests 1000 --model qwen/qwen3-14b --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-3/results/h-main/l40s_qwen_bracket_k1.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-3/results/h-main/l40s_qwen_bracket_k1.json"
+
+  - arm_id: "h-robustness"
+    conditions:
+      - name: "l40s_qwen_seed_robustness"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-3-4c8b8825 && python3 search_blis_iter8.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware L40S --budget 100 --seeds 42,43,44,45,46 --blis-seeds 42,43,44,45,46 --rate 500 --num-requests 1000 --model qwen/qwen3-14b --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-3/results/h-robustness/l40s_qwen_seed_robustness.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-3/results/h-robustness/l40s_qwen_seed_robustness.json"
+
+  - arm_id: "h-control-negative"
+    conditions:
+      - name: "h100_qwen_bracket_k1"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-3-4c8b8825 && python3 search_blis_iter8.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware H100 --budget 100 --seeds 42,43,44,45,46 --blis-seeds 42 --rate 500 --num-requests 1000 --model qwen/qwen3-14b --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-3/results/h-control-negative/h100_qwen_bracket_k1.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-3/results/h-control-negative/h100_qwen_bracket_k1.json"
+
+  - arm_id: "h-ablation"
+    conditions:
+      - name: "l40s_qwen_flat_tpe"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-3-4c8b8825 && python3 search_blis_iter8.py --strategy tpe --hardware L40S --budget 100 --seeds 42,43,44,45,46 --blis-seeds 42 --rate 500 --num-requests 1000 --model qwen/qwen3-14b --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-3/results/h-ablation/l40s_qwen_flat_tpe.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-3/results/h-ablation/l40s_qwen_flat_tpe.json"

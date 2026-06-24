@@ -1,0 +1,33 @@
+{
+  "iteration": 2,
+  "bundle_ref": "runs/iter-2/bundle.yaml",
+  "arms": [
+    {
+      "arm_type": "h-main",
+      "predicted": "At rate=2000, hierarchical search reaches 95% of optimal throughput (38,373 tok/s) in fewer evaluations than random search. Hierarchical converges in ~20 evals (Phase 1 identifies TP=4/2 in 15 evals, Phase 2 confirms batch=512). Random requires ~150+ evals. NSGA-II converges faster than random but slower than hierarchical (~20-150 evals).",
+      "observed": "Hierarchical: evals_to_95pct=14 (deterministic, Phase 1 eval 14 hits TP=4/2 with batch=512 giving 40,392 tok/s; Phase 2 LHS finds 41,233 tok/s best). Random: evals_to_95pct=64 (expected ~37 analytically; got 64 for seed=42). NSGA-II: evals_to_95pct=8 (faster than hierarchical, seed-dependent luck during 20-trial random warmup). Hierarchical vs random advantage: 64/14 = 4.6x (exceeds predicted 3x threshold). Final bests: hierarchical=41,233, nsga2=41,233, random=40,392.",
+      "status": "CONFIRMED",
+      "error_type": "magnitude",
+      "diagnostic_note": "Hierarchical beat random by 4.6x (>3x success criterion). However, NSGA-II unexpectedly beat hierarchical (8 vs 14 evals) — this is seed-dependent luck: NSGA-II's first 8 trials are random warmup and P(hit 95% threshold in 8 random trials) ~19%, so ~81% of seeds would show NSGA-II >= 14 evals. The prediction that 'NSGA-II slower than hierarchical' is refuted for seed=42 but likely holds in expectation. True qualifying config probability is ~2304/86400=2.67% per random draw (not 0.017% as stated in bundle — the 0.017% only counted the single optimal config, not all configs above 95% threshold), explaining why random needed 64 (not 150+) evals."
+    },
+    {
+      "arm_type": "h-control-negative",
+      "predicted": "At rate=50, all three strategies reach 95% of optimal throughput within 50 evaluations. Difference in convergence speed < 2x.",
+      "observed": "All three strategies reached 95% of optimal (13,520 tok/s) within 15 evaluations. Random: evals_to_95pct=10. Hierarchical: evals_to_95pct=15. NSGA-II: evals_to_95pct=3. Final best: all three found 14,232 tok/s (TP=8/1 with any secondary). Max convergence difference: 15/3=5x (hierarchical slowest, NSGA-II fastest).",
+      "status": "PARTIALLY_CONFIRMED",
+      "error_type": "magnitude",
+      "diagnostic_note": "Correct: all strategies converged within 15 (<<50) evals. Incorrect: the 'difference <2x' bound was violated (5x actual). Hierarchical is slowest because VALID_TP_INSTANCES ordering evaluates TP=8/1 last (eval 15 of Phase 1), making hierarchical structurally disadvantaged in easy regimes where the dominant tier has high TP. Random and NSGA-II can get lucky by sampling TP=8/1 early. The fixed-order Phase 1 is a weakness when the optimal tier is last in the TP ordering."
+    },
+    {
+      "arm_type": "h-robustness",
+      "predicted": "Phase 1 correctly identifies TP=4/2 as top-performing tier across all 3 seeds. Convergence speed (evals_to_95pct) CV < 30%.",
+      "observed": "All 3 seeds (42, 123, 456): Phase 1 top tier = TP=4/2 in 100% of runs. evals_to_95pct = 14 for all three seeds (CV = 0%). Final bests: seed42=41,233, seed123=41,580, seed456=42,296. Phase 1 TP=4/2 throughput: seed42=40,392, seed123=40,489, seed456=41,140 tok/s.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "Phase 1 tier ranking is perfectly stable: TP=4/2 > TP=8/1 > TP=2/4 for all seeds. The TP=4/2 advantage at rate=2000 is structural and seed-independent. evals_to_95pct is exactly 14 in all cases (deterministic: Phase 1 always hits TP=4/2 at eval 14 in VALID_TP_INSTANCES ordering). Phase 2 LHS finds marginally different final bests per seed (variance in secondary knob search), but all exceed 40,392."
+    }
+  ],
+  "experiment_valid": true,
+  "discrepancy_analysis": "Three discrepancies from predictions: (1) NSGA-II unexpectedly beat hierarchical at seed=42 (8 vs 14 evals) — explained by lucky random warmup sampling, not systematic evolutionary advantage; (2) random needed 64 evals, not 150+ — explained by the bundle underestimating qualifying configs (0.017% was only the single optimal config; actual 2.67% when all configs above 95% threshold are counted); (3) h-control-negative 5x convergence difference instead of <2x — explained by hierarchical's fixed-order Phase 1 evaluating the dominant tier (TP=8/1) last. Core predictions confirmed: hierarchical beats random by >3x at rate=2000, tier ranking is stable across seeds.",
+  "dominant_component_pct": null
+}

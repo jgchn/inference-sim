@@ -1,0 +1,11 @@
+{
+  "gate_type": "findings",
+  "summary": "All 4 experimental arms in iteration 7 were CONFIRMED. The 'lean bracket' search strategy (evaluating only TP=4 and TP=8 with max-profile settings, budget of 2 evaluations) finds configurations within 1% of the global best across all tested regimes in under 1 second, with perfect determinism across search seeds.",
+  "key_points": [
+    "h-main CONFIRMED: Lean bracket achieves within 0.00\u20130.68% of global best across all 4 regimes (H100/A100-SXM \u00d7 rate 100/500). evals_to_best exactly matches predictions: 1 eval when TP=4 wins, 2 evals when TP=8 wins. All 20 runs (4 regimes \u00d7 5 seeds) show perfect determinism.",
+    "h-control-negative CONFIRMED: Using min-profile instead of max-profile in the lean bracket is catastrophic \u2014 score drops 56.8% below max-profile (predicted >5%), validating that profile choice dominates configuration quality.",
+    "h-ablation CONFIRMED: Adding 10 Phase-2 random trials after Phase-1 yields improvement in 5/5 seeds (predicted \u22653/5), but gains are small (0.002\u20130.71%) since Phase 1 already lands within the 1% threshold at this crossover regime (rate=200).",
+    "h-robustness CONFIRMED: 25/25 (blis_seed \u00d7 search_seed) combinations pass the 1% threshold with TP=4 winning universally. Unexpected finding: workload seed variance causes scores to range 0.178\u20130.188, with seeds 43\u201346 exceeding the blis_seed=42 reference by up to 5%, suggesting per-seed global bests should be computed independently for rigorous robustness claims.",
+    "Practical implication: For capacity planning, evaluating just 2 configurations (TP=4/2-instance and TP=8/1-instance with max-profile defaults) in ~1 second is sufficient to identify near-optimal deployment on an 8-GPU node."
+  ]
+}

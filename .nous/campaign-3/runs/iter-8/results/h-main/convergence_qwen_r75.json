@@ -1,0 +1,92 @@
+{
+  "model": "qwen/qwen3-14b",
+  "rate": 75,
+  "pareto_density": 0.06055555555555556,
+  "exhaustive_hv": 62917200000.0,
+  "nsga2": {
+    "checkpoints": [
+      {
+        "eval": 40,
+        "hv": 54531000000.0,
+        "pareto_size": 16,
+        "pct_of_exhaustive": 86.67,
+        "elapsed_s": 2.7
+      },
+      {
+        "eval": 80,
+        "hv": 56669400000.0,
+        "pareto_size": 13,
+        "pct_of_exhaustive": 90.07,
+        "elapsed_s": 5.2
+      },
+      {
+        "eval": 120,
+        "hv": 59473800000.0,
+        "pareto_size": 23,
+        "pct_of_exhaustive": 94.53,
+        "elapsed_s": 7.4
+      },
+      {
+        "eval": 160,
+        "hv": 60766200000.0,
+        "pareto_size": 40,
+        "pct_of_exhaustive": 96.58,
+        "elapsed_s": 9.2
+      },
+      {
+        "eval": 200,
+        "hv": 61165800000.0,
+        "pareto_size": 54,
+        "pct_of_exhaustive": 97.22,
+        "elapsed_s": 10.5
+      }
+    ],
+    "final_hv": 61165800000.0,
+    "final_hv_pct": 97.21634147737026,
+    "eval_at_95pct": 129.17073170731706
+  },
+  "random": {
+    "checkpoints": [
+      {
+        "eval": 40,
+        "hv": 54021600000.0,
+        "pareto_size": 17,
+        "pct_of_exhaustive": 85.86,
+        "elapsed_s": 2.6
+      },
+      {
+        "eval": 80,
+        "hv": 58584600000.0,
+        "pareto_size": 17,
+        "pct_of_exhaustive": 93.11,
+        "elapsed_s": 5.0
+      },
+      {
+        "eval": 120,
+        "hv": 59580000000.0,
+        "pareto_size": 20,
+        "pct_of_exhaustive": 94.7,
+        "elapsed_s": 7.9
+      },
+      {
+        "eval": 160,
+        "hv": 59763600000.0,
+        "pareto_size": 23,
+        "pct_of_exhaustive": 94.99,
+        "elapsed_s": 10.7
+      },
+      {
+        "eval": 200,
+        "hv": 61239600000.00001,
+        "pareto_size": 26,
+        "pct_of_exhaustive": 97.33,
+        "elapsed_s": 13.4
+      }
+    ],
+    "final_hv": 61239600000.00001,
+    "final_hv_pct": 97.33363849630945,
+    "eval_at_95pct": 160.17094017094027
+  },
+  "convergence_gap": 31.00020846362321,
+  "gap_interpretation": "positive = NSGA-II reaches 95% first; negative = random reaches 95% first"
+}

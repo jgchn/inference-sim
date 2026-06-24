@@ -1,0 +1,567 @@
+{
+  "principles": [
+    {
+      "id": "RP-1",
+      "statement": "In BLIS configuration search, TP (tensor parallelism) is the dominant performance knob \u2014 all near-optimal configs (within 1% of global best) require TP=8 at fixed GPU count of 8. TP alone accounts for ~87% of fitness variance across the 10-dimensional search space.",
+      "confidence": "high",
+      "regime": "qwen3-14b and llama-3.1-8b on H100, A100-SXM, L40S; fitness objective throughput:0.4,p99_ttft:0.3,p99_e2e:0.3",
+      "evidence": [
+        "iteration-1-h-main"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 1,
+      "mechanism": "TP=8 maximizes compute parallelism \u2014 each request executes across all 8 GPUs simultaneously, reducing per-token latency proportionally. The fitness objective (throughput + latency terms) benefits from reduced latency at all percentiles.",
+      "applicability_bounds": "Holds when total GPU count = 8 (single H100 SXM node). Breaks when TP \u00d7 instances < total GPUs (memory constraint or small batch regimes).",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-2",
+      "statement": "TPE-based Bayesian optimization converges faster than random search for BLIS configuration search, but both find the global optimum within 100 evaluations due to the extreme dominance of a single parameter (TP). TPE's advantage manifests at very low budgets (20-50 evals): 5/5 seed success rate vs random's 3/5 at budget=50.",
+      "confidence": "high",
+      "regime": "rate=50, 200 requests, H100, qwen3-14b, budget=100, 5 search seeds",
+      "evidence": [
+        "iteration-1-h-main"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 1,
+      "mechanism": "TPE builds a probabilistic model of parameter\u2192fitness relationships after each evaluation. With TP as the dominant factor (~87% of variance), TPE quickly learns to concentrate sampling on TP=8 configs. Random must discover TP=8 by chance, requiring more evaluations on average.",
+      "applicability_bounds": "Holds for 10D BLIS space. Advantage shrinks as budget grows (both converge by budget=100). LHS also effective at budget=50 due to stratified coverage.",
+      "superseded_by": null,
+      "category": "algorithmic",
+      "status": "active"
+    },
+    {
+      "id": "RP-3",
+      "statement": "Large batch and token budget settings (max_running=512, max_tokens=8192, prefill_threshold=4096) improve fitness alongside TP=8. These are secondary but consistent contributors: within the TP=8 regime, 53 configs score within 1% of the global best, all using high batch/token budgets.",
+      "confidence": "medium",
+      "regime": "qwen3-14b on H100 SXM, 8 GPUs, rate=50-200 req/s",
+      "evidence": [
+        "iteration-1-h-main"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 1,
+      "mechanism": "Larger batch sizes reduce step overhead amortization cost. Larger max_tokens enables longer continuous steps without forced chunking. Prefill threshold=4096 enables chunked prefill for very long prompts, preventing head-of-line blocking. Together these maximize throughput within the TP=8 compute budget.",
+      "applicability_bounds": "These settings may cause GPU OOM in production if not paired with adequate KV-cache capacity. In the simulator, memory is modeled abstractly, so these represent the performance-optimal configuration under relaxed memory constraints.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-4",
+      "statement": "TPE outperforms random search even in extremely small discrete spaces (15 feasible points). A 15-point space with a strongly dominant mode (TP=8/1inst scores 13% above median) has enough structure for TPE to exploit: mean evals-to-best of 6.2 (TPE) vs 13.6 (random), a 2.2x speedup.",
+      "confidence": "high",
+      "regime": "Restricted to TP + num_instances only (15 valid combos), rate=50, 200 requests, H100, qwen3-14b",
+      "evidence": [
+        "iteration-1-h-control-negative"
+      ],
+      "contradicts": [
+        "Prior prediction that TPE advantage requires large search spaces"
+      ],
+      "extraction_iteration": 1,
+      "mechanism": "Even with 15 feasible points, TP=8/1inst creates a unimodal dominant peak. After 2-3 evaluations sampling TP values, TPE's model assigns high probability to TP=8 configs. Random sampling requires more trials to encounter TP=8/1inst specifically by chance.",
+      "applicability_bounds": "Applies when the fitness landscape has a strong dominant mode (>10% above median). In uniform landscapes, TPE overhead eliminates advantage.",
+      "superseded_by": null,
+      "category": "algorithmic",
+      "status": "active"
+    },
+    {
+      "id": "RP-5",
+      "statement": "BLIS evaluations complete in ~70-90ms per run on H100 (1000 requests, rate=500) and ~250ms per run on L40S (same workload). Hardware type affects eval wall time: L40S's lower bandwidth creates longer simulation wall times, making L40S experiments ~3x slower than H100. Budget=100 at L40S takes ~25s per search seed.",
+      "confidence": "high",
+      "regime": "BLIS with llama-3.1-8b-instruct, 1000 requests, rate=500, H100 and L40S",
+      "evidence": [
+        "iteration-2-h-main",
+        "iteration-2-h-robustness"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 2,
+      "mechanism": "BLIS simulation wall time is proportional to simulated time / hardware speed. L40S's lower TFLOPS (362 vs 989.5) and bandwidth (0.864 vs 3.35 TB/s) result in slower per-request simulation. With 1000 requests at rate=500, L40S takes ~250ms/eval vs H100's ~70-90ms/eval.",
+      "applicability_bounds": "Scales with num_requests and model complexity. The H100 vs L40S ratio (~3x) reflects primarily the bandwidth difference affecting memory-bandwidth-bound operations.",
+      "superseded_by": null,
+      "category": "infrastructure",
+      "status": "active"
+    },
+    {
+      "id": "RP-6",
+      "statement": "Hierarchical search (Phase 1: 4 TP-level evaluations; Phase 2: TPE within winner) is effective when the winning TP level has a >3% margin over competitors in Phase 1 with default secondary params. At 200 req/rate=200, TP=8 wins by 11%+ and hierarchical finds optimal in exactly 4 evals on 5/5 seeds. At 1000 req/rate=500 for qwen3-14b, TP=4/2inst wins by 4.9% and hierarchical achieves evals_to_best of 6-24 (median=11). However, when the TP margin is <1% (llama-3.1-8b: 0.14% with default params), Phase 1 is deterministically wrong (5/5 seeds) and hierarchical caps 7.4% below global best. The fix is Adaptive Phase 1 \u2014 see RP-11.",
+      "confidence": "high",
+      "regime": "All tested regimes (200/200 and 1000/500, both models)",
+      "evidence": [
+        "iteration-3-h-main",
+        "iteration-4-h-main",
+        "iteration-4-h-robustness"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 4,
+      "mechanism": "Phase 1 with default secondary params (mr=256, mt=4096, pf=1024) fails to distinguish TP=2/4inst and TP=4/2inst for llama-3.1-8b because mr=256 is below the threshold where TP=4's per-instance compute advantage manifests. The high-batch profile (mr=512, mt=8192, pf=4096) creates an 8.2% gap (0.2089 vs 0.1932) by allowing batch sizes that leverage TP=4's higher FLOPS.",
+      "applicability_bounds": "Failure mode is specific to regimes where two TP levels produce nearly identical scores with default secondary params. Depends on the default max_running (256) being below the discriminative threshold for TP=4 vs TP=2.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-7",
+      "statement": "The BLIS multi-objective Pareto front (objectives: maximize throughput, minimize e2e_p99, minimize ttft_p99) is degenerate: at fixed 8 GPU count, TP=8 simultaneously maximizes throughput and minimizes all latency metrics. NSGA-II at budget=200 discovers at most 2 deduped Pareto-optimal points (1% tolerance), all TP=8 configs.",
+      "confidence": "high",
+      "regime": "BLIS with qwen3-14b on H100, rate=200, 8 GPUs, 3 objectives",
+      "evidence": [
+        "iteration-2-h-control-negative"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 2,
+      "mechanism": "Higher TP reduces per-request memory-bandwidth latency (TTFT, E2E) via sharding, while simultaneously increasing throughput (faster completions). Within TP=8, secondary parameters (batch size, token budget) affect all metrics in the same direction. There is no throughput-vs-latency tradeoff because the bottleneck (GPU memory bandwidth) is reduced uniformly by TP. The large raw Pareto front (100+ points) is an artifact of metric degeneracy: many TP=8 configs produce bit-identical objective tuples.",
+      "applicability_bounds": "Pareto degeneracy holds when TP is the dominant bottleneck. At very low load (rate<50) or when considering per-GPU throughput instead of cluster throughput, tradeoffs may emerge. Not applicable to heterogeneous hardware configurations or PD disaggregation.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-8",
+      "statement": "The optimal BLIS fitness score at rate=500 with 200 requests is ~0.120497 (not 0.162349 as previously estimated). The stale estimate came from iter-1 probes under different conditions. At high rates with fixed request count, the short simulation horizon caps achievable throughput.",
+      "confidence": "high",
+      "regime": "BLIS with qwen3-14b on H100, rate=500, num_requests=200, fitness=throughput:0.4,p99_ttft:0.3,p99_e2e:0.3",
+      "evidence": [
+        "iteration-2-h-robustness"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 2,
+      "mechanism": "With 200 requests at rate=500, the simulation runs for only ~0.4 seconds before all requests are injected. The short horizon limits the sustained throughput that can be observed. Higher num_requests would produce a higher fitness score by extending the measurement window.",
+      "applicability_bounds": "Applies when num_requests is the binding constraint rather than steady-state capacity. Use num_requests\u22651000 for accurate high-rate fitness evaluation if the goal is to measure sustained throughput.",
+      "superseded_by": null,
+      "category": "infrastructure",
+      "status": "active"
+    },
+    {
+      "id": "RP-9",
+      "statement": "Phase 1 TP identification in hierarchical search is deterministic given a fixed BLIS seed: all search seeds select the same TP winner because they evaluate the same BLIS configs at the same seed. Extended in iter-8: determinism confirmed for qwen3-32b on H100 and A100-SXM (a third model, 2.3x larger than qwen3-14b), and for L40S with both models (qwen3-14b and llama-3.1-8b). 45/45 (regime x seed) combinations across iter-7 and iter-8 show identical per-regime results across all 5 search seeds.",
+      "confidence": "high",
+      "regime": "All tested hardware (H100, A100-SXM, L40S), all tested models (qwen3-14b, llama-3.1-8b, qwen3-32b), lean bracket strategy",
+      "evidence": [
+        "iteration-8-h-main",
+        "iteration-8-h-robustness"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 8,
+      "mechanism": "Lean bracket uses only the max-profile (max_running=512, max_tokens=8192, prefill_threshold=4096) which is deterministic given blis_seed. The search_seed parameter controls TPE/random sampling in Phase 2, which is bypassed (skip_phase2=True). Therefore all search seeds produce identical Phase 1 results for the same blis_seed. Since the default blis_seed=42 is used across all runs, all seeds are byte-identical.",
+      "applicability_bounds": "Applies to lean bracket (skip_phase2=True, bracket K=1). Phase 2 TPE results would vary by search_seed. This determinism is a property of the Phase 1 evaluation being BLIS-seed-fixed and profile-deterministic.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-10",
+      "statement": "At 1000 requests/rate=500, flat TPE finds the global best for llama-3.1-8b on H100 within median 26 evaluations. On L40S with tighter TP margins (2.1%), flat TPE fails to converge in 4/5 seeds within budget=100. TPE convergence reliability depends strongly on hardware-specific TP margin: high-margin hardware (H100: 7.6%) is reliably solved, low-margin hardware (L40S: 2.1%) is not.",
+      "confidence": "high",
+      "regime": "BLIS with llama-3.1-8b-instruct, hard regime (1000 req, rate=500), H100 and L40S",
+      "evidence": [
+        "iteration-2-h-ablation"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 2,
+      "mechanism": "Flat TPE must discover the correct TP level through Bayesian modeling of the full 10-dimensional space. With L40S's tight margin, TPE cannot reliably build a model that distinguishes TP=4 from TP=8 given the noise from secondary parameter variation. The failure is not budget-limited: 4/5 seeds reach best=0.107-0.108 after 100 evals, which is below threshold 0.108571, suggesting TPE is stuck in a TP=8 or mixed subspace.",
+      "applicability_bounds": "H100 median 26 evals confirmed. L40S median evals_to_best=101 (failure). The transition point is between H100's 7.6% and L40S's 2.1% margin. Adaptive hierarchical search is recommended for all hardware due to the potential for tight margins.",
+      "superseded_by": null,
+      "category": "method",
+      "status": "active"
+    },
+    {
+      "id": "RP-11",
+      "statement": "Adaptive Phase 1 K=2 (default + high-batch profiles) achieves median evals_to_best=7 for llama-3.1-8b at 1000 req/rate=500 on BOTH H100 and A100-SXM \u2014 hardware portability is confirmed. evals_to_best=7 is deterministic when blis_seed is fixed, not just median: all 5 search seeds produce identical Phase 1 results and reach threshold at eval 7. The algorithm requires strategic profiles (not random) for reliable Phase 1 identification when the TP margin at default secondary params is <1% (H100 llama hard: 0.14% TP4 vs TP2 margin). On hardware with wider default margins (A100 llama hard: 4.2% TP4 vs TP8 margin), random profiles also achieve 5/5 correct but with variable evals_to_best (median=10 on A100 vs guaranteed 7 with strategic). Superseded by bracket profiles (RP-15) which achieve evals_to_best=3 with no domain knowledge requirement. [Updated iter-6: bracket K=1 is the new recommended default \u2014 4 Phase 1 evals + 96 TPE trials, evals_to_best=3 deterministically.]",
+      "confidence": "high",
+      "regime": "adaptive-hierarchical K=2 strategic on hard regime (1000 req/rate=500)",
+      "evidence": [
+        "iteration-5-h-main",
+        "iteration-6-h-main"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 5,
+      "mechanism": "Strategic profiles evaluate default (mr=256) first, which gives TP4=0.1762 and TP2=0.1784 \u2014 a 0.14% margin insufficient for discrimination (TP2 wins Phase 1 round 1). The second profile (high-batch, mr=512) gives TP4=0.2089 > TP2=0.1932 (8.3% margin). With max() aggregation, TP4 wins Phase 1. The threshold (0.207103) is crossed at eval 7 (TP4 with mr=512 in round 2). Bracket profiles improve this by evaluating mr=512 first, crossing the threshold at eval 3.",
+      "applicability_bounds": "Strategic profiles still valid as an alternative; bracket profiles are strictly better for evals_to_best. Strategic profiles may be preferred if backward compatibility with prior experiments is required.",
+      "superseded_by": "RP-15",
+      "category": "search-algorithm",
+      "status": "active"
+    },
+    {
+      "id": "RP-12",
+      "statement": "The global best fitness for llama-3.1-8b at 200 req/rate=200 on H100 is 0.143598 (high-batch TP=8/1inst config: mr=512, mt=8192, pf=4096), not 0.143342 (default TP=8/1inst config). The high-batch TP=8 profile yields 0.18% improvement. For evals_to_best purposes, the TP=8 default score (0.143342) still exceeds the 1% threshold for the prior global best (0.141909), maintaining evals_to_best=4 for adaptive Phase 1. The GLOBAL_BEST_TABLE for this regime should be updated to 0.143598.",
+      "confidence": "high",
+      "regime": "llama-3.1-8b, 200 req/rate=200, H100, blis_seed=42",
+      "evidence": [
+        "iteration-4-h-control-negative"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 4,
+      "mechanism": "The high-batch profile (mr=512, mt=8192, pf=4096) for TP=8/1inst allows more tokens to be processed per step at low load, slightly improving utilization. At 200 requests, the system is not heavily loaded, so the marginal improvement from larger batch capacity is small (0.18%). With the updated global best (0.143598), the threshold becomes 0.142162, and the TP=8 default (0.143342) still clears it \u2014 so evals_to_best is unchanged.",
+      "applicability_bounds": "The improvement (0.18%) is small enough that it does not affect search algorithm conclusions. This is a calibration refinement, not a regime-changing discovery.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-13",
+      "statement": "TP=8/1inst easy-regime dominance (low request count, TP=8 wins) is conditional on max_running >= 256 on A100-SXM. With max_running in {32, 64, 128}, TP=4/2inst outperforms TP=8/1inst even at 200 req/rate=200 because 2 instances \u00d7 mr provides 2x effective concurrent capacity. Empirically on A100-SXM easy: max_running=128 gives TP8=0.1024, TP4=0.1035 (TP4 wins); max_running=256 gives TP8=0.1200, TP4=0.1035 (TP8 wins by 15.9%). The threshold lies between 128 and 256.",
+      "confidence": "high",
+      "regime": "llama-3.1-8b; A100-SXM; 200 req/rate=200 (easy regime); max_running in {32, 64, 128, 256, 512}",
+      "evidence": [
+        "iteration-5-h-control-negative"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 5,
+      "mechanism": "TP=8/1inst achieves its compute-per-request advantage when the single instance can maintain high GPU utilization by batching many requests. With max_running=128, the single TP=8 instance processes at most 128 concurrent requests, while 2x TP=4 instances process up to 256 concurrent total. At easy regime (200 requests), the extra capacity of the 2-instance configuration compensates for its lower per-request FLOPS. At max_running=256, the TP=8 instance can batch 256 requests, saturating its FLOPS advantage over the split 128+128 configuration of TP=4/2inst. The effective-concurrent-capacity = num_instances * max_running is the discriminative quantity.",
+      "applicability_bounds": "Confirmed on A100-SXM at 200 req/rate=200. The max_running threshold (128-256) likely varies by hardware and request count. Not tested at H100 easy regime. Does not affect hard regime (1000 req/rate=500) where TP=4/2inst wins regardless of max_running.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-14",
+      "statement": "Adaptive hierarchical search with strategic Phase 1 profiles is hardware-portable: the same algorithm, same profiles, and same hyperparameters (K=2) achieve identical evals_to_best=7 on both H100 and A100-SXM for the hard regime (1000 req/rate=500, llama-3.1-8b). No modification to the search algorithm or profiles is required when switching hardware. The strategic profiles' discriminative power transfers because both hardware types show a large enough TP=4/2inst advantage with high-batch params (H100: 8.2% TP4>TP2, A100: 5.0% TP4>TP8).",
+      "confidence": "high",
+      "regime": "llama-3.1-8b at 1000 req/rate=500; H100 and A100-SXM; strategic profiles K=2; budget=100",
+      "evidence": [
+        "iteration-5-h-robustness",
+        "iteration-4-h-main"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 5,
+      "mechanism": "The strategic profiles (default: mr=256,mt=4096,pf=1024; high-batch: mr=512,mt=8192,pf=4096) create the discriminative signal needed for Phase 1 on any hardware where TP=4/2inst has a >3% advantage over all other TP levels when high-batch params are used. On A100-SXM, the high-batch TP4 score (0.1712) exceeds the 1% threshold relative to the probe-based global best (0.1712 > 0.99 * 0.1712), so Phase 2 starts from the correct TP level and TPE finds the optimum at the same round.",
+      "applicability_bounds": "Tested on H100 and A100-SXM. Expected to generalize to other hardware where the TP crossover structure is preserved (TP=4 wins at high load). A100-SXM actual global best found by search (0.172212) slightly exceeds the probe estimate (0.171201) \u2014 update GLOBAL_BEST_TABLE accordingly.",
+      "superseded_by": null,
+      "category": "search",
+      "status": "active"
+    },
+    {
+      "id": "RP-15",
+      "statement": "Bracket Phase 1 profiles (always evaluate max and min of each secondary parameter, max-first ordering) achieve 5/5 Phase 1 correctness on all tested regimes (H100 hard llama, A100 easy llama, A100 hard qwen, L40S hard llama) while reducing evals_to_best from 7 to 3 or 4. Extended in iter-3: bracket K=1 also achieves 5/5 Phase 1 correctness for qwen3-14b on L40S (different TP winner TP=8 vs llama's TP=4) and H100 (TP=4 winner), confirming model-agnostic Phase 1 identification across both models and all hardware configurations tested. Extended in iter-5: bracket K=1 achieves 25/25 Phase 1 correctness on H100 at rate=100 (TP=8 winner, the reverse of rate>=150 behavior) and 25/25 evals_to_best=3 at rate=125 (crossover point). Rate-regime agnosticism confirmed.",
+      "confidence": "high",
+      "regime": "All tested: H100/A100-SXM/L40S, qwen3-14b and llama-3.1-8b, rates 100-1000, easy and hard regimes",
+      "evidence": [
+        "iteration-3-h-main",
+        "iteration-3-h-robustness",
+        "iteration-5-h-main",
+        "iteration-5-h-robustness",
+        "iteration-5-h-ablation"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 5,
+      "mechanism": "The max-profile creates a compute-saturated regime where the rate-dependent TP advantage (whether TP=8 at low rates or TP=4 at high rates) fully expresses, enabling reliable Phase 1 identification regardless of rate regime.",
+      "applicability_bounds": "Tested across 3 hardware types (H100, A100-SXM, L40S), 2 models (qwen3-14b, llama-3.1-8b), rates 100-1000, request counts 200 and 1000. evals_to_best=3 when TP=4 wins (position 3), evals_to_best=4 when TP=8 wins (position 4). At crossover rates (~125 for H100 qwen), evals_to_best=3 because TP=4 reaches threshold before TP=8 is evaluated.",
+      "superseded_by": null,
+      "category": "algorithm",
+      "status": "active"
+    },
+    {
+      "id": "RP-16",
+      "statement": "Bracket K=1 (max-only profile) is sufficient for Phase 1 TP identification and achieves evals_to_best of 3 or 4 depending on winner TP position in the evaluation order. Extended in iter-3: K=1 achieves 25/25 correctness for qwen3-14b on L40S hard (5 blis_seeds x 5 search seeds), including near-zero margin seeds (seed=43: 0.03%, seed=45: 0.11%). The min profile is universally redundant for Phase 1 correctness across all tested models and hardware. Extended in iter-5: K=1 achieves 25/25 correctness at rate=100 on H100 (TP=8 winner, evals_to_best=4) and 25/25 evals_to_best=3 at rate=125 (crossover, TP=4 and TP=8 within 1%). Rate-regime portability confirmed.",
+      "confidence": "high",
+      "regime": "All tested regimes including rate=100 and rate=125 on H100, qwen3-14b",
+      "evidence": [
+        "iteration-3-h-ablation",
+        "iteration-5-h-main",
+        "iteration-5-h-robustness",
+        "iteration-5-h-ablation"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 5,
+      "mechanism": "The max-profile (mr=512, mt=8192, pf=4096) saturates the compute path for each TP level, revealing the rate-dependent competitive advantage. The min profile adds no discriminative power because it fails to saturate the compute path, causing secondary params to dominate over TP-level differences.",
+      "applicability_bounds": "evals_to_best is 3 when TP=4 wins (position 3) or when TP=8 and TP=4 are within 1% (crossover point), and 4 when TP=8 wins (position 4). This asymmetry is an inherent consequence of the [TP=1, TP=2, TP=4, TP=8] evaluation order.",
+      "superseded_by": null,
+      "category": "algorithm",
+      "status": "active"
+    },
+    {
+      "id": "RP-17",
+      "statement": "The min profile (mr=min, mt=min, pf=min) in bracket Phase 1 selects the wrong TP winner. On H100 hard llama, it selects TP=1/8inst. On L40S hard llama, it selects TP=2/4inst. The failure mode is hardware-specific due to different compute-bandwidth tradeoffs. In all cases, Phase 2 TPE within the wrong TP level is trapped, achieving best_score well below the 1% threshold.",
+      "confidence": "high",
+      "regime": "BLIS with llama-3.1-8b-instruct on H100 and L40S, hard regime, bracket-min-only",
+      "evidence": [
+        "iteration-2-h-control-negative"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 2,
+      "mechanism": "At mr=32, the capacity-limited regime dominates. L40S: TP=2/4inst wins (4 instances \u00d7 mr=32=128 slots) because L40S low bandwidth (0.864 TB/s) makes TP=1 per-request slow, while TP=2 balances capacity and per-request speed. H100: TP=1/8inst wins (8 instances dominate at low batch). On L40S, best Phase 2 score ~0.0917 (16.2% below global best); Phase 2 is trapped in a suboptimal TP subspace.",
+      "applicability_bounds": "Min profile failure mode depends on hardware. The wrong winner differs between H100 and L40S. In all tested cases, the min profile always selects a non-optimal TP, validating the principle that the max profile is the universal Phase 1 discriminator.",
+      "superseded_by": null,
+      "category": "method",
+      "status": "active"
+    },
+    {
+      "id": "RP-18",
+      "statement": "Under high arrival rate (rate=200 vs rate=50), TPE's advantage over random search is larger (+6.87% fitness gap at budget=50 vs +5.36%). High load creates sharper fitness gradients \u2014 undersized configs saturate and show dramatically worse metrics, concentrating the optimal region and making Bayesian modeling more effective.",
+      "confidence": "medium",
+      "regime": "H100, qwen3-14b, 200 requests, budget=100, 5 search seeds; comparison rate=50 vs rate=200",
+      "evidence": [
+        "iteration-1-h-robustness"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 1,
+      "mechanism": "At high rates, low-TP and small-batch configs reach queue saturation quickly, producing near-zero throughput and very high latency. This creates steep fitness cliffs that TPE's model detects and avoids after 2-3 saturated evaluations. Random wastes proportionally more budget on these clearly-bad regions.",
+      "applicability_bounds": "Effect size (1.5x) is modest. At extreme overload (rate >> capacity), all configs fail and both methods perform equally poorly. Sharpest advantage expected in moderately overloaded regimes where good configs can still serve requests but bad configs saturate.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-19",
+      "statement": "At a TP margin of 2.1% (L40S hard llama), flat TPE cannot reliably identify the optimal TP level within budget=100: 4/5 search seeds fail to reach the 1% threshold. In contrast, bracket K=1 succeeds deterministically in 3 evals. The relationship between TP margin size and TPE convergence reliability is non-linear: H100 (7.6% margin) shows TPE median evals_to_best=26, while L40S (2.1% margin) shows TPE median evals_to_best=101 (failure). This defines a practical margin threshold below which bracket hierarchical search becomes qualitatively necessary, not just beneficial.",
+      "confidence": "high",
+      "regime": "BLIS with llama-3.1-8b-instruct, hard regime (1000 req, rate=500), L40S hardware, budget=100",
+      "evidence": [
+        "iteration-2-h-ablation",
+        "iteration-2-h-main"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 2,
+      "mechanism": "TPE's Bayesian model requires sufficient fitness signal contrast to distinguish TP=4 from TP=8 across the full 10-dimensional search space. At 2.1% margin, the expected contrast is too low for reliable TP=4 identification when secondary params are being simultaneously optimized. TPE may assign high probability to TP=8 configs with favorable secondary params (achieving ~0.108) that appear competitive with TP=4 configs at the same secondary params (0.109), preventing reliable discrimination. Bracket K=1's Phase 1 directly measures both TP=4 and TP=8 at max batch capacity, making the discrimination direct rather than probabilistic.",
+      "applicability_bounds": "The 2.1% margin threshold is based on a single hardware/model combination. The exact threshold where TPE fails may vary. Margins > 7% (H100) are reliably handled by TPE. The 2.1% L40S margin is reliably handled only by hierarchical search. The transition likely occurs in the 3-6% range.",
+      "superseded_by": null,
+      "category": "method",
+      "status": "active"
+    },
+    {
+      "id": "RP-20",
+      "statement": "Lean bracket (TP={4,8} max-profile, budget=2) is robust to BLIS workload variation across seeds for 70B on both H100 and L40S: 50/50 (hardware x blis_seed x search_seed) combinations achieve correct TP=8 identification. All 5 search seeds produce identical results per blis_seed (deterministic). Minimum TP=8 margin across all blis seeds: 2.4% (H100 blis_seed=45). L40S margins: 11.7-20.3%. 70B workload variation is larger than 14B: H100 scores range 0.091801-0.095769 (+4.3% vs reference) vs 14B range of +5.1%.",
+      "confidence": "high",
+      "regime": "llama-3.1-70b-instruct H100 and L40S at rate=500, blis seeds 42-46, 5 search seeds each",
+      "evidence": [
+        "iteration-9-h-robustness"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 9,
+      "mechanism": "BLIS seed controls request arrival times and token counts, not the latency model physics. The 70B weight-transfer advantage of TP=8 is structural (hardware bandwidth / model size), not workload-dependent. Different blis seeds create different queue dynamics and P99 tails but cannot change which TP level has lower per-step latency. The larger absolute margins for 70B (min 2.4% vs 14B min ~0.03%) make lean bracket more robust to blis_seed variation, not less.",
+      "applicability_bounds": "Extends RP-20 from 14B (qwen3-14b H100 rate=500) to 70B. Confirmed for both high-bandwidth (H100) and low-bandwidth (L40S) hardware. Lean bracket determinism (all 5 search seeds identical per blis_seed) holds because bracket profiles are deterministic (no RNG in lean bracket with K=1).",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-21",
+      "statement": "The TP winner in bracket K=1 Phase 1 is model-dependent on low-bandwidth hardware (L40S, 0.864 TB/s): qwen3-14b->TP=8/1inst at both rates 100 and 500, llama-3.1-8b->TP=8/1inst at rate=100 and TP=4/2inst at rate=500. Extended in iter-8: L40S validation confirmed for both models across 4 regimes. Also confirmed for qwen3-32b: TP=8 wins at both rates 100 and 500 (established in GLOBAL_BEST_TABLE but not directly tested as lean bracket robustness arm). Lean bracket correctly identifies model-dependent and rate-dependent winners on L40S without any algorithm modification.",
+      "confidence": "high",
+      "regime": "L40S hardware (0.864 TB/s), models up to 32B, rates 100-500 req/s",
+      "evidence": [
+        "iteration-8-h-robustness"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 8,
+      "mechanism": "L40S has the lowest bandwidth (0.864 TB/s) of tested hardware. For qwen3-14b (28GB weights), TP=8 bandwidth pooling advantage persists at all practical rates \u2014 no crossover exists. For llama-3.1-8b (smaller model, less weight loading per step), the crossover to compute-bound regime occurs at ~450-500 req/s \u2014 just at the edge of the tested rate range. TP=4/2inst wins at rate=500 because queue saturation effects from high arrival rates give the 2-instance configuration a fitness advantage that outweighs TP=8's per-step latency reduction.",
+      "applicability_bounds": "L40S-specific due to low bandwidth. On higher-bandwidth hardware (H100, A100-SXM), both 14B and 8B models tend toward TP=4 dominance at rate=500. The model-dependent winner pattern is unique to hardware where bandwidth constraints dominate even for lighter models.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-22",
+      "statement": "TPE convergence reliability at tight TP margins is hardware/model-specific, not universal. On L40S: the margin threshold for reliable flat TPE convergence at budget=100 lies between 2.1% (llama failure: 4/5 seeds fail) and 5.1% (qwen success: 4/5 exact). On A100-SXM: flat TPE succeeds at 1.07% margin (5/5 within-threshold, median evals_to_best=26) and at 4.47% margin (5/5 within-threshold, median evals_to_best=6). The [2.1%, 5.1%] bound is specific to L40S hardware and cannot be universally applied. A100-SXM's higher absolute fitness landscape allows more configurations to exceed the 1% threshold, making TPE convergence easier at equivalent relative margins.",
+      "confidence": "high",
+      "regime": "L40S hard (llama 2.1%, qwen 5.1%) and A100-SXM hard (qwen 1.07%, qwen 4.47%), 1000 req/rate=500.",
+      "evidence": [
+        "iteration-3-h-ablation",
+        "iteration-3-h-control-negative",
+        "iteration-4-h-ablation",
+        "iteration-4-h-control-negative"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 4,
+      "mechanism": "TPE convergence depends on: (1) relative TP margin (how distinguishable TP winner configs are from non-winners), AND (2) how many TP-winner configurations exceed the absolute 1% threshold (global_best \u00d7 0.99). On A100-SXM qwen, threshold=0.137432 is exceeded by many TP4/2inst configurations (not just max-profile), because A100-SXM's higher FLOP/bandwidth ratio creates a broader above-threshold region. On L40S llama at 2.1%, the threshold region is narrower, requiring more specific (TP=4+high-batch) configurations. Margin width still causally affects speed: within A100-SXM, 4.47% margin \u2192 median 6 evals, 1.07% margin \u2192 median 26 evals.",
+      "applicability_bounds": "The hardware-specificity means flat TPE cannot be ruled in or out based solely on relative margin width. Hardware characteristics (absolute fitness range, threshold coverage) must be considered. Bracket K=1 remains hardware-agnostic and achieves evals_to_best=3 in all tested configurations, making it the recommended default regardless of margin width.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-23",
+      "statement": "The global best for qwen3-14b on A100-SXM hard regime (1000 req/rate=500) is 0.138820, achievable with TP=4/2inst using round-robin routing (not least-loaded). Phase 1 max-profile (least-loaded) achieves 0.138290. Round-robin routing provides a 0.38% improvement over least-loaded for this hardware/workload. This is the first regime in the campaign where Phase 2 adds genuine value beyond Phase 1: flat TPE within TP=4/2inst discovers the routing improvement in 4/5 search seeds within budget=100.",
+      "confidence": "high",
+      "regime": "qwen3-14b A100-SXM hard (1000 req/rate=500), seed=42.",
+      "evidence": [
+        "iteration-4-h-main",
+        "iteration-4-h-robustness"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 4,
+      "mechanism": "Round-robin distributes requests uniformly between the 2 instances, while least-loaded can create imbalance when one instance temporarily has more in-flight requests. At 1000 req/rate=500 with A100-SXM timing characteristics, round-robin's uniform distribution marginally improves throughput. This effect is seed-dependent: at seed=46, least-loaded (0.147057) outperforms round-robin (0.146765), while at seed=42, round-robin wins. The routing effect is a small secondary optimization discoverable by Phase 2 TPE.",
+      "applicability_bounds": "Only matters for 2-instance configs (TP=4/2inst). Single-instance configs have degenerate routing (RP note: routing_policy has no effect at 1 instance). The routing advantage is seed-dependent and small (0.38%). The global best table entry 0.138820 is based on seed=42; other seeds may have slightly different optima.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-24",
+      "statement": "The TP winner in bracket K=1 Phase 1 is rate-dependent: TP=8/1inst wins at low arrival rates, TP=4/2inst wins at high arrival rates. This transition exists on ALL tested hardware (H100, A100-SXM). On H100, the crossover is at ~125 req/s. On A100-SXM, the crossover is at ~200 req/s. UPDATED iter-10: This rate-dependent crossover is WORKLOAD-CONDITIONAL \u2014 it applies only to workloads with short prompt distributions (prompt mean <= 512, i.e., chatbot and distribution). For workloads with prompt mean >= 1024 (contentgen, summarization, multidoc), TP=4/2inst wins at ALL tested rates on H100 (no crossover exists). The crossover rate scales inversely with memory bandwidth AND inversely with prompt token mean.",
+      "confidence": "high",
+      "regime": "qwen3-14b on H100 and A100-SXM, workloads: chatbot (mean=256), distribution (mean=512), contentgen (mean=1024), summarization (mean=4096), multidoc (mean=10240)",
+      "evidence": [
+        "iteration-5-crossover",
+        "iteration-6-crossover",
+        "iteration-10-h-main",
+        "iteration-10-h-robustness"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 10,
+      "mechanism": "Rate-dependent crossover emerges from the interplay between arrival rate (queue saturation effects) and TP-level parallelism. With longer prompts, the prefill compute cost per request increases, which means TP=4/2inst's parallelism advantage (two instances processing prefills simultaneously) becomes sufficient to win even at low rates. The crossover rate is effectively a function of three variables: hardware bandwidth, model size, AND prompt token distribution.",
+      "applicability_bounds": "Empirically validated for qwen3-14b on H100 and A100-SXM. Prompt-length crossover threshold on H100 is between 512 and 1024 tokens. Exception: multidoc on A100-SXM shows TP=8 winning at all rates (KV cache capacity mechanism overrides prefill compute mechanism).",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-25",
+      "statement": "Bracket K=1 hierarchical search correctly adapts to rate-dependent TP winner transitions without any algorithm modification, across all tested hardware platforms (H100 and A100-SXM). At low rates (TP=8 wins), achieves 25/25 Phase 1 correctness with evals_to_best=4. At crossover rate (~200 on A100-SXM), achieves 5/5 evals_to_best=3 because TP=4 at position 3 clears the 1% threshold before TP=8 is evaluated. The algorithm is rate-regime and hardware-agnostic.",
+      "confidence": "high",
+      "regime": "H100 and A100-SXM hardware, qwen3-14b and llama-3.1-8b-instruct models, rates 100-500 req/s",
+      "evidence": [
+        "iteration-5-h-main",
+        "iteration-5-h-ablation",
+        "iteration-6-h-main",
+        "iteration-6-h-ablation",
+        "iteration-6-h-robustness"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 6,
+      "mechanism": "The bracket max-profile (mr=512, mt=8192, pf=4096) evaluates each TP level under the compute-saturated regime where TP differences are maximally expressed. The 1% threshold mechanism naturally adapts: whichever TP level achieves the highest max-profile score and exceeds the threshold first determines evals_to_best. At crossover, both TP4 and TP8 score identically, but TP4 at position 3 triggers early termination \u2014 a property of the threshold mechanism, not a regime-specific tuning.",
+      "applicability_bounds": "Validated for 5 search seeds x up to 5 blis_seeds (25 combinations). Cross-hardware portability confirmed between H100 and A100-SXM. L40S not tested at low rates. Only validated with budget=100.",
+      "superseded_by": null,
+      "category": "algorithm",
+      "status": "active"
+    },
+    {
+      "id": "RP-26",
+      "statement": "At low arrival rates (rate=100), flat TPE converges dramatically faster than at high rates: median evals_to_best=6 on A100-SXM qwen3-14b (rate=100) vs median=26 on A100-SXM qwen3-14b (rate=500, from RP-22). The monotonic TP fitness landscape at rate=100 (TP1<TP2<TP4<TP8) provides clean signal for TPE's surrogate model. Despite this, bracket K=1 (evals_to_best=4 deterministically) still outperforms flat TPE (median=6) by 33%. Confirmed on both H100 (iter-5) and A100-SXM (iter-6).",
+      "confidence": "high",
+      "regime": "A100-SXM and H100, qwen3-14b, rate=100, 1000 requests",
+      "evidence": [
+        "iteration-5-h-control-negative",
+        "iteration-6-h-control-negative"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 6,
+      "mechanism": "At rate=100, the TP fitness landscape is strictly monotonic (each higher TP level always scores better), giving TPE's Gaussian process surrogate a clean gradient to follow. At rate=500, TP=4>TP=8 creates a non-monotonic surface that requires more samples to identify the optimum. The wide variance in TPE evals_to_best at rate=100 (1-18) vs bracket's deterministic 4 shows that even on easy landscapes, sampling-based methods have high variance while bracket is fully deterministic.",
+      "applicability_bounds": "TPE median=6 is faster than rate=500 (median=26) but bracket K=1 median=4 still wins. Bracket advantage of 33% at rate=100 is smaller than at rate=500 (bracket always 3-4 vs TPE median=26). Both methods reliably find global best at rate=100.",
+      "superseded_by": null,
+      "category": "algorithm",
+      "status": "active"
+    },
+    {
+      "id": "RP-27",
+      "statement": "The model-size-aware formula (load_index = params_B / bandwidth_TB_s; if load_index > 12: predict TP=8 always; else: predict via 400/BW crossover) achieves 24/24 (100%) accuracy on the 4-model x 3-hardware x 2-rate test grid with default workload. However, formula accuracy drops to 5/8 (62.5%) on H100 workload presets and 4/8 (50%) on A100-SXM workload presets. The formula is workload-blind: it has no input for prompt token distribution. Long-prompt workloads (prompt mean >= 1024) shift the effective crossover rate below 100 req/s on H100, causing the formula to predict TP=8 at rate=100 while actual winner is TP=4. On A100-SXM, an additional failure mode exists: very long prompts (multidoc avg=10240) cause TP=4/2inst to underperform due to KV cache capacity at high arrival rates, which the formula cannot model.",
+      "confidence": "high",
+      "regime": "qwen3-14b, H100 and A100-SXM, 1000 requests, rate=100 and rate=500, all 4 workload presets",
+      "evidence": [
+        "iteration-7-validation",
+        "iteration-8-validation",
+        "iteration-10-h-control-negative"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 10,
+      "mechanism": "The formula computes crossover_rate = 400 / bandwidth and compares rate vs crossover_rate. It has no parameter for prompt token distribution. For workloads with prompt mean >= 1024, the effective crossover rate drops below the formula's predicted value, causing systematic misprediction at rate=100 (where rate < formula_crossover but actual winner is still TP=4). Extending the formula would require a prompt_tokens_mean parameter and a revised crossover equation that accounts for prefill compute scaling.",
+      "applicability_bounds": "Formula maintains 100% accuracy only on default workload (prompt mean ~512) and for large models where no crossover exists (load_index > 12, i.e., 70B models). For real-world deployments with diverse workloads, lean bracket (which directly evaluates both TP options) is more reliable than the formula.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-28",
+      "statement": "Lean bracket (TP={4,8}, max-profile only, budget=2, no Phase 2) achieves within 1% of global best across all tested regimes, now including 4 workload presets (chatbot, contentgen, summarization, multidoc) on both H100 and A100-SXM. Extended to 16 workload-preset regimes x 5 seeds = 80 additional runs (40 H100 + 40 A100-SXM), all correct. Total validated runs: 75 (prior) + 80 (iter-10) = 155/155.",
+      "confidence": "high",
+      "regime": "qwen3-14b on H100 and A100-SXM, 1000 requests, rate=100 and rate=500, all 4 workload presets (chatbot/contentgen/summarization/multidoc) plus prior default workload results",
+      "evidence": [
+        "iteration-10-h-main",
+        "iteration-10-h-robustness"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 10,
+      "mechanism": "Lean bracket evaluates both TP=4/2inst and TP=8/1inst with max-profile secondary params (mr=512, mt=8192, pf=4096), then picks the higher scorer. This is workload-agnostic: the algorithm directly measures both TP options under compute-saturated conditions, so no formula or workload metadata is needed. The TP winner shifts with prompt token distribution because longer prompts increase prefill compute per request (sim/latency/roofline.go:291-351), shifting the effective crossover rate. Lean bracket captures this automatically regardless of workload shape.",
+      "applicability_bounds": "Confirmed for qwen3-14b on H100 and A100-SXM. Prior validation covers 4 models (qwen3-14b, llama-3.1-8b, qwen3-32b, llama-3.1-70b) and 3 hardware (H100, A100-SXM, L40S) but only with default workload. Workload preset validation currently only covers qwen3-14b on H100 and A100-SXM. The workload-agnostic property should generalize to other models/hardware by the same mechanism.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-29",
+      "statement": "Lean bracket with min-profile (mr=32, mt=2048, pf=0) is catastrophically suboptimal: 56.8% below max-profile lean bracket on H100 qwen rate=500. Min-profile in the lean bracket context inverts the TP4 vs TP8 ranking (TP4=0.077, TP8=0.063) but still cannot find TP=2/4inst (excluded) which would have scored 0.082 with full TP candidates. The max-profile is the mechanism enabling lean bracket correctness.",
+      "confidence": "high",
+      "regime": "H100, qwen3-14b, rate=500, 1000 requests, lean bracket (TP=4,8 only)",
+      "evidence": [
+        "iteration-7-h-control-negative"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 7,
+      "mechanism": "Min-profile (mr=32) creates a capacity-limited regime where 32 concurrent slots per instance limits throughput regardless of bandwidth. In this regime, instance count advantage would favor TP=2/4inst (4\u00d732=128 capacity) over TP=4/2inst (2\u00d732=64), but lean bracket's TP=2 exclusion means TP4 still 'wins' within the lean candidates at 0.077 \u2014 57% below the max-profile result. The compute-saturated max-profile regime is the necessary condition for lean bracket to correctly identify the bandwidth-dominant TP winner.",
+      "applicability_bounds": "Validates the max-profile requirement for lean bracket. Extends RP-17 to the lean bracket context. The specific scores (TP4=0.077, TP8=0.063 with min-profile) are H100/qwen/rate=500-specific.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-30",
+      "statement": "Mini Phase 2 (10 TPE trials) finds routing improvements on 5/5 seeds at the A100-SXM qwen rate=200 crossover regime, exceeding the predicted 3/5. Seeds 44-46 discover round-robin or weighted routing (0.33-0.71% improvement over least-loaded). Seeds 42-43 show marginal improvement (0.002-0.012%). All 5/5 remain within 1% of global best (0.135440). Phase 1 alone is also within threshold (0.134488 > threshold 0.134086), so evals_to_best=1 in all cases.",
+      "confidence": "high",
+      "regime": "A100-SXM, qwen3-14b, rate=200, 1000 requests, lean bracket + mini Phase 2 (budget=12)",
+      "evidence": [
+        "iteration-7-h-ablation"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 7,
+      "mechanism": "At rate=200 (A100-SXM crossover), TP=4/2inst and TP=8/1inst score identically in Phase 1 (0.1345 each), confirming the crossover point. Phase 2 explores routing options for the TP=4/2inst winner. The 3-option routing space (round-robin, least-loaded, weighted) is efficiently explored in 10 trials: TPE's random exploration phase covers the routing dimension early. The 5/5 improvement rate (vs 3/5 predicted) suggests routing discovery is more consistent than expected in the mini-budget regime.",
+      "applicability_bounds": "Specific to the A100-SXM rate=200 crossover regime where routing sensitivity is highest. Phase 2 adds 0.002-0.71% improvement \u2014 within 1% tolerance but not meaningless for seeds 44-46. On single-instance regimes (TP=8/1inst winners), Phase 2 routing trials are degenerate. Mini Phase 2 budget of 10 is sufficient for routing discovery at this specific regime.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-31",
+      "statement": "The minimum simulation horizon for reliable TP winner identification in lean bracket is >=1000 requests at high arrival rates (rate>=500 req/s). With <=100 requests at rate=500, lean bracket selects TP=8 instead of TP=4 on 4/4 tested high-rate regimes (H100 qwen3-14b, A100-SXM qwen3-14b, H100 llama-3.1-8b, H100 qwen3-32b). The TP=8 win margins at 100-req are 16-38%, compared to TP=4 win margins of 0.8-1.5% at 1000-req \u2014 the signal completely inverts at short horizons.",
+      "confidence": "high",
+      "regime": "High arrival rates (rate>=500 req/s), all tested hardware (H100, A100-SXM), multiple models (qwen3-14b, llama-3.1-8b, qwen3-32b), lean bracket strategy",
+      "evidence": [
+        "iteration-8-h-ablation"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 8,
+      "mechanism": "At 100 requests with rate=500, all 100 requests arrive within 0.2s. With 1-2 instances and high max_running, the burst is absorbed before any queue builds. In this regime, TP=8/1inst's lower per-step latency (single-GPU memory bandwidth pooled across 8 GPUs at reduced model size) dominates fitness score. The queuing advantage of TP=4/2inst (2 instances handling parallel requests) requires SUSTAINED load: the instance queue must reach steady-state depth, which takes hundreds of completed requests at high rates. At 1000 requests and rate=500, the simulation runs for ~2s of simulated time, giving 400+ requests to saturate the system before the measurement horizon ends. The minimum horizon is likely somewhere between 500-1000 requests for high-rate regimes. The 100-req micro-eval not only fails but fails by a wide margin in the wrong direction.",
+      "applicability_bounds": "This applies to multi-instance configurations (TP=4/2inst vs TP=8/1inst) at high rates (>=500 req/s). At low rates (rate=100), even 100 requests may be sufficient since TP=8 is the correct winner and has a large margin. The 1000-request standard is conservative but safe for all tested regimes.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-32",
+      "statement": "For large models (70B), the TP=8 advantage is structural and rate-independent: no crossover exists at any practical arrival rate (100-2000 req/s) on any tested hardware. TP=8 wins with margins 9-20% across all regimes. Default-profile (mr=256, mt=4096, pf=1024) preserves the TP=8 winner identification (6/6 correct) though scores are 15-19% below max-profile because the advantage comes from raw per-step latency physics, not batch-size-dependent queue dynamics.",
+      "confidence": "high",
+      "regime": "llama-3.1-70b-instruct on H100, A100-SXM, L40S at rates 100-2000 req/s, 1000 requests, blis seeds 42-46",
+      "evidence": [
+        "iteration-9-h-main",
+        "iteration-9-h-ablation",
+        "iteration-9-h-robustness"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 9,
+      "mechanism": "At 70B, the weight transfer time per step at TP=4 (two H100 GPUs sharing 140GB) is 2x longer than at TP=8 (eight H100 GPUs each holding 17.5GB). This gap (roofline.go:291-351) is so large that even with 2 instances at TP=4 routing traffic, the per-token latency deficit cannot be overcome by queue redistribution. This is qualitatively different from 14B/32B models where the crossover regime exists because the weight-transfer gap is smaller. TP=1 OOMs (137 GiB > 72 GiB per GPU), TP=2 scores 6.9x worse than TP=8.",
+      "applicability_bounds": "Confirmed for 70B at load_index > 20.9 on all tested hardware. Expected to generalize to any model with load_index >> 12. May not apply to future hardware with dramatically different bandwidth (e.g., H200 at 4.8 TB/s would give 70B load_index=14.6 \u2014 still above threshold=12 so TP=8 still wins). Not validated for models beyond 70B that require multi-node (405B+).",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    },
+    {
+      "id": "RP-33",
+      "statement": "The TP winner in lean bracket is workload-dependent: workloads with longer prompt token distributions shift the effective TP crossover rate lower (or eliminate it entirely). On H100 qwen3-14b with prompt mean >= 1024 (contentgen, summarization, multidoc), TP=4/2inst wins at ALL tested rates including rate=100. On H100 with prompt mean <= 512 (chatbot avg=256, distribution avg=512), the rate-dependent crossover (RP-24, ~125 req/s) still applies. On A100-SXM, multidoc (avg=10240) shows TP=8 winning at all rates due to KV cache capacity constraints at TP=4/2inst, not prefill compute.",
+      "confidence": "high",
+      "regime": "qwen3-14b on H100 and A100-SXM, 1000 requests, rate=100 and rate=500, workload presets chatbot/contentgen/summarization/multidoc",
+      "evidence": [
+        "iteration-10-h-main",
+        "iteration-10-h-robustness",
+        "iteration-10-probe-data"
+      ],
+      "contradicts": [],
+      "extraction_iteration": 10,
+      "mechanism": "Longer prompts increase prefill compute per request. At TP=8/1inst, a single instance must serialize all prefills; at TP=4/2inst, two instances process prefills in parallel. With prompt mean >= 1024, the prefill cost dominates enough that TP=4/2inst wins regardless of arrival rate on H100 (sim/latency/roofline.go:291-351). For multidoc on A100-SXM (avg=10240 tokens, max output=20480), KV cache requirements overwhelm TP=4/2inst on lower-effective-memory hardware, reversing the winner. The crossover rate from RP-24 (~125 H100, ~196 A100-SXM) is therefore specific to the default/chatbot workload and should be treated as workload-conditional.",
+      "applicability_bounds": "Empirically validated for qwen3-14b on H100 and A100-SXM. The prompt-length threshold for 'always TP=4' on H100 is between 512 (distribution, crossover exists) and 1024 (contentgen, no crossover). The KV cache capacity mechanism for multidoc on A100-SXM is hardware-specific (lower effective VRAM per instance at TP=4/2inst). May generalize to other models and hardware with similar architectural properties.",
+      "superseded_by": null,
+      "category": "domain",
+      "status": "active"
+    }
+  ]
+}

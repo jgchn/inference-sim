@@ -1,0 +1,11 @@
+{
+  "gate_type": "findings",
+  "summary": "The central hypothesis \u2014 that crossover yield advantage predicts whether NSGA-II outperforms random search \u2014 is REFUTED. Llama at rate=50 has the highest yield advantage (14.74x) of any condition, yet was predicted to have the lowest (<3x). The negative NSGA-II gap for Llama at rate=50 from iteration 7 appears to be a population-size artifact rather than a structural phenomenon.",
+  "key_points": [
+    "Main hypothesis refuted: All four conditions show yield advantage >9x (range 9.7x\u201316.8x), making yield advantage useless as a gap-direction predictor. Llama rate=50 at 14.74x was predicted to be <3x \u2014 completely wrong direction.",
+    "Ablation reveals the real finding: With pop_size=40 (vs likely pop_size=20 in iter-7), NSGA-II wins for BOTH models at rate=50 (Qwen +55.4, Llama +38.6). Iter-7's Llama negative gap (-22.9) was likely an algorithmic artifact of insufficient population diversity, not a structural property of the search landscape.",
+    "Pareto fronts at rate=50 show 100% block_size=32 concentration for both models (even more extreme than rate=100's 93.5%), making crossover yield uniformly high and eliminating any model/rate differentiation the theory depended on.",
+    "Null model control partially confirmed: observed yield is ~3x above null baseline (~75% vs ~22%), confirming Pareto spatial structure exists, but the null baseline is 3\u20135x density (not \u22481x as predicted), indicating intrinsic topological bias in the crossover operator inflates baselines.",
+    "Exhaustive sweep densities matched predictions exactly (Qwen 4.50%, Llama 5.33%), validating the simulation infrastructure, but the per-axis KV NDR direction was wrong (Llama higher than Qwen, not lower)."
+  ]
+}

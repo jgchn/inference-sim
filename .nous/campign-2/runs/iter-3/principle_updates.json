@@ -1,0 +1,58 @@
+[
+  {
+    "id": "RP-C2-10",
+    "statement": "Extremes-first Phase 1 (4 evals: max-instance per TP level with batch=512) identifies the optimal parallelism tier in exactly 3 evaluations for H100 rate=2000-5000 (where optimal is TP=4/2 at position 3) and at most 4 evaluations overall (budget ≤ 4 evals). This is 11 fewer evaluations than sequential Phase 1 (14 evals) for the same tier identification task.",
+    "confidence": "high",
+    "regime": "BLIS with qwen3-14b, H100 or A100-SXM, rate≥2000, budget≥4, using composite fitness scoring",
+    "evidence": ["iteration-3-h-main", "iteration-3-h-control-negative", "iteration-3-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 3,
+    "mechanism": "EXTREMES_PHASE1_CONFIGS order is (TP=1/8, TP=2/4, TP=4/2, TP=8/1). For H100 rate=2000-5000, TP=4/2 is optimal and evaluated at position 3. For A100-SXM rate=2000, TP=8/1 is optimal at position 4. Phase 1 uses batch=512 (RP-C2-5) which correctly discriminates tiers. The 95% threshold (0.95 * optimal) is first crossed at the eval where TP=4/2 is evaluated (H100) or TP=8/1 (A100-SXM).",
+    "applicability_bounds": "Applies when TP×instances≤8 (single H100 node), batch=512 in Phase 1, composite fitness scoring. Does NOT apply if optimal tier changes with rate (e.g., rate=50 where TP=8/1 wins on H100). Portability across hardware requires only that the optimal tier be among the 4 max-instance configs, which is always true.",
+    "superseded_by": null,
+    "category": "search_strategy",
+    "status": "active"
+  },
+  {
+    "id": "RP-C2-11",
+    "statement": "Extremes-first Phase 1 correctly identifies hardware-specific optimal parallelism tiers without any hardware-specific tuning: H100 picks TP=4/2 (score 0.1755) while A100-SXM picks TP=8/1 (score 0.1372), using identical algorithm code and parameters.",
+    "confidence": "high",
+    "regime": "BLIS with qwen3-14b, H100 or A100-SXM, rate=2000, budget≥4",
+    "evidence": ["iteration-3-h-main", "iteration-3-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 3,
+    "mechanism": "Phase 1 measures rather than predicts: it evaluates all 4 max-instance configs empirically with BLIS and picks the highest-scoring tier. H100's higher per-GPU memory bandwidth makes TP=4/2 (2 instances, 32GB each) more efficient at rate=2000; A100-SXM's lower bandwidth makes TP=8/1 more efficient. The algorithm is hardware-agnostic because it relies on measurement, not prediction.",
+    "applicability_bounds": "Verified for H100 and A100-SXM with qwen3-14b at rate=2000. Gap between TP=8/1 and TP=4/2 on A100-SXM is 0.66% (0.1372 vs 0.1363 with Phase 1 routing), stable across 3 seeds. May not hold if gap is below floating-point noise or if hardware changes optimal tier ordering.",
+    "superseded_by": null,
+    "category": "hardware_portability",
+    "status": "active"
+  },
+  {
+    "id": "RP-C2-3",
+    "statement": "UPDATED (was: 'At low request rates (rate=5 req/s), BLIS secondary knobs have ZERO effect'). At low request rates (rate=50 req/s), BLIS secondary knobs have zero effect on THROUGHPUT within a fixed parallelism tier. However, secondary knobs (especially max-num-running-reqs/batch size) DO affect composite fitness scores via p99_ttft and p99_e2e latency components: batch=32 gives composite score 0.063 while batch=512 gives 0.132 (2x difference) at rate=50 on H100 TP=8/1.",
+    "confidence": "high",
+    "regime": "BLIS with qwen3-14b, H100, rate=50, composite fitness scoring (throughput:0.4,p99_ttft:0.3,p99_e2e:0.3)",
+    "evidence": ["iteration-3-h-control-negative"],
+    "contradicts": ["RP-C2-3"],
+    "extraction_iteration": 3,
+    "mechanism": "At rate=50 req/s, all requests complete regardless of batch size (throughput = arrival rate). However, max_running limits concurrent running requests. With max_running=32, requests queue in WaitQ even at low load (32 running + waiting queue for remaining). This adds scheduling delay to TTFT. With max_running=512, all available requests (< 512 at rate=50) run immediately, minimizing TTFT. The latency components of the composite fitness function (weight 0.6 total) are sensitive to this scheduling delay even at low rates.",
+    "applicability_bounds": "Applies to composite fitness scoring including latency components. The original RP-C2-3 (zero effect) is correct ONLY for pure throughput metrics. Phase 1 using batch=512 incidentally happens to use the optimal secondary knob value at low rates, so Phase 2 adds no improvement in practice.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-C2-12",
+    "statement": "TPE Phase 2 (Optuna TPE, n_startup=5) and LHS Phase 2 show statistically indistinguishable convergence when the Phase 2 improvement window is ≤1% above Phase 1 score. TPE's surrogate model provides no reliable systematic advantage over LHS for small improvement windows (0.55% gap, 1/3 probability for the differentiating categorical value).",
+    "confidence": "medium",
+    "regime": "BLIS Phase 2 within TP=4/2 at H100 rate=5000, budget=46 Phase 2 evals, improvement gap=0.55%",
+    "evidence": ["iteration-3-h-ablation"],
+    "contradicts": [],
+    "extraction_iteration": 3,
+    "mechanism": "Phase 1 with batch=512 already captures 99.47% of optimal (0.1755 vs 0.176474). Phase 2 must find round-robin routing (1 of 3 options) to get remaining 0.55%. With 5 startup random trials, TPE has P=1-(2/3)^5=87% to sample round-robin, vs LHS which distributes samples across the space. Both strategies find the improvement but timing depends on seed. TPE won on 2/3 seeds (evals 20,12 vs 32,33 for LHS) and lost on 1/3 (eval 33 vs 10 for LHS). The improvement window is too small for TPE's surrogate to show systematic advantage over random sampling.",
+    "applicability_bounds": "When Phase 2 improvement window >5% (strong secondary knob signal), TPE should outperform LHS more reliably. The 26% batch-range scenario from the design (rate=5000 secondary knob prediction) was not realized because Phase 1 already uses batch=512. Future tests should set Phase 1 batch≠512 to create a genuine Phase 2 improvement window.",
+    "superseded_by": null,
+    "category": "search_strategy",
+    "status": "active"
+  }
+]

@@ -1,0 +1,44 @@
+[
+  {
+    "id": "RP-12",
+    "statement": "NSGA-II's convergence speed advantage over random search at the 95% HV threshold has a density breakeven near 5% Pareto density. At ~4.5% density (Qwen3-14B at rate=50), NSGA-II is barely faster (~5 evals). At ~5.33% density (Llama-3.1-8B at rate=50), random search reaches 95% HV ~23 evals BEFORE NSGA-II. NSGA-II retains a final HV advantage (99.87% vs 98.21% for Llama at eval=200), meaning it still finds more complete Pareto coverage but is slower to the 95% milestone at this density.",
+    "confidence": "medium",
+    "regime": "BLIS 6-parameter 4-objective space (tp, num_instances, scheduler, max_batch, kv_blocks, block_size), rate=50, reference point (0, 50000, 9, 11000), MC-200k HV",
+    "evidence": ["iteration-7-h-main", "iteration-7-h-control-negative", "iteration-7-h-ablation"],
+    "contradicts": [],
+    "extraction_iteration": 7,
+    "mechanism": "At 5.33% density with 200/1800 = 11.1% coverage, random expects ~10.7 Pareto-optimal hits from uniform sampling — sufficient for >95% HV. NSGA-II's crossover exploits the tp×kv×block_size interaction structure, but at 5.33% density the interaction is weaker (block_size×kv threshold effect is 40x for Llama vs 92x for Qwen), reducing the exploitable binary structure. The crossover advantage disappears at the 95% milestone but remains at the final HV level because NSGA-II continues refining coverage in later generations.",
+    "applicability_bounds": "Density threshold (~5%) is calibrated for rate=50, 1800-config space, pop=40, 4 gens, single-offspring tournament. Different tournament/offspring strategies may shift the threshold. At budget=200 and density <4.5%, NSGA-II wins decisively. At density >7%, random may fully dominate at the 95% threshold (untested). The final HV advantage of NSGA-II appears to persist across all tested densities.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-13",
+    "statement": "NSGA-II's convergence speed advantage (or disadvantage) over random search at the 95% HV threshold scales consistently with Pareto density across different model architectures in BLIS. Llama-3.1-8B (density 5.33%) shows reversed advantage (-22.9 evals vs Qwen3-14B density 4.5%, advantage +4.6 evals), confirming that the density-driven mechanism is portable: the SAME search algorithm applied to different models produces a proportionally different convergence gap. The gap direction is determined by whether density is above or below the ~5% breakeven.",
+    "confidence": "medium",
+    "regime": "BLIS at rate=50, same 1800-config parameter space, same NSGA-II implementation (pop=40, 4 gens), comparing Llama-3.1-8B (32 layers) vs Qwen3-14B (40 layers)",
+    "evidence": ["iteration-7-h-main", "iteration-7-h-control-negative", "iteration-7-h-ablation"],
+    "contradicts": [],
+    "extraction_iteration": 7,
+    "mechanism": "Llama-3.1-8B requires 80% of Qwen3-14B's KV bytes per token (32/40 layers, same head_dim=128 and num_kv_heads=8). This shifts the KV stress threshold lower: at tp=8,kv=3000,bs=16, Llama shows 40x TTFT improvement with bs=32 (22ms vs 883ms) vs Qwen's 92x (25ms vs 2323ms). The weaker binary stress interaction means fewer configs are catastrophically dominated, expanding the Pareto set from 81 to 96 configs (4.5% to 5.33%). This 0.83pp density increase is sufficient to push the 95%-threshold convergence advantage from +4.6 evals (NSGA-II barely wins) to -22.9 evals (random wins). The tp×kv×block_size interaction structure is preserved but weakened, consistent with the portability prediction's mechanism.",
+    "applicability_bounds": "Tested only at rate=50, same search space. Model portability applies when the KV stress interaction exists but differs in magnitude. For models with no block_size interaction (e.g., models with small KV per token that are never stressed at kv=2000), the mechanism would not produce the same density gradient. The density-to-gap mapping may shift with different budget sizes or Pareto front geometries.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-11",
+    "statement": "NSGA-II's convergence speed advantage over random search DECREASES with higher Pareto density, whether density is driven by arrival rate or model architecture. Rate-dimension (Qwen3-14B): convergence gap rate=50: ~91 evals, rate=75: 48 evals, rate=100: 57 evals (non-monotonic, density 4.5%→6.06%→6.89%). Architecture-dimension (rate=50): Qwen gap ~5-91 evals (density 4.5%), Llama gap ~-23 evals (density 5.33%, random faster). The ~5% density threshold is where NSGA-II loses its speed advantage at the 95% milestone. NSGA-II retains final HV advantage (1.5-5% higher than random at eval=200) across all tested configurations. [confidence: medium]",
+    "confidence": "medium",
+    "regime": "BLIS 6-parameter 4-objective space, pop=40, 4 gens, rate=50-100, Qwen3-14B and Llama-3.1-8B",
+    "evidence": ["iteration-5-h-main", "iteration-6-h-main", "iteration-7-h-main", "iteration-7-h-ablation"],
+    "contradicts": [],
+    "extraction_iteration": 7,
+    "mechanism": "Higher Pareto density (more non-dominated configs per random sample) reduces random search's disadvantage. NSGA-II's crossover exploits tp×kv×block_size interaction structure, but at higher density the structure is weaker (weaker threshold effects) and random samples find Pareto configs with higher probability. The final HV advantage persists because NSGA-II still converges toward the full Pareto frontier in later generations.",
+    "applicability_bounds": "Gap values are implementation-sensitive (single-offspring vs paired-offspring tournament selection changes absolute values). Rate-driven gap measurements (iter-5/iter-6) used paired-offspring; iter-7 used single-offspring. Cross-iteration comparison should focus on direction and relative magnitude, not absolute gap values. The ~5% density threshold and final HV advantage are more implementation-robust findings.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  }
+]

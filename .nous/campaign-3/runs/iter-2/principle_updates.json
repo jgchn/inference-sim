@@ -1,0 +1,72 @@
+[
+  {
+    "id": "RP-1",
+    "statement": "Multi-objective search algorithm comparison (NSGA-II vs random) requires both a non-trivial Pareto frontier AND a sparse Pareto-optimal configuration set (<<5% of configs per GPU tier). When many configurations per tier achieve equivalent frontier-level objectives, all search algorithms converge identically fast because the frontier is trivially accessible to random sampling.",
+    "confidence": "high",
+    "regime": "BLIS 3-objective space (rps, ttft, gpu_count) with any arrival rate that creates genuine tier differentiation",
+    "evidence": ["iteration-1-h-main", "iteration-2-h-main", "iteration-2-h-control-negative"],
+    "contradicts": [],
+    "extraction_iteration": 2,
+    "mechanism": "If batch_size alone controls the transition from 'under-batch' to 'tier-optimal' performance, and if multiple batch values qualify (e.g., 3 out of 5 batch sizes unlock full tier performance), then ~60% of within-tier configs are Pareto-optimal. With 50 evaluations and ~60% density, the probability of missing a tier is (0.4^50/5_tiers) ≈ 0 — all tiers found immediately. NSGA-II's selection pressure cannot improve on a problem where 60% of random samples are already optimal.",
+    "applicability_bounds": "Applies whenever a dominant structural parameter (like batch_size or TP) creates a threshold effect that makes a large fraction of configs per tier Pareto-optimal. Does NOT apply when performance within a tier varies continuously (e.g., arrival rate near saturation where batch size has graded effects).",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-2",
+    "statement": "Before running a search algorithm comparison on BLIS, validate BOTH objective diversity (5x variation across configs) AND Pareto set density (<<5% of configs per tier should be Pareto-optimal). If >10% of same-tier configs achieve tier-optimal metrics, the frontier is too easy to find for any algorithm to show convergence advantage.",
+    "confidence": "high",
+    "regime": "Any BLIS multi-objective search experiment",
+    "evidence": ["iteration-1-h-main", "iteration-2-h-main", "iteration-2-h-control-negative"],
+    "contradicts": [],
+    "extraction_iteration": 2,
+    "mechanism": "Objective diversity (5x) validates that the Pareto frontier is non-trivial and spans multiple GPU tiers. Pareto set density validates that the SEARCH PROBLEM is hard. Both are necessary: a non-trivial frontier with a fat Pareto set is still too easy. Density can be estimated from a 20-50 config probe: count fraction with objectives within 5% of per-tier best.",
+    "applicability_bounds": "Pre-experiment validation step. Most applicable when the search space has threshold effects (discrete batch sizes, TP tiers). Less relevant for continuous parameter spaces where Pareto density is naturally lower.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-3",
+    "statement": "In BLIS at rate=50 req/s with qwen/qwen3-14b on H100, the batch size threshold for tier-optimal performance is approximately max_num_running_reqs >= 256. Configs with batch < 256 show severely degraded TTFT (queueing-dominated regime), while batch >= 256 unlocks near-optimal TTFT for the GPU tier. This makes ~60% of within-tier configs (batch={256,512} out of {32,64,128,256,512}) Pareto-optimal within their GPU tier.",
+    "confidence": "medium",
+    "regime": "rate=50, qwen/qwen3-14b, H100, default workload distribution, seed=42",
+    "evidence": ["iteration-2-h-main", "iteration-2-h-control-negative"],
+    "contradicts": [],
+    "extraction_iteration": 2,
+    "mechanism": "At rate=50 req/s, the per-instance arrival rate for a 2-GPU config is ~12-25 req/s depending on TP. With batch=128, the scheduler can process at most 128 requests per step but the queue builds up when prefill is token-heavy. Above batch=256, prefill processing keeps pace with the arrival rate and queueing disappears. This threshold is rate-dependent: at higher rates (e.g., rate=100), even batch=512 may be insufficient, creating finer differentiation.",
+    "applicability_bounds": "Specific to rate=50, qwen3-14b/H100, default workload. Different rates, models, or workload distributions (longer prompts) will shift the threshold. At near-saturation rates (rate ≈ max_throughput), EVERY batch size will matter and density will drop significantly.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-4",
+    "statement": "Multi-objective TPE (Optuna TPESampler with multivariate=True) performs WORSE than uniform random search on BLIS's configuration space due to conditional parameter incompatibility: when num_instances depends on tp and routing parameters depend on num_instances, Optuna falls back to independent RandomSampler for the conditional parameters throughout the optimization. This prevents the TPE model from learning the tp→instances→routing dependency chain, causing the model to over-commit to regions accessible without exploiting that dependency.",
+    "confidence": "high",
+    "regime": "Optuna TPESampler with multivariate=True on parameter spaces with conditional dependencies; Optuna 4.x",
+    "evidence": ["iteration-2-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 2,
+    "mechanism": "Optuna's multivariate TPE models the joint distribution of parameters to capture correlations. However, when some parameters are only available in certain trials (e.g., routing_policy only appears when num_instances > 1), multivariate mode cannot build a joint model across all parameters. It falls back to univariate random sampling for the conditional parameters. This means TPE effectively uses a misspecified model that ignores the most important structural dependency (tp determines the feasible range of num_instances). The model then oversamples tp values where many instances are feasible, biasing toward certain GPU tiers. Confirmed by Optuna warnings appearing for >90% of trials post-startup.",
+    "applicability_bounds": "Applies to Optuna multivariate TPE when search space has hierarchical conditional dependencies. Solution: use non-multivariate TPE (multivariate=False) which handles independent parameters correctly, or restructure the space to avoid conditionals by representing num_instances as a fraction of max_instances (always a fixed [1/max, 2/max, ..., 1.0] categorical). Expected to apply to any Optuna version that uses the Gaussian tree-based TPE approach.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-5",
+    "statement": "In the BLIS configuration space, TP and num_instances are the dominant parameters controlling all three objectives (rps, ttft_p99, gpu_count). All other parameters (scheduler, routing_policy, block_size, gpu_memory_utilization, preemption_policy) are secondary differentiators that affect metrics only in specific regimes (near-saturation, long-prefill, KV-cache stress). Search experiments must verify that the secondary parameters create meaningful differentiation before assuming they contribute to search difficulty.",
+    "confidence": "high",
+    "regime": "BLIS rate=50, qwen3-14b/H100, default workload, seed=42",
+    "evidence": ["iteration-2-h-main", "iteration-2-h-control-negative", "iteration-2-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 2,
+    "mechanism": "At rate=50, all GPU configs are partially saturated but not heavily loaded. In this regime: (a) preemption count is 0 for all tested configs (no KV pressure); (b) scheduler differences (FCFS vs SJF) are negligible when the queue is short; (c) routing policy differences (round-robin vs weighted) are negligible when all instances are roughly equally loaded; (d) block_size (16 vs 32 tokens) has negligible latency impact; (e) gpu_memory_utilization (0.85 vs 0.95) has no effect since KV cache is under-utilized. The only non-trivial secondary parameter is max_num_running_reqs (batch size), which determines whether the system is in queueing regime or not.",
+    "applicability_bounds": "Specific to the rate=50, default workload condition. High-utilization regimes (rate near saturation) will activate routing, preemption, and scheduler effects. Prefix-sharing workloads will activate routing scorer differentiation. Long-prompt workloads will activate chunked prefill effects.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  }
+]

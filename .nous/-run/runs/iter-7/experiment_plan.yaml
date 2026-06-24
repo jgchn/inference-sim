@@ -1,0 +1,152 @@
+metadata:
+  iteration: 7
+  bundle_ref: "runs/iter-7/bundle.yaml"
+
+setup:
+  - cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim && go build -o blis main.go"
+    description: "Build the BLIS binary"
+  - cmd: "git apply /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/patches/h-main.patch"
+    description: "Apply h-main patch to create search_blis_iter7.py"
+
+arms:
+  # ── h-main: Lean Bracket Accuracy (4 regimes, 5 seeds each) ──────────────
+  # Each regime tests whether lean bracket (TP={4,8} max-profile only, budget=2, no Phase 2)
+  # achieves within 1% of global best. 5 search seeds should produce identical results
+  # (deterministic — no RNG in Phase 1, no Phase 2).
+
+  - arm_id: "h-main"
+    conditions:
+      # Regime 1: H100 qwen rate=500 (TP=4 winner, evals_to_best=1 predicted)
+      - name: "h100-qwen-rate500"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter7.py --strategy adaptive-hierarchical
+          --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2
+          --hardware H100 --budget 2 --seeds 42,43,44,45,46
+          --blis-seed 42 --rate 500 --num-requests 1000 --model qwen/qwen3-14b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/results/h-main/h100-rate500.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/results/h-main/h100-rate500.json"
+
+      # Regime 2: H100 qwen rate=100 (TP=8 winner, evals_to_best=2 predicted)
+      - name: "h100-qwen-rate100"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter7.py --strategy adaptive-hierarchical
+          --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2
+          --hardware H100 --budget 2 --seeds 42,43,44,45,46
+          --blis-seed 42 --rate 100 --num-requests 1000 --model qwen/qwen3-14b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/results/h-main/h100-rate100.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/results/h-main/h100-rate100.json"
+
+      # Regime 3: A100-SXM qwen rate=500 (TP=4 winner, evals_to_best=1 predicted)
+      - name: "a100-qwen-rate500"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter7.py --strategy adaptive-hierarchical
+          --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2
+          --hardware A100-SXM --budget 2 --seeds 42,43,44,45,46
+          --blis-seed 42 --rate 500 --num-requests 1000 --model qwen/qwen3-14b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/results/h-main/a100-rate500.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/results/h-main/a100-rate500.json"
+
+      # Regime 4: A100-SXM qwen rate=100 (TP=8 winner, evals_to_best=2 predicted)
+      - name: "a100-qwen-rate100"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter7.py --strategy adaptive-hierarchical
+          --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2
+          --hardware A100-SXM --budget 2 --seeds 42,43,44,45,46
+          --blis-seed 42 --rate 100 --num-requests 1000 --model qwen/qwen3-14b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/results/h-main/a100-rate100.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/results/h-main/a100-rate100.json"
+
+  # ── h-control-negative: Min-Profile Lean Bracket (wrong winner) ───────────
+  # Lean bracket with min-profile on H100 qwen rate=500 should select a suboptimal
+  # config. Min-profile best score should be >50% below max-profile best score.
+
+  - arm_id: "h-control-negative"
+    conditions:
+      - name: "h100-qwen-rate500-min-profile"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter7.py --strategy adaptive-hierarchical
+          --phase1-k 1 --phase1-profiles bracket-min-only --tp-candidates lean --skip-phase2
+          --hardware H100 --budget 2 --seeds 42,43,44,45,46
+          --blis-seed 42 --rate 500 --num-requests 1000 --model qwen/qwen3-14b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/results/h-control-negative/results.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/results/h-control-negative/results.json"
+
+  # ── h-ablation: Lean Bracket + Mini Phase 2 (routing recovery) ───────────
+  # A100-SXM qwen rate=200 (crossover/routing-sensitive regime).
+  # budget=12: 2 Phase 1 evals + 10 Phase 2 TPE trials.
+  # Phase 1 max-profile gives 0.134488 (least-loaded). Phase 2 should improve
+  # on >=3/5 seeds via routing discovery (round-robin/weighted).
+
+  - arm_id: "h-ablation"
+    conditions:
+      - name: "a100-qwen-rate200-budget12"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter7.py --strategy adaptive-hierarchical
+          --phase1-k 1 --phase1-profiles bracket --tp-candidates lean
+          --hardware A100-SXM --budget 12 --seeds 42,43,44,45,46
+          --blis-seed 42 --rate 200 --num-requests 1000 --model qwen/qwen3-14b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/results/h-ablation/results.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/results/h-ablation/results.json"
+
+  # ── h-robustness: Lean Bracket Across Workload Seeds ─────────────────────
+  # H100 qwen rate=500, 5 blis_seeds (42-46) × 5 search_seeds (42-46) = 25 combinations.
+  # Each blis_seed run in a separate invocation; each outputs its own file.
+  # All 25 should achieve within 1% of per-seed global best.
+
+  - arm_id: "h-robustness"
+    conditions:
+      - name: "h100-rate500-blis42"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter7.py --strategy adaptive-hierarchical
+          --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2
+          --hardware H100 --budget 2 --seeds 42,43,44,45,46
+          --blis-seed 42 --rate 500 --num-requests 1000 --model qwen/qwen3-14b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/results/h-robustness/blis42.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/results/h-robustness/blis42.json"
+
+      - name: "h100-rate500-blis43"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter7.py --strategy adaptive-hierarchical
+          --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2
+          --hardware H100 --budget 2 --seeds 42,43,44,45,46
+          --blis-seed 43 --rate 500 --num-requests 1000 --model qwen/qwen3-14b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/results/h-robustness/blis43.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/results/h-robustness/blis43.json"
+
+      - name: "h100-rate500-blis44"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter7.py --strategy adaptive-hierarchical
+          --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2
+          --hardware H100 --budget 2 --seeds 42,43,44,45,46
+          --blis-seed 44 --rate 500 --num-requests 1000 --model qwen/qwen3-14b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/results/h-robustness/blis44.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/results/h-robustness/blis45.json"
+
+      - name: "h100-rate500-blis45"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter7.py --strategy adaptive-hierarchical
+          --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2
+          --hardware H100 --budget 2 --seeds 42,43,44,45,46
+          --blis-seed 45 --rate 500 --num-requests 1000 --model qwen/qwen3-14b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/results/h-robustness/blis45.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/results/h-robustness/blis45.json"
+
+      - name: "h100-rate500-blis46"
+        cmd: >
+          cd /Users/jchen/go/src/inference-sim/inference-sim &&
+          python3 search_blis_iter7.py --strategy adaptive-hierarchical
+          --phase1-k 1 --phase1-profiles bracket --tp-candidates lean --skip-phase2
+          --hardware H100 --budget 2 --seeds 42,43,44,45,46
+          --blis-seed 46 --rate 500 --num-requests 1000 --model qwen/qwen3-14b
+          --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/results/h-robustness/blis46.json
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-7/results/h-robustness/blis46.json"

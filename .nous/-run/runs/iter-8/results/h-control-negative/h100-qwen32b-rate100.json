@@ -1,0 +1,75 @@
+{
+  "config": {
+    "budget": 100,
+    "seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "blis_seed": 42,
+    "num_requests": 1000,
+    "rate": 100.0,
+    "model": "qwen/qwen3-32b",
+    "hardware": "H100",
+    "global_best": 0.132535,
+    "phase1_k": 3,
+    "phase1_profiles": "strategic",
+    "tp_candidates": "all",
+    "skip_phase2": false
+  },
+  "runs": [
+    {
+      "strategy": "formula-predict",
+      "hardware": "H100",
+      "hw_bandwidth_TBs": 3.35,
+      "crossover_rate": 119.40298507462687,
+      "predicted_tp": 8,
+      "predicted_instances": 1,
+      "score": 0.132535,
+      "global_best": 0.132535,
+      "threshold": 0.13120964999999998,
+      "formula_correct": true,
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_running": 512,
+        "max_tokens": 8192,
+        "prefill_threshold": 4096,
+        "block_size": 16,
+        "routing": "round-robin",
+        "admission": "always-admit",
+        "preemption": "fcfs"
+      },
+      "wall_time_s": 0.4612637500104029,
+      "evaluations": [
+        {
+          "eval_idx": 0,
+          "score": 0.132535,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 512,
+            "max_tokens": 8192,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.4609475420002127,
+          "best_so_far": 0.132535
+        }
+      ],
+      "wall_time_total_s": 0.4612764169869479,
+      "n_evaluations": 1,
+      "search_seed": 42,
+      "best_score": 0.132535,
+      "evals_to_best": 1
+    }
+  ],
+  "total_wall_time_s": 0.4618412910058396
+}

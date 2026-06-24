@@ -1,0 +1,10 @@
+{
+  "gate_type": "findings",
+  "summary": "Iteration 8 tested whether the 'lean bracket' search strategy (evaluating only TP={4,8} configurations) generalizes to a new model (qwen3-32b) and a new GPU (L40S). The main and robustness hypotheses were fully confirmed: 45/45 regime\u00d7seed combinations hit the global best. The ablation hypothesis (micro-eval at 100 requests fails) was fully confirmed at 4/4. The formula-based baseline partially confirmed: it failed for the predicted mechanism (model-size blindness) but achieved 83.3% accuracy instead of the predicted \u226478%.",
+  "key_points": [
+    "Lean bracket finds global-best configuration in all 45 tested combinations (25 for qwen3-32b across H100/A100-SXM, 20 for L40S across qwen3-14b/llama-3.1-8b), requiring only 1-2 evaluations per regime (~0.5-0.9s each). This validates lean bracket across all 3 GPUs (H100, A100-SXM, L40S) and all 3 models (qwen3-14b, llama-3.1-8b, qwen3-32b).",
+    "The analytic formula baseline scored 15/18 correct (83.3%), not \u226414/18 as predicted. The miss was due to a 'lucky' correct call on H100 qwen3-32b at rate=500: the formula predicts TP=4, which happens to be the actual winner because the true crossover (~350 req/s for 32B) falls below 500. All 3 formula failures follow the predicted mechanism \u2014 model-size blindness causing TP=4 predictions where TP=8 dominates (A100-SXM 32B, L40S 14B, L40S 32B, all at rate=500).",
+    "100-request micro-evaluation is confirmed unreliable: all 4 tested high-rate regimes incorrectly select TP=8 by large margins (16-38%), whereas 1000-request evaluation correctly identifies TP=4 as optimal. The short horizon prevents queue saturation effects from manifesting, making minimum evaluation horizon of \u22651000 requests a firm requirement.",
+    "The qwen3-32b model shifts the H100 TP crossover point from ~130 req/s (14B) to ~350 req/s (32B), but the lean bracket adapts empirically without any formula knowledge. On A100-SXM, TP=8 dominates at all tested rates for 32B (no crossover), consistent with bandwidth limitations on that platform for larger models."
+  ]
+}

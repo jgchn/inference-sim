@@ -1,0 +1,12 @@
+{
+  "arm": "h-main",
+  "name": "H100-r2000-tp4i2-b512-s42",
+  "hardware": "H100",
+  "tp": 4,
+  "instances": 2,
+  "rate": 2000,
+  "nreq": 2000,
+  "batch": 512,
+  "seed": 42,
+  "score": 0.196464
+}

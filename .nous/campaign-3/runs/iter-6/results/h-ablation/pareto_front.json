@@ -1,0 +1,2418 @@
+{
+  "arm": "h-ablation",
+  "rate": 75,
+  "phase": "exhaustive",
+  "total_configs": 1800,
+  "pareto_count": 109,
+  "density_pct": 6.055555555555555,
+  "hypervolume": 62917200000.0,
+  "convergence": [
+    {
+      "eval": 40,
+      "hv": 16565400000.0,
+      "pareto_size": 4
+    },
+    {
+      "eval": 80,
+      "hv": 21936600000.0,
+      "pareto_size": 8
+    },
+    {
+      "eval": 120,
+      "hv": 22032000000.0,
+      "pareto_size": 11
+    },
+    {
+      "eval": 160,
+      "hv": 30529800000.000004,
+      "pareto_size": 15
+    },
+    {
+      "eval": 200,
+      "hv": 30529800000.000004,
+      "pareto_size": 17
+    },
+    {
+      "eval": 240,
+      "hv": 30535200000.000004,
+      "pareto_size": 23
+    },
+    {
+      "eval": 280,
+      "hv": 33940800000.0,
+      "pareto_size": 25
+    },
+    {
+      "eval": 320,
+      "hv": 33940800000.0,
+      "pareto_size": 26
+    },
+    {
+      "eval": 360,
+      "hv": 33940800000.0,
+      "pareto_size": 29
+    },
+    {
+      "eval": 400,
+      "hv": 35542800000.0,
+      "pareto_size": 32
+    },
+    {
+      "eval": 440,
+      "hv": 35542800000.0,
+      "pareto_size": 34
+    },
+    {
+      "eval": 480,
+      "hv": 35542800000.0,
+      "pareto_size": 37
+    },
+    {
+      "eval": 520,
+      "hv": 36315000000.0,
+      "pareto_size": 43
+    },
+    {
+      "eval": 560,
+      "hv": 36315000000.0,
+      "pareto_size": 47
+    },
+    {
+      "eval": 600,
+      "hv": 36315000000.0,
+      "pareto_size": 53
+    },
+    {
+      "eval": 640,
+      "hv": 36556200000.0,
+      "pareto_size": 59
+    },
+    {
+      "eval": 680,
+      "hv": 36556200000.0,
+      "pareto_size": 63
+    },
+    {
+      "eval": 720,
+      "hv": 36556200000.0,
+      "pareto_size": 69
+    },
+    {
+      "eval": 760,
+      "hv": 36707400000.0,
+      "pareto_size": 77
+    },
+    {
+      "eval": 800,
+      "hv": 36707400000.0,
+      "pareto_size": 83
+    },
+    {
+      "eval": 840,
+      "hv": 36707400000.0,
+      "pareto_size": 89
+    },
+    {
+      "eval": 880,
+      "hv": 36837000000.0,
+      "pareto_size": 97
+    },
+    {
+      "eval": 920,
+      "hv": 36837000000.0,
+      "pareto_size": 103
+    },
+    {
+      "eval": 960,
+      "hv": 36837000000.0,
+      "pareto_size": 109
+    },
+    {
+      "eval": 1000,
+      "hv": 38460600000.0,
+      "pareto_size": 113
+    },
+    {
+      "eval": 1040,
+      "hv": 41452200000.0,
+      "pareto_size": 117
+    },
+    {
+      "eval": 1080,
+      "hv": 41563800000.0,
+      "pareto_size": 122
+    },
+    {
+      "eval": 1120,
+      "hv": 49478400000.0,
+      "pareto_size": 126
+    },
+    {
+      "eval": 1160,
+      "hv": 49478400000.0,
+      "pareto_size": 128
+    },
+    {
+      "eval": 1200,
+      "hv": 49478400000.0,
+      "pareto_size": 131
+    },
+    {
+      "eval": 1240,
+      "hv": 51426000000.0,
+      "pareto_size": 78
+    },
+    {
+      "eval": 1280,
+      "hv": 51426000000.0,
+      "pareto_size": 80
+    },
+    {
+      "eval": 1320,
+      "hv": 51426000000.0,
+      "pareto_size": 83
+    },
+    {
+      "eval": 1360,
+      "hv": 51834600000.0,
+      "pareto_size": 86
+    },
+    {
+      "eval": 1400,
+      "hv": 51834600000.0,
+      "pareto_size": 88
+    },
+    {
+      "eval": 1440,
+      "hv": 51834600000.0,
+      "pareto_size": 91
+    },
+    {
+      "eval": 1480,
+      "hv": 56073600000.0,
+      "pareto_size": 95
+    },
+    {
+      "eval": 1520,
+      "hv": 58870800000.0,
+      "pareto_size": 97
+    },
+    {
+      "eval": 1560,
+      "hv": 59085000000.0,
+      "pareto_size": 102
+    },
+    {
+      "eval": 1600,
+      "hv": 61147800000.0,
+      "pareto_size": 96
+    },
+    {
+      "eval": 1640,
+      "hv": 61147800000.0,
+      "pareto_size": 97
+    },
+    {
+      "eval": 1680,
+      "hv": 61147800000.0,
+      "pareto_size": 100
+    },
+    {
+      "eval": 1720,
+      "hv": 62688600000.00001,
+      "pareto_size": 102
+    },
+    {
+      "eval": 1760,
+      "hv": 62883000000.0,
+      "pareto_size": 103
+    },
+    {
+      "eval": 1800,
+      "hv": 62917200000.0,
+      "pareto_size": 109
+    }
+  ],
+  "pareto_configs": [
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -5.265513796462301,
+        20281.27544,
+        1.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 1,
+      "total_kv_blocks": 3000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -6.0067701104560935,
+        13285.850399999998,
+        1.0,
+        3000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -5.265513796462301,
+        20281.27544,
+        1.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 2,
+      "total_kv_blocks": 4000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -6.8993752339750625,
+        9078.23242,
+        1.0,
+        4000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 3,
+      "total_kv_blocks": 5000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -6.950154672217153,
+        85.32717,
+        1.0,
+        5000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -5.265513796462301,
+        20281.27544,
+        1.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 2,
+      "total_kv_blocks": 4000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -6.8993752339750625,
+        9078.23242,
+        1.0,
+        4000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 3,
+      "total_kv_blocks": 5000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -6.950154672217153,
+        85.32717,
+        1.0,
+        5000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 1,
+      "total_kv_blocks": 3000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -6.349876815564716,
+        14789.42011,
+        1.0,
+        3000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 3,
+      "total_kv_blocks": 5000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -6.950154672217153,
+        85.32717,
+        1.0,
+        5000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 3,
+      "total_kv_blocks": 5000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -6.950154672217153,
+        85.32717,
+        1.0,
+        5000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -8.510450343671133,
+        6016.820859999995,
+        2.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 1,
+      "total_kv_blocks": 3000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -9.003296376902474,
+        60.64924,
+        2.0,
+        3000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -8.510450343671133,
+        6016.820859999995,
+        2.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 1,
+      "total_kv_blocks": 3000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -9.003296376902474,
+        60.64924,
+        2.0,
+        3000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -8.510450343671133,
+        6016.820859999995,
+        2.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 1,
+      "total_kv_blocks": 3000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -9.003296376902474,
+        60.64924,
+        2.0,
+        3000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -8.52566850725903,
+        6147.046449999996,
+        2.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 1,
+      "total_kv_blocks": 3000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -9.003296376902474,
+        60.64924,
+        2.0,
+        3000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -8.52566850725903,
+        6147.046449999996,
+        2.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 1,
+      "total_kv_blocks": 3000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -9.003296376902474,
+        60.64924,
+        2.0,
+        3000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -8.52566850725903,
+        6147.046449999996,
+        2.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 1,
+      "total_kv_blocks": 3000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -9.003296376902474,
+        60.64924,
+        2.0,
+        3000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 2,
+      "num_instances": 3,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -10.055588297668342,
+        51.62027,
+        3.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 2,
+      "num_instances": 3,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -10.055588297668342,
+        51.62027,
+        3.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 2,
+      "num_instances": 3,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -10.055588297668342,
+        51.62027,
+        3.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 2,
+      "num_instances": 3,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -10.055588297668342,
+        51.62027,
+        3.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 2,
+      "num_instances": 3,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -10.055588297668342,
+        51.62027,
+        3.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 2,
+      "num_instances": 3,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -10.055588297668342,
+        51.62027,
+        3.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 3,
+      "num_instances": 4,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 1,
+      "max_num_running_reqs": 64,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -10.74188853142271,
+        49.48859,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 3,
+      "num_instances": 4,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -10.74188853142271,
+        49.48859,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 3,
+      "num_instances": 4,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -10.74188853142271,
+        49.48859,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 3,
+      "num_instances": 4,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -10.74188853142271,
+        49.48859,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 3,
+      "num_instances": 4,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 1,
+      "max_num_running_reqs": 64,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -10.74188853142271,
+        49.48859,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 3,
+      "num_instances": 4,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -10.74188853142271,
+        49.48859,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 3,
+      "num_instances": 4,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -10.74188853142271,
+        49.48859,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 3,
+      "num_instances": 4,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -10.74188853142271,
+        49.48859,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 4,
+      "num_instances": 5,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 1,
+      "max_num_running_reqs": 64,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 0,
+      "block_size_in_tokens": 16,
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 4,
+      "num_instances": 5,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 1,
+      "max_num_running_reqs": 64,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 4,
+      "num_instances": 5,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 0,
+      "block_size_in_tokens": 16,
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 4,
+      "num_instances": 5,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 4,
+      "num_instances": 5,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 0,
+      "block_size_in_tokens": 16,
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 4,
+      "num_instances": 5,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 4,
+      "num_instances": 5,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 0,
+      "block_size_in_tokens": 16,
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 4,
+      "num_instances": 5,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 4,
+      "num_instances": 5,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 1,
+      "max_num_running_reqs": 64,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 0,
+      "block_size_in_tokens": 16,
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 4,
+      "num_instances": 5,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 1,
+      "max_num_running_reqs": 64,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 4,
+      "num_instances": 5,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 0,
+      "block_size_in_tokens": 16,
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 4,
+      "num_instances": 5,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 4,
+      "num_instances": 5,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 0,
+      "block_size_in_tokens": 16,
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 4,
+      "num_instances": 5,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 4,
+      "num_instances": 5,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 0,
+      "block_size_in_tokens": 16,
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 0,
+      "tp": 1,
+      "inst_idx": 4,
+      "num_instances": 5,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -11.169438539689736,
+        47.67511,
+        5.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -9.566415148073997,
+        10161.834,
+        2.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 1,
+      "total_kv_blocks": 3000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -10.807976199971769,
+        6308.06733,
+        2.0,
+        3000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -9.566415148073997,
+        10161.834,
+        2.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 2,
+      "total_kv_blocks": 4000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -12.5834629639743,
+        88.00329999999362,
+        2.0,
+        4000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 3,
+      "total_kv_blocks": 5000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -12.614224960574239,
+        51.65414,
+        2.0,
+        5000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -9.566415148073997,
+        10161.834,
+        2.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 2,
+      "total_kv_blocks": 4000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -12.5834629639743,
+        88.00329999999362,
+        2.0,
+        4000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 3,
+      "total_kv_blocks": 5000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -12.614224960574239,
+        51.65414,
+        2.0,
+        5000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 1,
+      "total_kv_blocks": 3000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -11.465532373905228,
+        6832.283979999999,
+        2.0,
+        3000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 2,
+      "total_kv_blocks": 4000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -12.5834629639743,
+        88.00329999999362,
+        2.0,
+        4000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 3,
+      "total_kv_blocks": 5000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -12.614224960574239,
+        51.65414,
+        2.0,
+        5000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 2,
+      "total_kv_blocks": 4000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -12.5834629639743,
+        88.00329999999362,
+        2.0,
+        4000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 3,
+      "total_kv_blocks": 5000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -12.614224960574239,
+        51.65414,
+        2.0,
+        5000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -15.352340042050061,
+        2123.6195,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 1,
+      "total_kv_blocks": 3000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -16.00893554746517,
+        39.4655,
+        4.0,
+        3000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -15.352340042050061,
+        2123.6195,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 1,
+      "total_kv_blocks": 3000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -16.00893554746517,
+        39.4655,
+        4.0,
+        3000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -15.352340042050061,
+        2123.6195,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 1,
+      "total_kv_blocks": 3000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -16.00893554746517,
+        39.4655,
+        4.0,
+        3000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 1,
+      "total_kv_blocks": 3000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -16.00893554746517,
+        39.4655,
+        4.0,
+        3000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 1,
+      "total_kv_blocks": 3000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -16.00893554746517,
+        39.4655,
+        4.0,
+        3000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 1,
+      "total_kv_blocks": 3000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -16.00893554746517,
+        39.4655,
+        4.0,
+        3000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 2,
+      "num_instances": 3,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 1,
+      "max_num_running_reqs": 64,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -17.397655248411553,
+        36.07364,
+        6.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 2,
+      "num_instances": 3,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -17.397655248411553,
+        36.07364,
+        6.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 2,
+      "num_instances": 3,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -17.397655248411553,
+        36.07364,
+        6.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 2,
+      "num_instances": 3,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -17.397655248411553,
+        36.07364,
+        6.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 2,
+      "num_instances": 3,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 1,
+      "max_num_running_reqs": 64,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -17.397655248411553,
+        36.07364,
+        6.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 2,
+      "num_instances": 3,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -17.397655248411553,
+        36.07364,
+        6.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 2,
+      "num_instances": 3,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -17.397655248411553,
+        36.07364,
+        6.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 1,
+      "tp": 2,
+      "inst_idx": 2,
+      "num_instances": 3,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -17.397655248411553,
+        36.07364,
+        6.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 2,
+      "tp": 4,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -16.013310263491014,
+        4796.73258,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 2,
+      "tp": 4,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 1,
+      "total_kv_blocks": 3000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -18.233819377061618,
+        2802.73833,
+        4.0,
+        3000.0
+      ]
+    },
+    {
+      "tp_idx": 2,
+      "tp": 4,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -16.013310263491014,
+        4796.73258,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 2,
+      "tp": 4,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 2,
+      "total_kv_blocks": 4000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -20.796679186267536,
+        34.63711,
+        4.0,
+        4000.0
+      ]
+    },
+    {
+      "tp_idx": 2,
+      "tp": 4,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -16.013310263491014,
+        4796.73258,
+        4.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 2,
+      "tp": 4,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 2,
+      "total_kv_blocks": 4000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -20.796679186267536,
+        34.63711,
+        4.0,
+        4000.0
+      ]
+    },
+    {
+      "tp_idx": 2,
+      "tp": 4,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 1,
+      "total_kv_blocks": 3000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -19.29660218674885,
+        3386.51849,
+        4.0,
+        3000.0
+      ]
+    },
+    {
+      "tp_idx": 2,
+      "tp": 4,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 1,
+      "total_kv_blocks": 3000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -19.054538567195877,
+        3112.9547199999997,
+        4.0,
+        3000.0
+      ]
+    },
+    {
+      "tp_idx": 2,
+      "tp": 4,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 2,
+      "total_kv_blocks": 4000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -20.796679186267536,
+        34.63711,
+        4.0,
+        4000.0
+      ]
+    },
+    {
+      "tp_idx": 2,
+      "tp": 4,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 1,
+      "total_kv_blocks": 3000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -19.054538567195877,
+        3112.9547199999997,
+        4.0,
+        3000.0
+      ]
+    },
+    {
+      "tp_idx": 2,
+      "tp": 4,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 2,
+      "total_kv_blocks": 4000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -20.796679186267536,
+        34.63711,
+        4.0,
+        4000.0
+      ]
+    },
+    {
+      "tp_idx": 2,
+      "tp": 4,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -25.180091159484025,
+        28.94737,
+        8.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 2,
+      "tp": 4,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -25.180091159484025,
+        28.94737,
+        8.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 2,
+      "tp": 4,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -25.180091159484025,
+        28.94737,
+        8.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 2,
+      "tp": 4,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -25.180091159484025,
+        28.94737,
+        8.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 2,
+      "tp": 4,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -25.180091159484025,
+        28.94737,
+        8.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 2,
+      "tp": 4,
+      "inst_idx": 1,
+      "num_instances": 2,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -25.180091159484025,
+        28.94737,
+        8.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 3,
+      "tp": 8,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 1,
+      "total_kv_blocks": 3000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -27.853124347627602,
+        1142.9107999999999,
+        8.0,
+        3000.0
+      ]
+    },
+    {
+      "tp_idx": 3,
+      "tp": 8,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 2,
+      "total_kv_blocks": 4000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -29.923590112647354,
+        26.34634,
+        8.0,
+        4000.0
+      ]
+    },
+    {
+      "tp_idx": 3,
+      "tp": 8,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 0,
+      "scheduler": "fcfs",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 2,
+      "total_kv_blocks": 4000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -29.923590112647354,
+        26.34634,
+        8.0,
+        4000.0
+      ]
+    },
+    {
+      "tp_idx": 3,
+      "tp": 8,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -25.353005744610808,
+        3369.8855299999996,
+        8.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 3,
+      "tp": 8,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 2,
+      "max_num_running_reqs": 128,
+      "kv_idx": 1,
+      "total_kv_blocks": 3000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -28.577523748993894,
+        1262.5808299999994,
+        8.0,
+        3000.0
+      ]
+    },
+    {
+      "tp_idx": 3,
+      "tp": 8,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -25.353005744610808,
+        3369.8855299999996,
+        8.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 3,
+      "tp": 8,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 3,
+      "max_num_running_reqs": 256,
+      "kv_idx": 2,
+      "total_kv_blocks": 4000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -29.923590112647354,
+        26.34634,
+        8.0,
+        4000.0
+      ]
+    },
+    {
+      "tp_idx": 3,
+      "tp": 8,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 0,
+      "total_kv_blocks": 2000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -25.353005744610808,
+        3369.8855299999996,
+        8.0,
+        2000.0
+      ]
+    },
+    {
+      "tp_idx": 3,
+      "tp": 8,
+      "inst_idx": 0,
+      "num_instances": 1,
+      "sched_idx": 1,
+      "scheduler": "sjf",
+      "batch_idx": 4,
+      "max_num_running_reqs": 512,
+      "kv_idx": 2,
+      "total_kv_blocks": 4000,
+      "bs_idx": 1,
+      "block_size_in_tokens": 32,
+      "objectives": [
+        -29.923590112647354,
+        26.34634,
+        8.0,
+        4000.0
+      ]
+    }
+  ]
+}

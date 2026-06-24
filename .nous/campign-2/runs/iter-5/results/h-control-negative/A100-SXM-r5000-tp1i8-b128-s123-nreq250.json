@@ -1,0 +1,12 @@
+{
+  "arm": "h-control-negative",
+  "name": "A100-SXM-r5000-tp1i8-b128-s123-nreq250",
+  "hardware": "A100-SXM",
+  "tp": 1,
+  "instances": 8,
+  "rate": 5000,
+  "nreq": 250,
+  "batch": 128,
+  "seed": 123,
+  "score": 0.038706
+}

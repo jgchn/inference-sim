@@ -1,0 +1,67 @@
+metadata:
+  iteration: 7
+  bundle_ref: "runs/iter-7/bundle.yaml"
+  description: >
+    Model portability study: Does NSGA-II's convergence speed advantage over random search
+    transfer across model architectures? Tests Llama-3.1-8B (32 layers, 5.33% Pareto density)
+    vs Qwen3-14B (40 layers, 4.5% Pareto density) on the same 1800-config 4-objective space at rate=50.
+    Objectives (all minimized): [-rps, ttft_p99_ms, gpu_count, kv_blocks].
+    Reference point (0, 50000, 9, 11000). MC-HV with 200k samples, seed=42.
+
+setup:
+  - cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-7-0f66e3f5 && go build -o blis main.go"
+    description: "Build BLIS binary in worktree"
+
+  - cmd: >
+      cd /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-7-0f66e3f5 &&
+      ./blis run --model meta-llama/llama-3.1-8b-instruct --hardware H100 --latency-model trained-physics
+      --num-requests 200 --rate 50 --prefix-tokens 512 --seed 42
+      --max-num-scheduled-tokens 4096 --long-prefill-token-threshold 0
+      --admission-policy always-admit --preemption-policy fcfs
+      --block-size-in-tokens 16 --routing-policy round-robin --gpu-memory-utilization 0.9
+      --tp 2 --num-instances 2 --scheduler fcfs --max-num-running-reqs 128
+      --total-kv-blocks 3000 --metrics-path $TMPDIR/baseline_llama.json
+    description: "Validate baseline Llama command (expected: rps=19.62, ttft_p99=1741.3, preemptions=50)"
+
+arms:
+  - arm_id: "h-robustness"
+    conditions:
+      - name: "exhaustive-llama-rate50"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-7-0f66e3f5 && python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-7/inputs/search_exhaustive_llama.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-7/results/h-robustness/pareto_front.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-7/inputs/blis_common.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-7/inputs/search_exhaustive_llama.py"
+        description: "Exhaustive sweep of all 1800 configs with Llama-3.1-8B at rate=50. Parameter space: tp=[1,2,4,8], num_instances=range(1,8//tp+1), scheduler=[fcfs,sjf], max_num_running_reqs=[32,64,128,256,512], total_kv_blocks=[2000,3000,4000,5000,7500,10000], block_size_in_tokens=[16,32]. Outputs pareto_front.json and convergence.json with exhaustive_hv used as reference for h-main and h-control-negative."
+
+  - arm_id: "h-main"
+    conditions:
+      - name: "nsga2-llama-pop40-gen4-seed42"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-7-0f66e3f5 && python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-7/inputs/search_nsga2_llama.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-7/results/h-main/pareto_front.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-7/inputs/blis_common.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-7/inputs/search_nsga2_llama.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-7/results/h-robustness/pareto_front.json"
+        description: "NSGA-II on Llama-3.1-8B, pop=40, 4 generations (40 init + 4x40 = 200 total evals), rng_seed=42. 6-gene encoding: (tp_idx, inst_idx, sched_idx, batch_idx, kv_idx, block_size_idx). Uniform crossover, 15% per-gene mutation, tp-instances constraint repair. Reads exhaustive_hv from h-robustness output. Tracks HV every 40 evals."
+
+  - arm_id: "h-control-negative"
+    conditions:
+      - name: "random-llama-200evals-seed43"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-7-0f66e3f5 && python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-7/inputs/search_random_llama.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-7/results/h-control-negative/pareto_front.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-7/inputs/blis_common.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-7/inputs/search_random_llama.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-7/results/h-robustness/pareto_front.json"
+        description: "Uniform random search on Llama-3.1-8B, 200 evals, rng_seed=43. Reads exhaustive_hv from h-robustness output. Tracks HV every 40 evals."
+
+  - arm_id: "h-ablation"
+    conditions:
+      - name: "qwen-reverify-nsga2-seed42-random-seed43"
+        cmd: "cd /Users/jchen/go/src/inference-sim/inference-sim/.nous-experiments/iter-7-0f66e3f5 && python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-7/inputs/search_qwen_reverify.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-7/results/h-ablation/pareto_front.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-7/inputs/blis_common.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-7/inputs/search_qwen_reverify.py"
+        description: "Qwen3-14B re-verification in same session. Runs NSGA-II (pop=40, 4 gens, seed=42) and random (200 evals, seed=43) on Qwen3-14B at rate=50. Uses iter-5 exhaustive HV=58570200000.0 as reference. Validates infrastructure consistency (BLIS binary unchanged) and provides same-session cross-model comparison. NSGA-II eval=40 should match iter-5's 87.4%."

@@ -1,0 +1,11 @@
+{
+  "gate_type": "continue",
+  "summary": "Iteration 4 completed the 2-model \u00d7 3-hardware matrix: A100-SXM behaves like H100 (TP=4 wins for both models), not like L40S (which is model-dependent). The bracket K=1 algorithm achieved perfect 25/25 Phase 1 identification across all seed combinations, while the flat TPE ablation revealed that convergence difficulty depends on both margin width AND hardware-specific fitness landscape shape \u2014 not margin width alone.",
+  "key_points": [
+    "Matrix completion confirmed: A100-SXM (2.039 TB/s) joins H100 (3.35 TB/s) in the TP=4 regime for qwen3-14b, while L40S (0.864 TB/s) remains TP=8. The bandwidth threshold for qwen3-14b switching from TP=8 to TP=4 lies between 0.864 and 2.039 TB/s.",
+    "Bracket K=1 is fully validated: 25/25 correct Phase 1 identifications across 5 blis_seeds \u00d7 5 search seeds, always finding the TP=4/2inst winner at evaluation 3 \u2014 even at the tightest margin in the campaign (1.07% at seed=42).",
+    "Flat TPE convergence threshold is hardware-specific: at the tight 1.07% margin on A100-SXM, all 5 seeds still passed the within-1% threshold (median 26 evals), unlike L40S llama at a wider 2.1% margin where 4/5 seeds failed. The [2.1%, 5.1%] failure boundary established on L40S does not transfer universally \u2014 landscape structure (how many configs score above threshold) matters as much as relative margin width.",
+    "Phase 2 TPE adds genuine value on A100-SXM for the first time: round-robin routing produces a 0.38% improvement over the Phase 1 max-profile (0.138820 vs 0.138290), making the full two-phase algorithm necessary to reach the true global best. However, the routing advantage is seed-dependent (round-robin wins at seed=42, least-loaded wins at seed=46).",
+    "Remaining unknowns: (1) Does a larger model (qwen3-32b) push the bandwidth threshold higher? (2) How does arrival rate affect TP margin and search difficulty? (3) Can the search algorithm be packaged with auto-detection of optimal strategy based on an upfront margin estimate? The next iteration should explore at least one of these to extend the campaign's generalizability."
+  ]
+}

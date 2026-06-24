@@ -1,0 +1,210 @@
+[
+  {
+    "config": {
+      "tp": 8,
+      "num_instances": 1,
+      "scheduler": "fcfs",
+      "max_num_running_reqs": 128,
+      "max_num_scheduled_tokens": 8192,
+      "long_prefill_token_threshold": 4096,
+      "block_size_in_tokens": 16,
+      "routing_policy": "round-robin",
+      "routing_scorers": null,
+      "admission_policy": "always-admit",
+      "preemption_policy": "fcfs",
+      "gpu_memory_utilization": 0.85
+    },
+    "objectives": [
+      -37.01500625368531,
+      25.089029999999998,
+      8.0
+    ],
+    "metrics": {
+      "responses_per_sec": 37.01500625368531,
+      "ttft_p99_ms": 25.089029999999998
+    },
+    "eval_num": 3
+  },
+  {
+    "config": {
+      "tp": 2,
+      "num_instances": 1,
+      "scheduler": "fcfs",
+      "max_num_running_reqs": 512,
+      "max_num_scheduled_tokens": 4096,
+      "long_prefill_token_threshold": 2048,
+      "block_size_in_tokens": 32,
+      "routing_policy": "round-robin",
+      "routing_scorers": null,
+      "admission_policy": "always-admit",
+      "preemption_policy": "fcfs",
+      "gpu_memory_utilization": 0.95
+    },
+    "objectives": [
+      -19.9948837091565,
+      61.41912,
+      2.0
+    ],
+    "metrics": {
+      "responses_per_sec": 19.9948837091565,
+      "ttft_p99_ms": 61.41912
+    },
+    "eval_num": 14
+  },
+  {
+    "config": {
+      "tp": 4,
+      "num_instances": 1,
+      "scheduler": "priority-fcfs",
+      "max_num_running_reqs": 256,
+      "max_num_scheduled_tokens": 4096,
+      "long_prefill_token_threshold": 2048,
+      "block_size_in_tokens": 32,
+      "routing_policy": "round-robin",
+      "routing_scorers": null,
+      "admission_policy": "always-admit",
+      "preemption_policy": "fcfs",
+      "gpu_memory_utilization": 0.9
+    },
+    "objectives": [
+      -29.742327936766383,
+      35.31626,
+      4.0
+    ],
+    "metrics": {
+      "responses_per_sec": 29.742327936766383,
+      "ttft_p99_ms": 35.31626
+    },
+    "eval_num": 20
+  },
+  {
+    "config": {
+      "tp": 1,
+      "num_instances": 3,
+      "scheduler": "reverse-priority",
+      "max_num_running_reqs": 256,
+      "max_num_scheduled_tokens": 2048,
+      "long_prefill_token_threshold": 0,
+      "block_size_in_tokens": 16,
+      "routing_policy": "round-robin",
+      "routing_scorers": null,
+      "admission_policy": "tier-shed",
+      "preemption_policy": "fcfs",
+      "gpu_memory_utilization": 0.95
+    },
+    "objectives": [
+      -17.208584495492143,
+      61.022870000000005,
+      3.0
+    ],
+    "metrics": {
+      "responses_per_sec": 17.208584495492143,
+      "ttft_p99_ms": 61.022870000000005
+    },
+    "eval_num": 86
+  },
+  {
+    "config": {
+      "tp": 1,
+      "num_instances": 3,
+      "scheduler": "priority-fcfs",
+      "max_num_running_reqs": 256,
+      "max_num_scheduled_tokens": 8192,
+      "long_prefill_token_threshold": 0,
+      "block_size_in_tokens": 32,
+      "routing_policy": "least-loaded",
+      "routing_scorers": null,
+      "admission_policy": "always-admit",
+      "preemption_policy": "priority",
+      "gpu_memory_utilization": 0.95
+    },
+    "objectives": [
+      -17.05437805497206,
+      60.63898,
+      3.0
+    ],
+    "metrics": {
+      "responses_per_sec": 17.05437805497206,
+      "ttft_p99_ms": 60.63898
+    },
+    "eval_num": 111
+  },
+  {
+    "config": {
+      "tp": 1,
+      "num_instances": 1,
+      "scheduler": "sjf",
+      "max_num_running_reqs": 512,
+      "max_num_scheduled_tokens": 4096,
+      "long_prefill_token_threshold": 1024,
+      "block_size_in_tokens": 16,
+      "routing_policy": "round-robin",
+      "routing_scorers": null,
+      "admission_policy": "always-admit",
+      "preemption_policy": "fcfs",
+      "gpu_memory_utilization": 0.95
+    },
+    "objectives": [
+      -10.9391795400937,
+      13591.46695,
+      1.0
+    ],
+    "metrics": {
+      "responses_per_sec": 10.9391795400937,
+      "ttft_p99_ms": 13591.46695
+    },
+    "eval_num": 222
+  },
+  {
+    "config": {
+      "tp": 1,
+      "num_instances": 1,
+      "scheduler": "priority-fcfs",
+      "max_num_running_reqs": 512,
+      "max_num_scheduled_tokens": 8192,
+      "long_prefill_token_threshold": 2048,
+      "block_size_in_tokens": 32,
+      "routing_policy": "round-robin",
+      "routing_scorers": null,
+      "admission_policy": "always-admit",
+      "preemption_policy": "fcfs",
+      "gpu_memory_utilization": 0.95
+    },
+    "objectives": [
+      -10.922830399836105,
+      12750.51438,
+      1.0
+    ],
+    "metrics": {
+      "responses_per_sec": 10.922830399836105,
+      "ttft_p99_ms": 12750.51438
+    },
+    "eval_num": 248
+  },
+  {
+    "config": {
+      "tp": 2,
+      "num_instances": 1,
+      "scheduler": "fcfs",
+      "max_num_running_reqs": 512,
+      "max_num_scheduled_tokens": 2048,
+      "long_prefill_token_threshold": 0,
+      "block_size_in_tokens": 32,
+      "routing_policy": "round-robin",
+      "routing_scorers": null,
+      "admission_policy": "always-admit",
+      "preemption_policy": "fcfs",
+      "gpu_memory_utilization": 0.95
+    },
+    "objectives": [
+      -19.994888506702146,
+      62.20221,
+      2.0
+    ],
+    "metrics": {
+      "responses_per_sec": 19.994888506702146,
+      "ttft_p99_ms": 62.20221
+    },
+    "eval_num": 511
+  }
+]

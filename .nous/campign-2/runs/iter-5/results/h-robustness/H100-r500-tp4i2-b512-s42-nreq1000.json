@@ -1,0 +1,12 @@
+{
+  "arm": "h-robustness",
+  "name": "H100-r500-tp4i2-b512-s42-nreq1000",
+  "hardware": "H100",
+  "tp": 4,
+  "instances": 2,
+  "rate": 500,
+  "nreq": 1000,
+  "batch": 512,
+  "seed": 42,
+  "score": 0.178063
+}

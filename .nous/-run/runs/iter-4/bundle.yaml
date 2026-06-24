@@ -1,0 +1,132 @@
+metadata:
+  iteration: 4
+  family: "a100-qwen-margin-threshold"
+  research_question: "Does bracket K=1 correctly identify the TP winner for qwen3-14b on A100-SXM (completing the 2×3 model×hardware matrix), and can the flat TPE convergence threshold be narrowed using A100-SXM qwen's seed-by-seed margin variation (1.07%–4.47%)?"
+
+arm_selection_rationale: >
+  h-main completes the model×hardware matrix: A100-SXM qwen is the last untested cell, and bracket
+  K=1 faces the tightest TP=4 margin in the campaign (1.07%). h-robustness confirms bracket handles
+  the full margin range (1.07%–4.47%) across 5 blis_seeds. h-ablation and h-control-negative together
+  narrow the TPE margin threshold: h-ablation tests flat TPE at 1.07% (below the known 2.1% failure
+  regime), while h-control-negative tests flat TPE at 4.47% (inside the known 5.1% success regime).
+  The pair provides a within-hardware margin comparison — same algorithm, same hardware, different
+  seeds producing different margins — isolating margin width as the causal variable.
+
+arms:
+  - type: h-main
+    prediction: >
+      Bracket K=1 on A100-SXM hard qwen3-14b (blis_seed=42) correctly identifies TP=4/2inst as
+      the Phase 1 winner on all 5 search seeds, with evals_to_best=3. Phase 1 max-profile scores:
+      TP1=0.085746, TP2=0.115450, TP4=0.138290, TP8=0.136812. The 1.07% TP=4 margin over TP=8
+      is sufficient for unambiguous Phase 1 identification. Global best is 0.138820
+      (round-robin routing, discoverable in Phase 2). Threshold = 0.99 × 0.138820 = 0.137432;
+      TP=4 Phase 1 score (0.138290) exceeds threshold at eval 3 (3rd in PHASE1_TP_CONFIGS order:
+      TP=1, TP=2, TP=4, TP=8). This confirms A100-SXM follows H100 behavior (TP=4 for both models),
+      not L40S behavior (model-dependent TP winner). Phase 2 TPE should find the round-robin
+      routing improvement, achieving best_score ≈ 0.138820 (0.38% above Phase 1).
+    mechanism: >
+      A100-SXM bandwidth (2.039 TB/s) is sufficient for TP=4/2inst to dominate: two instances
+      provide higher aggregate throughput via overlapping batch execution, while TP=4's weight
+      sharding is adequate at this bandwidth. The TP=8/1inst single-instance throughput cannot
+      compensate for the lost parallelism. This matches H100 behavior (3.35 TB/s, TP=4 wins)
+      and contrasts with L40S (0.864 TB/s) where qwen's larger model size tips the balance to
+      TP=8 due to severe weight-loading bottleneck. The bandwidth threshold for the qwen TP
+      winner transition lies between 0.864 TB/s (L40S, TP=8) and 2.039 TB/s (A100, TP=4).
+    diagnostic: >
+      If TP=8 is identified instead of TP=4: the bandwidth threshold hypothesis is wrong — A100's
+      2.039 TB/s may still be insufficient for qwen's 14B parameters. Check qwen3-14b model config
+      for any changes to parameter count or architecture. If evals_to_best > 3: verify that
+      TP=4's Phase 1 score (0.138290) exceeds the threshold (0.137432). If Phase 2 does not
+      improve over Phase 1: round-robin routing may not be in the search space or TPE may not
+      explore it within the remaining budget.
+    code_changes:
+      - file: "search_blis_iter9.py"
+        intent: >
+          Copy search_blis_iter8.py (from iter-3 h-main.patch) and update the GLOBAL_BEST_TABLE
+          entry for A100-SXM qwen3-14b hard regime from 0.138290 to 0.138820. The previous value
+          (0.138290) was the max-profile score with least-loaded routing. Probing revealed that
+          round-robin routing produces 0.138820 (0.38% higher) — this is the true global best.
+          No other code changes are needed; the script already supports --hardware, --blis-seeds,
+          bracket K=1, and flat TPE strategies.
+        rationale: >
+          The GLOBAL_BEST_TABLE drives evals_to_best and within-threshold computations. The
+          stale value (0.138290) would produce a threshold of 0.136907, which TP=8's max-profile
+          (0.136812) nearly crosses — potentially causing misleading evals_to_best calculations.
+          The corrected value (0.138820) produces threshold 0.137432, cleanly separating TP=4
+          (above) from TP=8 (below) at seed=42.
+
+  - type: h-robustness
+    prediction: >
+      Bracket K=1 on A100-SXM hard qwen3-14b achieves 25/25 correct Phase 1 identification of
+      TP=4/2inst across 5 blis_seeds (42-46) × 5 search seeds. evals_to_best=3 at all 25
+      combinations. At every seed, TP=4's max-profile score exceeds the seed=42-calibrated
+      threshold (0.137432): seed=42: 0.138290, seed=43: 0.143114, seed=44: 0.139425, seed=45:
+      0.147744, seed=46: 0.147057 — all above 0.137432. Seeds 42 and 44 have the tightest TP=4
+      margins in the campaign (1.07%, 1.24%), but bracket's deterministic evaluation resolves
+      them identically on every search seed (confirming RP-9).
+    mechanism: >
+      Bracket Phase 1 is deterministic: given a fixed blis_seed, the same 4 BLIS configs are
+      evaluated, producing identical scores regardless of search_seed (RP-9). The max-profile
+      (mr=512, mt=8192, pf=4096) maximizes TP-level differentiation. TP=4 wins at all 5
+      blis_seeds because A100-SXM's bandwidth (2.039 TB/s) consistently favors 2-instance
+      parallelism over single-instance TP=8 for qwen. The margin variation (1.07%–4.47%)
+      reflects workload variation across seeds, not a change in the underlying hardware advantage.
+    diagnostic: >
+      If any seed selects TP=8: check that seed's Phase 1 scores. TP=8 would need to outscore
+      TP=4 at the max-profile, which would require a workload realization where single-instance
+      throughput dominates (unlikely at rate=500 with 1000 requests). If evals_to_best > 3 at
+      some seed: check whether that seed's TP=4 score falls below the threshold (0.137432).
+      Probed values show all seeds well above this threshold.
+
+  - type: h-ablation
+    prediction: >
+      Flat TPE on A100-SXM hard qwen3-14b at blis_seed=42 (1.07% TP margin) shows poor
+      convergence: ≤2/5 search seeds reach the exact global best (0.138820) within budget=100,
+      and median evals_to_best is >50 (possibly >100, indicating failure). This is worse than
+      L40S llama at 2.1% margin (1/5 exact per RP-19) and far worse than L40S qwen at 5.1%
+      margin (4/5 exact, median=6 per RP-22). The within-1% threshold (0.137432) is also
+      challenging: TP=8 max-profile (0.136812) falls below it, so TPE must specifically discover
+      TP=4/2inst with high batch params (mr=512, mt=8192) to cross the threshold. Bracket K=1's
+      deterministic evals_to_best=3 is strictly better.
+    mechanism: >
+      At 1.07% margin, TP=4/2inst and TP=8/1inst configs are nearly indistinguishable in fitness
+      (0.138290 vs 0.136812). TPE's Bayesian model cannot reliably separate these two regions
+      from 100 noisy samples across a 10-dimensional space. The threshold-crossing region is
+      narrow: only TP=4/2inst with mr=512+mt=8192 scores above 0.137432 (TP=4 with mr=256
+      scores only 0.124728). Random sampling probability of hitting this region is ~0.44%
+      (1/15 × 1/5 × 1/3), yielding ~0.44 expected threshold-crossing samples per 100 trials.
+      TPE's exploitation helps but requires early discovery of the TP=4 advantage, which the
+      tight margin makes unlikely.
+    diagnostic: >
+      If TPE achieves ≥4/5 success: the 1.07% margin may still be sufficient for TPE when
+      combined with A100-SXM's absolute fitness values (which are higher than L40S, possibly
+      creating steeper gradients). Check convergence traces to see if TPE discovers TP=4 through
+      direct exploration or serendipitously via high-scoring TP=8 configs that lead it in the
+      right direction. If TPE achieves 0/5 within-threshold: check whether the search space
+      enumeration matches expectations (15 TP/instance pairs, correct option lists).
+
+  - type: h-control-negative
+    prediction: >
+      Flat TPE on A100-SXM hard qwen3-14b at blis_seed=46 (4.47% TP margin) shows markedly
+      better convergence than h-ablation's tight margin: ≥3/5 seeds reach the within-1%
+      threshold, with median evals_to_best in 5–15 range. This approaches but may not match
+      L40S qwen's 5.1% performance (4/5 exact, median=6) since 4.47% is slightly narrower.
+      The contrast with h-ablation demonstrates that margin width — not hardware type or model
+      — is the causal variable determining TPE convergence reliability. TP=4 margin over TP=8
+      at seed=46 is 4.47% (TP4=0.147057, TP8=0.140490); at seed=42 it is 1.07%. Both use
+      identical hardware, model, and search algorithm — only the blis_seed (workload realization)
+      differs.
+    mechanism: >
+      At 4.47% margin, TP=4 configs produce visibly higher fitness scores than TP=8 configs,
+      giving TPE's Bayesian model a stronger signal to focus on TP=4/2inst. The threshold
+      (0.137432) is easily crossed: TP=8's max-profile at seed=46 (0.140490) already exceeds
+      it, so TPE can cross the threshold even by finding good TP=8 configs. The wider margin
+      concentrates the search landscape's peak, making gradient-based exploitation effective.
+      This is the same mechanism that enabled TPE success at L40S qwen's 5.1% margin (RP-22).
+    diagnostic: >
+      If TPE fails ≥4/5 at seed=46: the 4.47% margin may still be below the convergence
+      threshold, which would place the threshold in [4.47%, 5.1%] — a much narrower bound.
+      Check whether seed=46's absolute score distribution differs from seed=42 in ways that
+      confound the margin comparison (e.g., more variance in secondary param effects). If TPE
+      achieves 5/5 with median < 5: the threshold may be well below 4.47%, and the L40S llama
+      failure at 2.1% may have additional contributing factors beyond margin width.

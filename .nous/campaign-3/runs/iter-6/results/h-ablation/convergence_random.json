@@ -1,0 +1,42 @@
+{
+  "arm": "h-ablation",
+  "rate": 75,
+  "algorithm": "random",
+  "total_evals": 200,
+  "exhaustive_hv": 62917200000.0,
+  "final_hv": 61239600000.00001,
+  "final_hv_pct": 97.33363849630945,
+  "final_pareto_size": 26,
+  "convergence": [
+    {
+      "eval": 40,
+      "hv": 54021600000.0,
+      "pareto_size": 17,
+      "hv_pct": 85.86141786347771
+    },
+    {
+      "eval": 80,
+      "hv": 58584600000.0,
+      "pareto_size": 17,
+      "hv_pct": 93.11380671740001
+    },
+    {
+      "eval": 120,
+      "hv": 59580000000.0,
+      "pareto_size": 20,
+      "hv_pct": 94.69588602162843
+    },
+    {
+      "eval": 160,
+      "hv": 59763600000.0,
+      "pareto_size": 23,
+      "hv_pct": 94.9876981175259
+    },
+    {
+      "eval": 200,
+      "hv": 61239600000.00001,
+      "pareto_size": 26,
+      "hv_pct": 97.33363849630945
+    }
+  ]
+}

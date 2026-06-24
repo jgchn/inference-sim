@@ -1,0 +1,11 @@
+{
+  "gate_type": "findings",
+  "summary": "The two-phase search strategy (lean Phase 1 tier selection \u2192 TPE Phase 2 tuning) works exceptionally well in its designed regime (H100, high request rate) but has identifiable failure modes at low rates and on A100-SXM hardware where tier rankings become ambiguous. TPE converges dramatically faster than predicted (2-3 evals vs \u226420) and consistently outperforms random Latin Hypercube sampling.",
+  "key_points": [
+    "h-main CONFIRMED: Lean Phase 1 correctly identifies TP=4/2 at H100 rate=5000 across all 3 seeds. TPE Phase 2 reaches 95% of optimal in just 2-3 evaluations (far faster than the predicted \u226420), finding scores that match or exceed the reference (0.176474\u20130.178597 vs reference 0.176474).",
+    "h-control-negative PARTIALLY CONFIRMED: Lean Phase 1 always fails at H100 rate=500 (0/3 seeds correct), but the severity depends on which wrong tier is selected\u2014seed=42 picks TP=2/4 with an unrecoverable 24.2% deficit, while seeds 123/456 pick TP=4/2 with only 4-8% deficit because that tier is partially batch-sensitive. The predicted uniform \u226520% deficit only holds for one seed.",
+    "h-ablation CONFIRMED: TPE consistently reaches 95% of within-tier optimal faster than LHS across all seeds (2-3 evals vs 5-16 evals). Final quality is comparable, but TPE's surrogate model learns the dominant batch-size lever quickly.",
+    "h-robustness PARTIALLY CONFIRMED: Standard Phase 1 (batch=512) achieves 16/18 correct tier identifications (89%) rather than the predicted 100%. Failures occur on A100-SXM at seed=456 where TP=4/2 and TP=8/1 are within 0.1-1.0%\u2014a genuine tie zone rather than an algorithm failure. Lean Phase 1 fails in 4/6 conditions as predicted.",
+    "NEW INSIGHT: Tier rankings on A100-SXM are seed-sensitive at rates \u22652000, suggesting that production deployments near tier boundaries should either average over multiple workload samples or treat the competing tiers as equivalent. The 'lean screening at batch=128' approach is reliable only when the winning tier is clearly saturated."
+  ]
+}

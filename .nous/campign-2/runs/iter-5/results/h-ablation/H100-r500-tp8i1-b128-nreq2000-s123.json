@@ -1,0 +1,12 @@
+{
+  "arm": "h-ablation",
+  "name": "H100-r500-tp8i1-b128-nreq2000-s123",
+  "hardware": "H100",
+  "tp": 8,
+  "instances": 1,
+  "rate": 500,
+  "nreq": 2000,
+  "batch": 128,
+  "seed": 123,
+  "score": 0.133740
+}

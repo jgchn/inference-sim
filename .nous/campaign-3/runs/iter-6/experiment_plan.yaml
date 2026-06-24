@@ -1,0 +1,57 @@
+metadata:
+  iteration: 6
+  bundle_ref: "runs/iter-6/bundle.yaml"
+  description: >
+    NSGA-II vs random search convergence portability across load regimes.
+    Tests whether NSGA-II advantage from rate=50 (iter-5: 91-eval gap, 4.5% density)
+    generalizes to rate=75 and rate=100. 1800-config corrected space unchanged.
+    4 objectives: -rps, ttft_p99_ms, gpu_count, total_kv_blocks. Reference point (0, 50000, 9, 11000).
+
+setup:
+  - cmd: "go build -o blis main.go"
+    description: "Build BLIS binary in worktree"
+  - cmd: "mkdir -p /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-6/results/h-robustness /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-6/results/h-main /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-6/results/h-control-negative /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-6/results/h-ablation"
+    description: "Create per-arm result subdirectories"
+
+arms:
+  - arm_id: "h-robustness"
+    conditions:
+      - name: "exhaustive-rate100"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-6/inputs/search_exhaustive_rate100.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-6/results/h-robustness/pareto_front.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-6/inputs/blis_common.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-6/inputs/search_exhaustive_rate100.py"
+        description: "Exhaustive sweep of all 1800 corrected-space configs at rate=100. Outputs pareto_front.json with pareto_count, density_pct, hypervolume, and per-eval convergence."
+
+  - arm_id: "h-main"
+    conditions:
+      - name: "nsga2-rate100-seed42"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-6/inputs/search_nsga2_rate100.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-6/results/h-main/convergence.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-6/inputs/blis_common.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-6/inputs/search_nsga2_rate100.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-6/results/h-robustness/pareto_front.json"
+        description: "NSGA-II at rate=100. pop=40, 4 gens (200 total evals), 15% mutation, uniform crossover. 6-gene encoding: (tp_idx, inst_idx, sched_idx, batch_idx, kv_idx, block_size_idx). Reads exhaustive HV from h-robustness output for normalization. Tracks HV every 40 evals."
+
+  - arm_id: "h-control-negative"
+    conditions:
+      - name: "random-rate100-seed43"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-6/inputs/search_random_rate100.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-6/results/h-control-negative/convergence.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-6/inputs/blis_common.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-6/inputs/search_random_rate100.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-6/results/h-robustness/pareto_front.json"
+        description: "Uniform random search at rate=100. 200 evals, random seed=43. Reads exhaustive HV from h-robustness for normalization. Tracks HV every 40 evals."
+
+  - arm_id: "h-ablation"
+    conditions:
+      - name: "rate75-exhaustive-nsga2-random"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-6/inputs/search_rate75.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-6/results/h-ablation/pareto_front.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-6/inputs/blis_common.py"
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-6/inputs/search_rate75.py"
+        description: "Intermediate load point: exhaustive sweep (1800 evals), NSGA-II (200 evals, seed=42), and random (200 evals, seed=43) at rate=75. Outputs: pareto_front.json (exhaustive), convergence_nsga2.json, convergence_random.json. Tests monotonicity of load-vs-algorithm-advantage relationship."

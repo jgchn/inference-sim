@@ -1,0 +1,47 @@
+metadata:
+  iteration: 6
+  bundle_ref: "runs/iter-6/bundle.yaml"
+  description: "Cross-hardware rate crossover on A100-SXM: bracket K=1 at rate=100 and rate=200 (crossover)"
+
+setup:
+  - cmd: "go build -o blis main.go"
+    description: "Build the BLIS binary"
+  - cmd: "git apply /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-6/patches/h-main.patch"
+    description: "Apply iter-6 base patch (adds search_blis_iter6.py + llama model config)"
+
+arms:
+  - arm_id: "h-main"
+    conditions:
+      - name: "bracket-k1-a100-qwen-rate100"
+        cmd: "python3 search_blis_iter6.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware A100-SXM --budget 100 --seeds 42,43,44,45,46 --rate 100 --num-requests 1000 --model qwen/qwen3-14b --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-6/results/h-main/results.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-6/results/h-main/results.json"
+
+  - arm_id: "h-robustness"
+    conditions:
+      - name: "bracket-k1-a100-llama-blis42"
+        cmd: "python3 search_blis_iter6.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware A100-SXM --budget 100 --seeds 42,43,44,45,46 --blis-seed 42 --rate 100 --num-requests 1000 --model meta-llama/llama-3.1-8b-instruct --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-6/results/h-robustness/blis_seed_42.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-6/results/h-robustness/blis_seed_42.json"
+      - name: "bracket-k1-a100-llama-blis43"
+        cmd: "python3 search_blis_iter6.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware A100-SXM --budget 100 --seeds 42,43,44,45,46 --blis-seed 43 --rate 100 --num-requests 1000 --model meta-llama/llama-3.1-8b-instruct --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-6/results/h-robustness/blis_seed_43.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-6/results/h-robustness/blis_seed_43.json"
+      - name: "bracket-k1-a100-llama-blis44"
+        cmd: "python3 search_blis_iter6.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware A100-SXM --budget 100 --seeds 42,43,44,45,46 --blis-seed 44 --rate 100 --num-requests 1000 --model meta-llama/llama-3.1-8b-instruct --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-6/results/h-robustness/blis_seed_44.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-6/results/h-robustness/blis_seed_44.json"
+      - name: "bracket-k1-a100-llama-blis45"
+        cmd: "python3 search_blis_iter6.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware A100-SXM --budget 100 --seeds 42,43,44,45,46 --blis-seed 45 --rate 100 --num-requests 1000 --model meta-llama/llama-3.1-8b-instruct --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-6/results/h-robustness/blis_seed_45.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-6/results/h-robustness/blis_seed_45.json"
+      - name: "bracket-k1-a100-llama-blis46"
+        cmd: "python3 search_blis_iter6.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware A100-SXM --budget 100 --seeds 42,43,44,45,46 --blis-seed 46 --rate 100 --num-requests 1000 --model meta-llama/llama-3.1-8b-instruct --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-6/results/h-robustness/blis_seed_46.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-6/results/h-robustness/blis_seed_46.json"
+
+  - arm_id: "h-ablation"
+    conditions:
+      - name: "bracket-k1-a100-qwen-rate200"
+        cmd: "python3 search_blis_iter6.py --strategy adaptive-hierarchical --phase1-k 1 --phase1-profiles bracket --hardware A100-SXM --budget 100 --seeds 42,43,44,45,46 --rate 200 --num-requests 1000 --model qwen/qwen3-14b --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-6/results/h-ablation/results.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-6/results/h-ablation/results.json"
+
+  - arm_id: "h-control-negative"
+    conditions:
+      - name: "tpe-a100-qwen-rate100"
+        cmd: "python3 search_blis_iter6.py --strategy tpe --hardware A100-SXM --budget 100 --seeds 42,43,44,45,46 --rate 100 --num-requests 1000 --model qwen/qwen3-14b --output /Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-6/results/h-control-negative/results.json"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/-run/runs/iter-6/results/h-control-negative/results.json"

@@ -1,0 +1,12 @@
+{
+  "arm": "h-control-negative",
+  "name": "H100-r5000-tp1i8-b512-s42-nreq250",
+  "hardware": "H100",
+  "tp": 1,
+  "instances": 8,
+  "rate": 5000,
+  "nreq": 250,
+  "batch": 512,
+  "seed": 42,
+  "score": 0.053978
+}

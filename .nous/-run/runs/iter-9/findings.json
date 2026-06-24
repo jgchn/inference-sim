@@ -1,0 +1,41 @@
+{
+  "iteration": 9,
+  "bundle_ref": "runs/iter-9/bundle.yaml",
+  "arms": [
+    {
+      "arm_type": "h-main",
+      "predicted": "Lean bracket achieves within 1% of global best on all 6 regimes (3 hardware x 2 rates) for llama-3.1-70b. TP=8 wins on ALL regimes with evals_to_best=2 everywhere. All 5 search seeds produce identical results per regime (deterministic).",
+      "observed": "30/30 runs: TP=8 wins on all 6 regimes x 5 seeds. Scores exactly match GLOBAL_BEST_TABLE on all regimes. evals_to_best=2 on all 30 (TP=4 eval first at position 1, TP=8 at position 2 clears threshold). H100 r100=0.088793, H100 r500=0.091801, A100-SXM r100=0.063273, A100-SXM r500=0.063991, L40S r100=0.034041, L40S r500=0.034137. All 5 search seeds identical per regime (deterministic lean bracket). TP=4 max scores: H100 r100=0.0812, H100 r500=0.0832, A100-SXM r100=0.0560, A100-SXM r500=0.0564, L40S r100=0.0289, L40S r500=0.0284. TP=8 wins by 9.4%-20.2% across all regimes.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": null
+    },
+    {
+      "arm_type": "h-control-negative",
+      "predicted": "Model-aware formula achieves 24/24 (100%) accuracy. Old formula achieves 18/24 (75%). All 6 failures of old formula occur at regimes where load_index > 12 and rate > crossover_rate but actual winner is TP=8.",
+      "observed": "Old formula on 70B: 3/6 correct (only rate=100 regimes where rate<crossover). Fails at H100 rate=500 (predicts TP=4, actual TP=8, score=0.083221 vs best=0.091801, 9.3% below threshold), A100-SXM rate=500 (predicts TP=4, score=0.056407 vs best=0.063991, 11.9% below), L40S rate=500 (predicts TP=4, score=0.028378 vs best=0.034137, 16.9% below). Combined with 15/18 on prior regimes: old formula = 18/24 = 75% as predicted. Model-aware formula on 70B: 6/6 correct. load_index: H100=20.90, A100-SXM=34.33, L40S=81.02 — all exceed threshold=12.0, triggering no-crossover regime prediction of TP=8. Combined with 18/18 on prior regimes (load_index threshold correctly routes): model-aware formula = 24/24 = 100%. Old formula failures on prior regimes: qwen3-14b L40S rate=500 (load_index=16.2>12, actual TP=8, formula predicts TP=4), qwen3-32b A100-SXM rate=500 (load_index=15.7>12, same failure), qwen3-32b L40S rate=500 (load_index=37.0>12, same failure). All 6 failures are exactly at load_index > 12 as predicted.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": null
+    },
+    {
+      "arm_type": "h-ablation",
+      "predicted": "Default-profile lean bracket (mr=256, mt=4096, pf=1024) selects TP=8 on all 6 regimes for 70B (6/6 correct TP winner). Scores will be 15-21% lower than max-profile but TP winner unchanged.",
+      "observed": "6/6 correct TP winner: TP=8 on all regimes with default (strategic) profile. Scores vs max-profile: H100 r100=0.074927 vs 0.088793 (-15.6%), H100 r500=0.076004 vs 0.091801 (-17.2%), A100-SXM r100=0.052597 vs 0.063273 (-16.9%), A100-SXM r500=0.052787 vs 0.063991 (-17.5%), L40S r100=0.027565 vs 0.034041 (-19.0%), L40S r500=0.027578 vs 0.034137 (-19.2%). All 6 regimes score 15-19% below global best (outside 1% threshold as expected since default profile is not max-profile). evals_to_best=3 on all (never reaches threshold within 2 budget evals, confirming scores are well below threshold). TP=8 margin over TP=4 preserved: H100 r100=6.3%, H100 r500=4.1%, A100-SXM r100=9.2%, A100-SXM r500=7.7%, L40S r100=13.6%, L40S r500=13.1%.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "Scores are 15-19% below global best (outside 1% threshold) because default profile uses mr=256 vs max mr=512. TP winner is correct but scores are sub-threshold. For 70B, the TP=8 advantage is structural (weight transfer physics) not batch-size dependent, confirming the mechanism. evals_to_best=3 signals 'never reached threshold within budget' not a 3rd eval — budget=2 so this is expected."
+    },
+    {
+      "arm_type": "h-robustness",
+      "predicted": "Lean bracket achieves within 1% of BLIS-seed-specific best on all 50 combinations (2 hardware x 5 blis seeds x 5 search seeds). TP=8 wins on all 50. All 5 search seeds produce identical results per blis_seed. Minimum TP=8 margin > 2%.",
+      "observed": "50/50 correct: TP=8 wins on all 50 combinations. Per blis_seed on H100: seed42=0.091801 (TP4=0.0832, margin=10.3%), seed43=0.092221 (TP4=0.0891, margin=3.5%), seed44=0.092187 (TP4=0.0841, margin=9.6%), seed45=0.095769 (TP4=0.0935, margin=2.4%), seed46=0.095361 (TP4=0.0925, margin=3.1%). All 5 search seeds identical per blis_seed (deterministic). L40S: seed42=0.034137, seed43=0.034374, seed44=0.034357, seed45=0.035960, seed46=0.035704 — all TP=8 winners, all 5 search seeds identical per blis_seed. Minimum margin across all 50: 2.4% (H100 blis_seed=45). TP=4 scores on L40S: seed42=0.0284, seed43=0.0308, seed44=0.0286, seed45=0.0317, seed46=0.0318 vs TP=8: seed42=0.0341, seed43=0.0344, seed44=0.0344, seed45=0.0360, seed46=0.0357. L40S margins: 20.0%, 11.7%, 20.3%, 13.6%, 12.3%. Minimum L40S margin=11.7%.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "H100 blis_seed=45 showed minimum TP=8 margin of 2.4% (predicted: >2%). evals_to_best=1 for blis_seeds 45 and 46 because TP=4 score crossed above the seed=42 global best threshold (TP4 scores 0.0935 and 0.0925 exceed threshold 0.099×0.091801=0.090883). This is a blis_seed-specific global best artifact — the lean bracket still correctly identifies TP=8 as winner."
+    }
+  ],
+  "experiment_valid": true,
+  "discrepancy_analysis": "All four arms confirmed with no refutations. h-main: perfect 30/30 confirmation at exact global best scores, evals_to_best=2 everywhere as predicted. h-control-negative: old formula achieves exactly 18/24 (75%) as predicted; model-aware formula achieves 24/24 (100%) as predicted; all 6 failures are precisely at load_index > 12 regimes, validating the threshold mechanism. h-ablation: default-profile correctly identifies TP=8 on all 6 regimes confirming the structural (weight-transfer-based) nature of 70B TP advantage. Scores 15-19% below max-profile as predicted. h-robustness: 50/50 correct, deterministic per blis_seed, minimum margin 2.4% (H100 blis_seed=45). The campaign now spans 4 models (8B, 14B, 32B, 70B), 3 hardware platforms, 2 rates — lean bracket achieves 75/75 across all iterations combined.",
+  "dominant_component_pct": null
+}

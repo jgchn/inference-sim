@@ -1,0 +1,11 @@
+{
+  "gate_type": "design",
+  "summary": "Iteration 3 tests whether the bracket K=1 hierarchical search generalizes across models by running it on qwen3-14b (a larger model that should prefer TP=8 on low-bandwidth L40S hardware, unlike llama which prefers TP=4). Four arms validate model-dependent TP selection, robustness at near-zero margins, hardware-specificity of the effect, and comparison against flat TPE.",
+  "key_points": [
+    "h-main: Bracket K=1 on L40S with qwen3-14b should identify TP=8/1inst (not TP=4/2inst as with llama) in exactly 3 evaluations across all 5 search seeds, confirming model-agnostic Phase 1 correctly handles a different TP winner (5.1% margin).",
+    "h-robustness: Tests 25 combinations (5 blis_seeds \u00d7 5 search seeds) where some seeds have near-zero TP margins (0.03% at seed=43). Prediction is 25/25 correct due to Phase 1 determinism \u2014 the same blis_seed always produces identical scores regardless of search seed.",
+    "h-control-negative: On H100 (3.35 TB/s bandwidth vs L40S's 0.864 TB/s), qwen3-14b should revert to TP=4/2inst winner (matching llama's pattern), confirming the TP=8 preference is hardware-specific to low-bandwidth GPUs where weight-loading bottlenecks dominate.",
+    "h-ablation: Flat TPE on L40S qwen should perform better than it did for llama (predicting 2-4/5 seeds succeed vs llama's 1/5) due to the wider 5.1% margin, but bracket K=1 still provides superior worst-case guarantees (deterministic evals_to_best=3).",
+    "Confirm criteria: h-main/h-robustness pass if TP=8 is always selected in Phase 1; h-control-negative passes if TP=4 is selected on H100; h-ablation passes if TPE success rate is between 2-4/5. Refutation: if H100 also selects TP=8 for qwen, the bandwidth-based mechanism hypothesis is wrong."
+  ]
+}

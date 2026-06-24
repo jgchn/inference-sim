@@ -1,0 +1,127 @@
+metadata:
+  iteration: 10
+  family: "workload-shape-sensitivity"
+  research_question: "Does lean bracket (TP={4,8}, max-profile, budget=2) remain correct when the workload token distribution changes from the default (prompt mean=512) to named presets with 2-20x different prompt token distributions? Does the model-aware formula (load_index + 400/BW crossover) fail when prompt token distribution shifts the TP crossover?"
+
+arms:
+  # Arms included: h-main (core falsifiable claim), h-control-negative (formula fails on
+  # workload-shifted regimes — validates that the mechanism is prompt-length-driven),
+  # h-robustness (hardware portability of workload-agnostic lean bracket). Excluded
+  # h-ablation (no component to remove — lean bracket is unchanged) and h-super-additivity
+  # (no combined factors to test).
+
+  - type: h-main
+    prediction: >
+      Lean bracket (TP={4,8}, max-profile, budget=2) achieves within 1% of global best on
+      all 8 workload-preset regimes (4 presets x 2 rates) on H100 for qwen3-14b. TP winner
+      is workload-dependent: TP=4 wins on 7/8 regimes (contentgen x2, summarization x2,
+      multidoc x2, chatbot rate=500), TP=8 wins on 1/8 (chatbot rate=100). evals_to_best=1
+      on 7/8 regimes (TP=4 at position 1 clears threshold), evals_to_best=2 on chatbot
+      rate=100 (TP=8 at position 2). All 5 search seeds produce identical results per regime
+      (deterministic). Probe-established global bests: chatbot r100=0.200393, chatbot
+      r500=0.268650, contentgen r100=0.099677, contentgen r500=0.104103, summarization
+      r100=0.085079, summarization r500=0.085323, multidoc r100=0.016893, multidoc
+      r500=0.016903.
+    mechanism: >
+      Lean bracket evaluates both TP=4/2inst and TP=8/1inst with max-profile secondaries
+      (mr=512, mt=8192, pf=4096), then picks the higher scorer. This is workload-agnostic:
+      the algorithm doesn't need to know which workload is running because it directly
+      measures both options. The TP winner shifts with prompt token distribution because
+      longer prompts increase prefill compute per request (sim/latency/roofline.go:291-351).
+      At TP=8/1inst, a single instance must serialize all prefills; at TP=4/2inst, two
+      instances process prefills in parallel. With prompt mean >= 1024 (contentgen,
+      summarization, multidoc), the prefill cost dominates enough that TP=4/2inst wins
+      regardless of arrival rate. With prompt mean <= 512 (chatbot, distribution), the
+      rate-dependent crossover from RP-24 still applies.
+    diagnostic: >
+      If lean bracket fails on any regime: (1) Check if the workload preset is producing
+      expected token distributions (grep for mean/stdev in BLIS stderr). (2) Check if
+      multidoc's very long prompts (avg 10240) cause KV cache OOM at TP=4 on H100 (look
+      for dropped requests in metrics). (3) If TP winner doesn't match probe, re-run probe
+      at exact same parameters to rule out non-determinism.
+    code_changes:
+      - file: "search_blis_iter10.py"
+        intent: >
+          Copy from search_blis_iter8.py. Add --workload CLI argument (default
+          'distribution'). Pass --workload to build_blis_cmd() which adds it to the BLIS
+          command line when not 'distribution'. Extend GLOBAL_BEST_TABLE key from 4-tuple
+          to 5-tuple (model, hardware, rate, num_requests, workload). Add all existing
+          entries with workload='distribution'. Add new workload-preset entries from probes
+          (8 H100 entries, 8 A100-SXM entries). Add 70B distribution entries from iter-9.
+          Update all GLOBAL_BEST_TABLE lookups to include the workload parameter.
+        rationale: >
+          The search script needs workload awareness to test lean bracket across workload
+          presets. Extending the GLOBAL_BEST_TABLE key is necessary because the global best
+          score is workload-specific (different token distributions produce different
+          fitness landscapes).
+
+  - type: h-control-negative
+    prediction: >
+      Model-aware formula (load_index threshold + 400/BW crossover) correctly predicts TP
+      winner on at most 5/8 H100 workload regimes (62.5%). It fails on 3 regimes:
+      summarization rate=100, contentgen rate=100, and multidoc rate=100 — all predict TP=8
+      (rate=100 < crossover_rate=119.4) but actual winner is TP=4. The formula succeeds on
+      chatbot rate=100 (TP=8 correct) and all 4 rate=500 regimes (TP=4 correct). On
+      A100-SXM, formula accuracy drops further to at most 4/8 (50%): it additionally fails
+      on chatbot rate=500 (predicts TP=4, actual TP=8 by 0.18% margin) and multidoc
+      rate=500 (predicts TP=4, actual TP=8 by 125% margin due to KV cache capacity
+      constraints). Formula scores on failed H100 regimes will be 2-10% below global best.
+    mechanism: >
+      The model-aware formula computes crossover_rate = 400 / bandwidth_TB_s and predicts
+      TP winner based solely on rate vs crossover_rate and load_index = params / bandwidth.
+      It has no input for prompt token distribution. When prompt tokens are long (>= 1024),
+      the effective crossover rate drops below 100 req/s (the formula's predicted crossover
+      is 119.4 for H100), so the formula predicts TP=8 at rate=100 while the actual winner
+      is TP=4. The formula is structurally blind to this effect because it treats all
+      workloads identically. On A100-SXM, the multidoc anomaly (TP=8 winning despite long
+      prompts) adds a second failure mode: KV cache capacity constraints at TP=4 that the
+      formula cannot model.
+    diagnostic: >
+      If the formula achieves > 5/8 on H100: check that probe-established global bests are
+      correct by re-running the exact probe configs. If summarization or contentgen at
+      rate=100 unexpectedly favors TP=8, the workload preset may have changed since probing.
+    code_changes:
+      - file: "search_blis_iter10.py"
+        intent: >
+          Add MODEL_PARAMS dict mapping model shortnames to parameter counts in billions
+          (llama-3.1-8b: 8, qwen3-14b: 14, qwen3-32b: 32, llama-3.1-70b: 70). Add
+          run_model_aware_predict() function: computes load_index = MODEL_PARAMS[model] /
+          HW_BANDWIDTH[hardware]; if load_index > 12.0 predicts TP=8/1inst (no crossover);
+          else uses crossover = 400 / bandwidth, predicts TP=4/2inst if rate > crossover,
+          else TP=8/1inst. Applies max-profile secondaries, runs one BLIS eval, returns
+          result dict including strategy, load_index, no_crossover_regime flag, and
+          formula_correct. Wire model-aware-predict into argparse choices and main dispatch.
+        rationale: >
+          Implements RP-27 model-aware formula as a search strategy to test its workload
+          blindness. The formula was validated at 24/24 on default workload — testing on
+          workload presets reveals the limitation.
+
+  - type: h-robustness
+    prediction: >
+      Lean bracket achieves within 1% of global best on all 8 A100-SXM workload regimes
+      (4 presets x 2 rates). The TP winner pattern differs from H100: chatbot rate=100 and
+      rate=500 both favor TP=8 (A100-SXM has higher crossover rate ~200 vs H100 ~125),
+      multidoc favors TP=8 at both rates (KV cache capacity constraint at TP=4 on
+      lower-bandwidth hardware). Contentgen and summarization favor TP=4 at both rates
+      (consistent with H100). The chatbot rate=500 regime has only 0.18% TP margin — lean
+      bracket still picks the correct winner (TP=8) and both TP levels exceed the 1%
+      threshold, giving evals_to_best=1. All 5 search seeds produce identical results per
+      regime. Probe-established A100-SXM global bests: chatbot r100=0.193078, chatbot
+      r500=0.234138, contentgen r100=0.072420, contentgen r500=0.070609, summarization
+      r100=0.056095, summarization r500=0.055265, multidoc r100=0.007025, multidoc
+      r500=0.007118.
+    mechanism: >
+      A100-SXM has lower memory bandwidth (2.039 vs 3.35 TB/s) which shifts the
+      rate-dependent crossover higher (~200 vs ~125). For short-prompt workloads (chatbot),
+      this means TP=8 wins at rate=500 on A100-SXM while TP=4 wins on H100. For long-prompt
+      workloads, TP=4 still wins because the prefill compute advantage overcomes the
+      bandwidth difference. The multidoc anomaly (TP=8 winning at both rates on A100-SXM
+      but TP=4 winning on H100) is driven by KV cache capacity: 10240-token prompts with
+      max 20480 create massive KV cache requirements that constrain TP=4/2inst on A100-SXM
+      where per-GPU effective memory is lower.
+    diagnostic: >
+      If lean bracket fails on A100-SXM multidoc (predicts wrong TP): check if the probe
+      score is reproducible. If the 0.18% chatbot margin flips: the regime is at the noise
+      threshold and both TP levels are within tolerance anyway. If contentgen or
+      summarization TP winner flips on A100-SXM: check for dropped requests or timeouts in
+      the metrics output.

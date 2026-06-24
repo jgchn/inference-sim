@@ -1,0 +1,1465 @@
+{
+  "config": {
+    "budget": 12,
+    "seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "blis_seed": 42,
+    "num_requests": 1000,
+    "rate": 200.0,
+    "model": "qwen/qwen3-14b",
+    "hardware": "A100-SXM",
+    "global_best": 0.13544,
+    "phase1_k": 1,
+    "phase1_profiles": "bracket",
+    "tp_candidates": "lean",
+    "skip_phase2": false
+  },
+  "runs": [
+    {
+      "strategy": "adaptive-hierarchical",
+      "phase1_k": 1,
+      "phase1_profiles_type": "bracket",
+      "phase1_profiles_used": [
+        {
+          "max_running": 512,
+          "max_tokens": 8192,
+          "prefill_threshold": 4096
+        }
+      ],
+      "tp_candidates": "lean",
+      "skip_phase2": false,
+      "search_seed": 42,
+      "budget": 12,
+      "best_score": 0.134504,
+      "best_config": {
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_running": 512,
+        "max_tokens": 2048,
+        "prefill_threshold": 1024,
+        "block_size": 16,
+        "routing": "round-robin",
+        "admission": "tier-shed",
+        "preemption": "fcfs"
+      },
+      "phase1_winner": {
+        "tp": 4,
+        "instances": 2
+      },
+      "phase1_tp_scores": {
+        "4": [
+          0.134488
+        ],
+        "8": [
+          0.134486
+        ]
+      },
+      "phase1_tp_max_scores": {
+        "4": 0.134488,
+        "8": 0.134486
+      },
+      "evaluations": [
+        {
+          "eval_idx": 0,
+          "phase": 1,
+          "phase1_profile": 0,
+          "score": 0.134488,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "block_size": 16,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "fcfs",
+            "max_running": 512,
+            "max_tokens": 8192,
+            "prefill_threshold": 4096
+          },
+          "wall_time_s": 0.3208724580035778,
+          "best_so_far": 0.134488
+        },
+        {
+          "eval_idx": 1,
+          "phase": 1,
+          "phase1_profile": 0,
+          "score": 0.134486,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs",
+            "max_running": 512,
+            "max_tokens": 8192,
+            "prefill_threshold": 4096
+          },
+          "wall_time_s": 0.3177860830037389,
+          "best_so_far": 0.134488
+        },
+        {
+          "eval_idx": 2,
+          "phase": 2,
+          "score": 0.120695,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "priority-fcfs",
+            "max_running": 256,
+            "max_tokens": 8192,
+            "prefill_threshold": 0,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.24793037500057835,
+          "best_so_far": 0.134488
+        },
+        {
+          "eval_idx": 3,
+          "phase": 2,
+          "score": 0.134504,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 1024,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.31339104200014845,
+          "best_so_far": 0.134504
+        },
+        {
+          "eval_idx": 4,
+          "phase": 2,
+          "score": 0.082421,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 64,
+            "max_tokens": 4096,
+            "prefill_threshold": 0,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.22021829200093634,
+          "best_so_far": 0.134504
+        },
+        {
+          "eval_idx": 5,
+          "phase": 2,
+          "score": 0.082421,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "priority-fcfs",
+            "max_running": 64,
+            "max_tokens": 8192,
+            "prefill_threshold": 1024,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.23672549999901094,
+          "best_so_far": 0.134504
+        },
+        {
+          "eval_idx": 6,
+          "phase": 2,
+          "score": 0.056633,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "priority-fcfs",
+            "max_running": 32,
+            "max_tokens": 4096,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.2697383749909932,
+          "best_so_far": 0.134504
+        },
+        {
+          "eval_idx": 7,
+          "phase": 2,
+          "score": 0.05557,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "sjf",
+            "max_running": 32,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.23376887499762233,
+          "best_so_far": 0.134504
+        },
+        {
+          "eval_idx": 8,
+          "phase": 2,
+          "score": 0.056562,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 32,
+            "max_tokens": 2048,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.24548095899808686,
+          "best_so_far": 0.134504
+        },
+        {
+          "eval_idx": 9,
+          "phase": 2,
+          "score": 0.123099,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "reverse-priority",
+            "max_running": 256,
+            "max_tokens": 8192,
+            "prefill_threshold": 0,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.2375152910099132,
+          "best_so_far": 0.134504
+        },
+        {
+          "eval_idx": 10,
+          "phase": 2,
+          "score": 0.1218,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "reverse-priority",
+            "max_running": 256,
+            "max_tokens": 8192,
+            "prefill_threshold": 2048,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.24690320799709298,
+          "best_so_far": 0.134504
+        },
+        {
+          "eval_idx": 11,
+          "phase": 2,
+          "score": 0.082775,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "priority-fcfs",
+            "max_running": 64,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.26063191700086463,
+          "best_so_far": 0.134504
+        }
+      ],
+      "wall_time_total_s": 3.1607815000024857,
+      "checkpoint_best": {
+        "10": 0.134504,
+        "12": 0.134504
+      },
+      "n_evaluations": 12,
+      "evals_to_best": 1,
+      "checkpoint_evals_to_best": {
+        "10": 1,
+        "12": 1
+      }
+    },
+    {
+      "strategy": "adaptive-hierarchical",
+      "phase1_k": 1,
+      "phase1_profiles_type": "bracket",
+      "phase1_profiles_used": [
+        {
+          "max_running": 512,
+          "max_tokens": 8192,
+          "prefill_threshold": 4096
+        }
+      ],
+      "tp_candidates": "lean",
+      "skip_phase2": false,
+      "search_seed": 43,
+      "budget": 12,
+      "best_score": 0.134491,
+      "best_config": {
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "sjf",
+        "max_running": 512,
+        "max_tokens": 2048,
+        "prefill_threshold": 4096,
+        "block_size": 32,
+        "routing": "round-robin",
+        "admission": "always-admit",
+        "preemption": "priority"
+      },
+      "phase1_winner": {
+        "tp": 4,
+        "instances": 2
+      },
+      "phase1_tp_scores": {
+        "4": [
+          0.134488
+        ],
+        "8": [
+          0.134486
+        ]
+      },
+      "phase1_tp_max_scores": {
+        "4": 0.134488,
+        "8": 0.134486
+      },
+      "evaluations": [
+        {
+          "eval_idx": 0,
+          "phase": 1,
+          "phase1_profile": 0,
+          "score": 0.134488,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "block_size": 16,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "fcfs",
+            "max_running": 512,
+            "max_tokens": 8192,
+            "prefill_threshold": 4096
+          },
+          "wall_time_s": 0.3103030839993153,
+          "best_so_far": 0.134488
+        },
+        {
+          "eval_idx": 1,
+          "phase": 1,
+          "phase1_profile": 0,
+          "score": 0.134486,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs",
+            "max_running": 512,
+            "max_tokens": 8192,
+            "prefill_threshold": 4096
+          },
+          "wall_time_s": 0.34006233399850316,
+          "best_so_far": 0.134488
+        },
+        {
+          "eval_idx": 2,
+          "phase": 2,
+          "score": 0.082775,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "priority-fcfs",
+            "max_running": 64,
+            "max_tokens": 8192,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.2699271250021411,
+          "best_so_far": 0.134488
+        },
+        {
+          "eval_idx": 3,
+          "phase": 2,
+          "score": 0.134491,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "sjf",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.2363337910064729,
+          "best_so_far": 0.134491
+        },
+        {
+          "eval_idx": 4,
+          "phase": 2,
+          "score": 0.056562,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 32,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.19616270800179336,
+          "best_so_far": 0.134491
+        },
+        {
+          "eval_idx": 5,
+          "phase": 2,
+          "score": 0.123099,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "priority-fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.24669879200519063,
+          "best_so_far": 0.134491
+        },
+        {
+          "eval_idx": 6,
+          "phase": 2,
+          "score": 0.106617,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "priority-fcfs",
+            "max_running": 128,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.23557962500490248,
+          "best_so_far": 0.134491
+        },
+        {
+          "eval_idx": 7,
+          "phase": 2,
+          "score": 0.123099,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "priority-fcfs",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 1024,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.2401801669911947,
+          "best_so_far": 0.134491
+        },
+        {
+          "eval_idx": 8,
+          "phase": 2,
+          "score": 0.122897,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 4096,
+            "prefill_threshold": 1024,
+            "block_size": 16,
+            "routing": "least-loaded",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.2952557499957038,
+          "best_so_far": 0.134491
+        },
+        {
+          "eval_idx": 9,
+          "phase": 2,
+          "score": 0.079724,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "sjf",
+            "max_running": 64,
+            "max_tokens": 4096,
+            "prefill_threshold": 1024,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.23042912500386592,
+          "best_so_far": 0.134491
+        },
+        {
+          "eval_idx": 10,
+          "phase": 2,
+          "score": 0.123688,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.23496233399782795,
+          "best_so_far": 0.134491
+        },
+        {
+          "eval_idx": 11,
+          "phase": 2,
+          "score": 0.134488,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "reverse-priority",
+            "max_running": 512,
+            "max_tokens": 8192,
+            "prefill_threshold": 2048,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.24110770798870362,
+          "best_so_far": 0.134491
+        }
+      ],
+      "wall_time_total_s": 3.08580670900119,
+      "checkpoint_best": {
+        "10": 0.134491,
+        "12": 0.134491
+      },
+      "n_evaluations": 12,
+      "evals_to_best": 1,
+      "checkpoint_evals_to_best": {
+        "10": 1,
+        "12": 1
+      }
+    },
+    {
+      "strategy": "adaptive-hierarchical",
+      "phase1_k": 1,
+      "phase1_profiles_type": "bracket",
+      "phase1_profiles_used": [
+        {
+          "max_running": 512,
+          "max_tokens": 8192,
+          "prefill_threshold": 4096
+        }
+      ],
+      "tp_candidates": "lean",
+      "skip_phase2": false,
+      "search_seed": 44,
+      "budget": 12,
+      "best_score": 0.134935,
+      "best_config": {
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority",
+        "max_running": 512,
+        "max_tokens": 4096,
+        "prefill_threshold": 0,
+        "block_size": 16,
+        "routing": "round-robin",
+        "admission": "tier-shed",
+        "preemption": "priority"
+      },
+      "phase1_winner": {
+        "tp": 4,
+        "instances": 2
+      },
+      "phase1_tp_scores": {
+        "4": [
+          0.134488
+        ],
+        "8": [
+          0.134486
+        ]
+      },
+      "phase1_tp_max_scores": {
+        "4": 0.134488,
+        "8": 0.134486
+      },
+      "evaluations": [
+        {
+          "eval_idx": 0,
+          "phase": 1,
+          "phase1_profile": 0,
+          "score": 0.134488,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "block_size": 16,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "fcfs",
+            "max_running": 512,
+            "max_tokens": 8192,
+            "prefill_threshold": 4096
+          },
+          "wall_time_s": 0.3019571670010919,
+          "best_so_far": 0.134488
+        },
+        {
+          "eval_idx": 1,
+          "phase": 1,
+          "phase1_profile": 0,
+          "score": 0.134486,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs",
+            "max_running": 512,
+            "max_tokens": 8192,
+            "prefill_threshold": 4096
+          },
+          "wall_time_s": 0.3315680829982739,
+          "best_so_far": 0.134488
+        },
+        {
+          "eval_idx": 2,
+          "phase": 2,
+          "score": 0.08314,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 64,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.2576799999951618,
+          "best_so_far": 0.134488
+        },
+        {
+          "eval_idx": 3,
+          "phase": 2,
+          "score": 0.134488,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "priority-fcfs",
+            "max_running": 512,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.24753491699812002,
+          "best_so_far": 0.134488
+        },
+        {
+          "eval_idx": 4,
+          "phase": 2,
+          "score": 0.056633,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "priority-fcfs",
+            "max_running": 32,
+            "max_tokens": 8192,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.2294879580003908,
+          "best_so_far": 0.134488
+        },
+        {
+          "eval_idx": 5,
+          "phase": 2,
+          "score": 0.134935,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "reverse-priority",
+            "max_running": 512,
+            "max_tokens": 4096,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.31713816701085307,
+          "best_so_far": 0.134935
+        },
+        {
+          "eval_idx": 6,
+          "phase": 2,
+          "score": 0.103545,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "sjf",
+            "max_running": 128,
+            "max_tokens": 8192,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.23981712500972208,
+          "best_so_far": 0.134935
+        },
+        {
+          "eval_idx": 7,
+          "phase": 2,
+          "score": 0.082421,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "priority-fcfs",
+            "max_running": 64,
+            "max_tokens": 4096,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.26110120900557376,
+          "best_so_far": 0.134935
+        },
+        {
+          "eval_idx": 8,
+          "phase": 2,
+          "score": 0.056562,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "reverse-priority",
+            "max_running": 32,
+            "max_tokens": 8192,
+            "prefill_threshold": 1024,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.23038141599681694,
+          "best_so_far": 0.134935
+        },
+        {
+          "eval_idx": 9,
+          "phase": 2,
+          "score": 0.082421,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "priority-fcfs",
+            "max_running": 64,
+            "max_tokens": 8192,
+            "prefill_threshold": 0,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.23124404199188575,
+          "best_so_far": 0.134935
+        },
+        {
+          "eval_idx": 10,
+          "phase": 2,
+          "score": 0.082775,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "reverse-priority",
+            "max_running": 64,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.27259420799964573,
+          "best_so_far": 0.134935
+        },
+        {
+          "eval_idx": 11,
+          "phase": 2,
+          "score": 0.102028,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "sjf",
+            "max_running": 128,
+            "max_tokens": 4096,
+            "prefill_threshold": 0,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.2334032090002438,
+          "best_so_far": 0.134935
+        }
+      ],
+      "wall_time_total_s": 3.162957499996992,
+      "checkpoint_best": {
+        "10": 0.134935,
+        "12": 0.134935
+      },
+      "n_evaluations": 12,
+      "evals_to_best": 1,
+      "checkpoint_evals_to_best": {
+        "10": 1,
+        "12": 1
+      }
+    },
+    {
+      "strategy": "adaptive-hierarchical",
+      "phase1_k": 1,
+      "phase1_profiles_type": "bracket",
+      "phase1_profiles_used": [
+        {
+          "max_running": 512,
+          "max_tokens": 8192,
+          "prefill_threshold": 4096
+        }
+      ],
+      "tp_candidates": "lean",
+      "skip_phase2": false,
+      "search_seed": 45,
+      "budget": 12,
+      "best_score": 0.13544,
+      "best_config": {
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "reverse-priority",
+        "max_running": 512,
+        "max_tokens": 4096,
+        "prefill_threshold": 4096,
+        "block_size": 32,
+        "routing": "weighted",
+        "admission": "always-admit",
+        "preemption": "priority"
+      },
+      "phase1_winner": {
+        "tp": 4,
+        "instances": 2
+      },
+      "phase1_tp_scores": {
+        "4": [
+          0.134488
+        ],
+        "8": [
+          0.134486
+        ]
+      },
+      "phase1_tp_max_scores": {
+        "4": 0.134488,
+        "8": 0.134486
+      },
+      "evaluations": [
+        {
+          "eval_idx": 0,
+          "phase": 1,
+          "phase1_profile": 0,
+          "score": 0.134488,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "block_size": 16,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "fcfs",
+            "max_running": 512,
+            "max_tokens": 8192,
+            "prefill_threshold": 4096
+          },
+          "wall_time_s": 0.31755383299605455,
+          "best_so_far": 0.134488
+        },
+        {
+          "eval_idx": 1,
+          "phase": 1,
+          "phase1_profile": 0,
+          "score": 0.134486,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs",
+            "max_running": 512,
+            "max_tokens": 8192,
+            "prefill_threshold": 4096
+          },
+          "wall_time_s": 0.32595600000058766,
+          "best_so_far": 0.134488
+        },
+        {
+          "eval_idx": 2,
+          "phase": 2,
+          "score": 0.082775,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 64,
+            "max_tokens": 4096,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "weighted",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.26741995800693985,
+          "best_so_far": 0.134488
+        },
+        {
+          "eval_idx": 3,
+          "phase": 2,
+          "score": 0.082612,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "reverse-priority",
+            "max_running": 64,
+            "max_tokens": 2048,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.22457908400974702,
+          "best_so_far": 0.134488
+        },
+        {
+          "eval_idx": 4,
+          "phase": 2,
+          "score": 0.10264,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "sjf",
+            "max_running": 128,
+            "max_tokens": 4096,
+            "prefill_threshold": 2048,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.2423544579942245,
+          "best_so_far": 0.134488
+        },
+        {
+          "eval_idx": 5,
+          "phase": 2,
+          "score": 0.121417,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "priority-fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.24676829199597705,
+          "best_so_far": 0.134488
+        },
+        {
+          "eval_idx": 6,
+          "phase": 2,
+          "score": 0.105967,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "reverse-priority",
+            "max_running": 128,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.2894586670008721,
+          "best_so_far": 0.134488
+        },
+        {
+          "eval_idx": 7,
+          "phase": 2,
+          "score": 0.08314,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "priority-fcfs",
+            "max_running": 64,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.2246040830068523,
+          "best_so_far": 0.134488
+        },
+        {
+          "eval_idx": 8,
+          "phase": 2,
+          "score": 0.13544,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "reverse-priority",
+            "max_running": 512,
+            "max_tokens": 4096,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.2445047500077635,
+          "best_so_far": 0.13544
+        },
+        {
+          "eval_idx": 9,
+          "phase": 2,
+          "score": 0.082421,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "reverse-priority",
+            "max_running": 64,
+            "max_tokens": 4096,
+            "prefill_threshold": 2048,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.2269162500015227,
+          "best_so_far": 0.13544
+        },
+        {
+          "eval_idx": 10,
+          "phase": 2,
+          "score": 0.056633,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "reverse-priority",
+            "max_running": 32,
+            "max_tokens": 2048,
+            "prefill_threshold": 2048,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.23856612500094343,
+          "best_so_far": 0.13544
+        },
+        {
+          "eval_idx": 11,
+          "phase": 2,
+          "score": 0.082421,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 64,
+            "max_tokens": 2048,
+            "prefill_threshold": 1024,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.21833350000088103,
+          "best_so_far": 0.13544
+        }
+      ],
+      "wall_time_total_s": 3.076179957992281,
+      "checkpoint_best": {
+        "10": 0.13544,
+        "12": 0.13544
+      },
+      "n_evaluations": 12,
+      "evals_to_best": 1,
+      "checkpoint_evals_to_best": {
+        "10": 1,
+        "12": 1
+      }
+    },
+    {
+      "strategy": "adaptive-hierarchical",
+      "phase1_k": 1,
+      "phase1_profiles_type": "bracket",
+      "phase1_profiles_used": [
+        {
+          "max_running": 512,
+          "max_tokens": 8192,
+          "prefill_threshold": 4096
+        }
+      ],
+      "tp_candidates": "lean",
+      "skip_phase2": false,
+      "search_seed": 46,
+      "budget": 12,
+      "best_score": 0.134935,
+      "best_config": {
+        "tp": 4,
+        "num_instances": 2,
+        "scheduler": "fcfs",
+        "max_running": 512,
+        "max_tokens": 4096,
+        "prefill_threshold": 2048,
+        "block_size": 16,
+        "routing": "round-robin",
+        "admission": "tier-shed",
+        "preemption": "priority"
+      },
+      "phase1_winner": {
+        "tp": 4,
+        "instances": 2
+      },
+      "phase1_tp_scores": {
+        "4": [
+          0.134488
+        ],
+        "8": [
+          0.134486
+        ]
+      },
+      "phase1_tp_max_scores": {
+        "4": 0.134488,
+        "8": 0.134486
+      },
+      "evaluations": [
+        {
+          "eval_idx": 0,
+          "phase": 1,
+          "phase1_profile": 0,
+          "score": 0.134488,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "block_size": 16,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "fcfs",
+            "max_running": 512,
+            "max_tokens": 8192,
+            "prefill_threshold": 4096
+          },
+          "wall_time_s": 0.31166066699370276,
+          "best_so_far": 0.134488
+        },
+        {
+          "eval_idx": 1,
+          "phase": 1,
+          "phase1_profile": 0,
+          "score": 0.134486,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs",
+            "max_running": 512,
+            "max_tokens": 8192,
+            "prefill_threshold": 4096
+          },
+          "wall_time_s": 0.32129320899548475,
+          "best_so_far": 0.134488
+        },
+        {
+          "eval_idx": 2,
+          "phase": 2,
+          "score": 0.082421,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 64,
+            "max_tokens": 4096,
+            "prefill_threshold": 2048,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.2161606669978937,
+          "best_so_far": 0.134488
+        },
+        {
+          "eval_idx": 3,
+          "phase": 2,
+          "score": 0.134935,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 512,
+            "max_tokens": 4096,
+            "prefill_threshold": 2048,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.3104121659998782,
+          "best_so_far": 0.134935
+        },
+        {
+          "eval_idx": 4,
+          "phase": 2,
+          "score": 0.105967,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "priority-fcfs",
+            "max_running": 128,
+            "max_tokens": 8192,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.2819328339974163,
+          "best_so_far": 0.134935
+        },
+        {
+          "eval_idx": 5,
+          "phase": 2,
+          "score": 0.122055,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "reverse-priority",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 1024,
+            "block_size": 32,
+            "routing": "weighted",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.24398749999818392,
+          "best_so_far": 0.134935
+        },
+        {
+          "eval_idx": 6,
+          "phase": 2,
+          "score": 0.118489,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "sjf",
+            "max_running": 256,
+            "max_tokens": 8192,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.3058673329942394,
+          "best_so_far": 0.134935
+        },
+        {
+          "eval_idx": 7,
+          "phase": 2,
+          "score": 0.08314,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "priority-fcfs",
+            "max_running": 64,
+            "max_tokens": 4096,
+            "prefill_threshold": 2048,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.23846008299733512,
+          "best_so_far": 0.134935
+        },
+        {
+          "eval_idx": 8,
+          "phase": 2,
+          "score": 0.133665,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "priority-fcfs",
+            "max_running": 512,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "least-loaded",
+            "admission": "tier-shed",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.3128092910046689,
+          "best_so_far": 0.134935
+        },
+        {
+          "eval_idx": 9,
+          "phase": 2,
+          "score": 0.134488,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 512,
+            "max_tokens": 8192,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.23968379200960044,
+          "best_so_far": 0.134935
+        },
+        {
+          "eval_idx": 10,
+          "phase": 2,
+          "score": 0.056544,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "reverse-priority",
+            "max_running": 32,
+            "max_tokens": 2048,
+            "prefill_threshold": 4096,
+            "block_size": 32,
+            "routing": "least-loaded",
+            "admission": "always-admit",
+            "preemption": "priority"
+          },
+          "wall_time_s": 0.2352916660020128,
+          "best_so_far": 0.134935
+        },
+        {
+          "eval_idx": 11,
+          "phase": 2,
+          "score": 0.123099,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "priority-fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 1024,
+            "block_size": 32,
+            "routing": "round-robin",
+            "admission": "tier-shed",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.2378614580084104,
+          "best_so_far": 0.134935
+        }
+      ],
+      "wall_time_total_s": 3.264052749989787,
+      "checkpoint_best": {
+        "10": 0.134935,
+        "12": 0.134935
+      },
+      "n_evaluations": 12,
+      "evals_to_best": 1,
+      "checkpoint_evals_to_best": {
+        "10": 1,
+        "12": 1
+      }
+    }
+  ],
+  "total_wall_time_s": 15.755796084005851
+}

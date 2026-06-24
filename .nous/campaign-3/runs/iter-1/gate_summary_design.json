@@ -1,0 +1,11 @@
+{
+  "gate_type": "design",
+  "summary": "We are testing whether NSGA-II (an evolutionary multi-objective optimizer) finds better throughput-vs-latency tradeoffs than random sampling when tuning LLM inference serving configurations in BLIS, using 500 evaluations (~50-125 seconds total compute). Three arms compare NSGA-II, uniform random, and Latin Hypercube Sampling to isolate whether selection pressure (not just better coverage) drives improvement.",
+  "key_points": [
+    "Primary metric: hypervolume of the Pareto front over two objectives (maximize throughput req/s, minimize P99 TTFT ms) \u2014 NSGA-II predicted to consistently beat random's hypervolume at equal 500-evaluation budget.",
+    "Three arms: NSGA-II (pop=50, 10 generations) as h-main, uniform random as negative control, and Latin Hypercube Sampling as robustness check to separate 'better coverage' from 'selection pressure' as the active ingredient.",
+    "Confirmation criteria: NSGA-II hypervolume > LHS > random; refutation signals include >20% of random samples being non-dominated (space is 'easy'), or NSGA-II hypervolume plateauing by generation 1-2 (space too small for selection to matter).",
+    "Constraints are well-specified (TP*replicas\u22648, conditional routing/scorer params, prefill<scheduled tokens) \u2014 all three implementations must enforce these, making constraint-handling code shared and reducing confounds.",
+    "Risk: the discrete/categorical nature of BLIS's ~294K-config space may blunt LHS stratification and NSGA-II crossover operators; diagnostic checks (generation-over-generation hypervolume, fraction of pruned offspring) are built into the design to detect this."
+  ]
+}

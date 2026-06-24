@@ -1,0 +1,11 @@
+{
+  "gate_type": "design",
+  "summary": "This iteration tests whether simulation duration (num_requests) \u2014 not max batch size \u2014 is the real confound that caused inconsistent tier rankings in earlier phases. If confirmed, Phase 1 can drop the expensive batch=512 sweep and use batch=128 with nreq\u22652000, cutting the search space significantly.",
+  "key_points": [
+    "H-main: Run lean Phase 1 (batch=128, nreq=2000) across 6 conditions (H100/A100 \u00d7 3 rates) \u00d7 3 seeds (18 runs per tier). Predict TP=4/2 wins in \u226516/18 cases, matching the batch=512/nreq=2000 reference with \u22653% margin \u2014 confirming batch size is irrelevant once simulation is long enough for steady-state queues.",
+    "H-control-negative: At nreq=250 (short sim), expect \u226550% disagreement with the nreq=2000 reference, with TP=8/1 artificially favored because transient dynamics dominate before queues equilibrate. This isolates nreq as the causal variable.",
+    "H-ablation: On H100/rate=500, compare {batch=128,nreq=2000} vs {batch=512,nreq=2000} vs {batch=512,nreq=500}. Predict both nreq=2000 configs agree (same tier winner) while nreq=500 picks a different winner (TP=8/1) \u2014 directly showing nreq matters more than batch size.",
+    "H-robustness: Sweep nreq \u2208 {500,750,1000,1500,2000} on H100/rate=500/batch=512/seed=42 to locate the exact transition point where TP=4/2 overtakes TP=8/1. Predict crossover between nreq=500\u20131000, validating the transient-vs-steady-state mechanism.",
+    "Refutation criteria: If batch=128/nreq=2000 disagrees with batch=512/nreq=2000 in >2/18 conditions, batch capacity IS a steady-state bottleneck and cannot be eliminated from Phase 1. Check by comparing responses_per_sec between the two batch sizes at matched nreq."
+  ]
+}

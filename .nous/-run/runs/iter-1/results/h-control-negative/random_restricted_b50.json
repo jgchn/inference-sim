@@ -1,0 +1,4654 @@
+{
+  "config": {
+    "budget": 50,
+    "seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "blis_seed": 42,
+    "num_requests": 200,
+    "rate": 50.0,
+    "restricted_space": true
+  },
+  "runs": [
+    {
+      "strategy": "random",
+      "search_seed": 42,
+      "budget": 50,
+      "best_score": 0.096881,
+      "best_config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_running": 256,
+        "max_tokens": 2048,
+        "prefill_threshold": 0,
+        "block_size": 16,
+        "routing": "round-robin",
+        "admission": "always-admit",
+        "preemption": "fcfs"
+      },
+      "evaluations": [
+        {
+          "eval_idx": 0,
+          "score": 0.038806,
+          "config": {
+            "tp": 1,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06408124999870779,
+          "best_so_far": 0.038806
+        },
+        {
+          "eval_idx": 1,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07574808299978031,
+          "best_so_far": 0.06739
+        },
+        {
+          "eval_idx": 2,
+          "score": 0.061918,
+          "config": {
+            "tp": 2,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07666366600096808,
+          "best_so_far": 0.06739
+        },
+        {
+          "eval_idx": 3,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.069909165998979,
+          "best_so_far": 0.06739
+        },
+        {
+          "eval_idx": 4,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07178987500083167,
+          "best_so_far": 0.06739
+        },
+        {
+          "eval_idx": 5,
+          "score": 0.077391,
+          "config": {
+            "tp": 4,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08081812499949592,
+          "best_so_far": 0.077391
+        },
+        {
+          "eval_idx": 6,
+          "score": 0.038806,
+          "config": {
+            "tp": 1,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06707770899993193,
+          "best_so_far": 0.077391
+        },
+        {
+          "eval_idx": 7,
+          "score": 0.066127,
+          "config": {
+            "tp": 2,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07543908400111832,
+          "best_so_far": 0.077391
+        },
+        {
+          "eval_idx": 8,
+          "score": 0.043316,
+          "config": {
+            "tp": 1,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07481787500000792,
+          "best_so_far": 0.077391
+        },
+        {
+          "eval_idx": 9,
+          "score": 0.038806,
+          "config": {
+            "tp": 1,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06645370799924422,
+          "best_so_far": 0.077391
+        },
+        {
+          "eval_idx": 10,
+          "score": 0.046137,
+          "config": {
+            "tp": 1,
+            "num_instances": 8,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07312779199855868,
+          "best_so_far": 0.077391
+        },
+        {
+          "eval_idx": 11,
+          "score": 0.096881,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.14410345800024515,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 12,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07959866700002749,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 13,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08732762500039826,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 14,
+          "score": 0.066127,
+          "config": {
+            "tp": 2,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07684250000056636,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 15,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0816442499999539,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 16,
+          "score": 0.046137,
+          "config": {
+            "tp": 1,
+            "num_instances": 8,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07550133299992012,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 17,
+          "score": 0.038806,
+          "config": {
+            "tp": 1,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06893424999907438,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 18,
+          "score": 0.077391,
+          "config": {
+            "tp": 4,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0767785410007491,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 19,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07369937499970547,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 20,
+          "score": 0.046137,
+          "config": {
+            "tp": 1,
+            "num_instances": 8,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07214483300049324,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 21,
+          "score": 0.04466,
+          "config": {
+            "tp": 1,
+            "num_instances": 6,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07891954200022155,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 22,
+          "score": 0.041915,
+          "config": {
+            "tp": 1,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06958066600054735,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 23,
+          "score": 0.084888,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.09705354200013971,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 24,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08306841699959477,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 25,
+          "score": 0.061918,
+          "config": {
+            "tp": 2,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07779354199919908,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 26,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07410941700072726,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 27,
+          "score": 0.077391,
+          "config": {
+            "tp": 4,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08502299999963725,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 28,
+          "score": 0.053946,
+          "config": {
+            "tp": 2,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0681412919984723,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 29,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07717191600022488,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 30,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0830179999993561,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 31,
+          "score": 0.043316,
+          "config": {
+            "tp": 1,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0732073750004929,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 32,
+          "score": 0.038806,
+          "config": {
+            "tp": 1,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06663208299869439,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 33,
+          "score": 0.053946,
+          "config": {
+            "tp": 2,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07012424999993527,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 34,
+          "score": 0.084888,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.10468391600079485,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 35,
+          "score": 0.032484,
+          "config": {
+            "tp": 1,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.060655457999018836,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 36,
+          "score": 0.077391,
+          "config": {
+            "tp": 4,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08667037499981234,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 37,
+          "score": 0.077391,
+          "config": {
+            "tp": 4,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0825364169995737,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 38,
+          "score": 0.044846,
+          "config": {
+            "tp": 1,
+            "num_instances": 5,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06604125000012573,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 39,
+          "score": 0.061918,
+          "config": {
+            "tp": 2,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07750162499905855,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 40,
+          "score": 0.041915,
+          "config": {
+            "tp": 1,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07467866600018169,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 41,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0809767920000013,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 42,
+          "score": 0.066127,
+          "config": {
+            "tp": 2,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07933624999895983,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 43,
+          "score": 0.04466,
+          "config": {
+            "tp": 1,
+            "num_instances": 6,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07188958400001866,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 44,
+          "score": 0.038806,
+          "config": {
+            "tp": 1,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07081004199972085,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 45,
+          "score": 0.096881,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.13728199999968638,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 46,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07570324999869626,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 47,
+          "score": 0.084888,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.09141695800099114,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 48,
+          "score": 0.066127,
+          "config": {
+            "tp": 2,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07229000000006636,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 49,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0820267920007609,
+          "best_so_far": 0.096881
+        }
+      ],
+      "wall_time_total_s": 3.960072667001441,
+      "checkpoint_best": {
+        "15": 0.096881,
+        "20": 0.096881,
+        "50": 0.096881
+      },
+      "n_evaluations": 50
+    },
+    {
+      "strategy": "random",
+      "search_seed": 43,
+      "budget": 50,
+      "best_score": 0.096881,
+      "best_config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_running": 256,
+        "max_tokens": 2048,
+        "prefill_threshold": 0,
+        "block_size": 16,
+        "routing": "round-robin",
+        "admission": "always-admit",
+        "preemption": "fcfs"
+      },
+      "evaluations": [
+        {
+          "eval_idx": 0,
+          "score": 0.046137,
+          "config": {
+            "tp": 1,
+            "num_instances": 8,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08360491699932027,
+          "best_so_far": 0.046137
+        },
+        {
+          "eval_idx": 1,
+          "score": 0.061918,
+          "config": {
+            "tp": 2,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07952612499866518,
+          "best_so_far": 0.061918
+        },
+        {
+          "eval_idx": 2,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0785154169989255,
+          "best_so_far": 0.061918
+        },
+        {
+          "eval_idx": 3,
+          "score": 0.032484,
+          "config": {
+            "tp": 1,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07150629100033257,
+          "best_so_far": 0.061918
+        },
+        {
+          "eval_idx": 4,
+          "score": 0.053946,
+          "config": {
+            "tp": 2,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0677948339998693,
+          "best_so_far": 0.061918
+        },
+        {
+          "eval_idx": 5,
+          "score": 0.032484,
+          "config": {
+            "tp": 1,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06635825000012119,
+          "best_so_far": 0.061918
+        },
+        {
+          "eval_idx": 6,
+          "score": 0.044846,
+          "config": {
+            "tp": 1,
+            "num_instances": 5,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07226437499957683,
+          "best_so_far": 0.061918
+        },
+        {
+          "eval_idx": 7,
+          "score": 0.077391,
+          "config": {
+            "tp": 4,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07549304099848086,
+          "best_so_far": 0.077391
+        },
+        {
+          "eval_idx": 8,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07136320800054818,
+          "best_so_far": 0.077391
+        },
+        {
+          "eval_idx": 9,
+          "score": 0.053946,
+          "config": {
+            "tp": 2,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06671649999952933,
+          "best_so_far": 0.077391
+        },
+        {
+          "eval_idx": 10,
+          "score": 0.096881,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.13177170800008753,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 11,
+          "score": 0.043316,
+          "config": {
+            "tp": 1,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07098195899925486,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 12,
+          "score": 0.077391,
+          "config": {
+            "tp": 4,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08190687500064087,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 13,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08442370800003118,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 14,
+          "score": 0.04466,
+          "config": {
+            "tp": 1,
+            "num_instances": 6,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08130929199978709,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 15,
+          "score": 0.043316,
+          "config": {
+            "tp": 1,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07423229100095341,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 16,
+          "score": 0.044846,
+          "config": {
+            "tp": 1,
+            "num_instances": 5,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06538691600144375,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 17,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07586416699996335,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 18,
+          "score": 0.061918,
+          "config": {
+            "tp": 2,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07775383400075953,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 19,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07540470900130458,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 20,
+          "score": 0.041915,
+          "config": {
+            "tp": 1,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06661691599947517,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 21,
+          "score": 0.096881,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.1408647500011284,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 22,
+          "score": 0.04466,
+          "config": {
+            "tp": 1,
+            "num_instances": 6,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07604120799987868,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 23,
+          "score": 0.084888,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.10433758299950568,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 24,
+          "score": 0.041915,
+          "config": {
+            "tp": 1,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08075866699982726,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 25,
+          "score": 0.044846,
+          "config": {
+            "tp": 1,
+            "num_instances": 5,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06607237500065821,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 26,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08666433300095377,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 27,
+          "score": 0.044846,
+          "config": {
+            "tp": 1,
+            "num_instances": 5,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07555066699933377,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 28,
+          "score": 0.084888,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.09461770799862279,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 29,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06991391699921223,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 30,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06879583299996739,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 31,
+          "score": 0.032484,
+          "config": {
+            "tp": 1,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06317779199889628,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 32,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07256520900045871,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 33,
+          "score": 0.044846,
+          "config": {
+            "tp": 1,
+            "num_instances": 5,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06998533299884002,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 34,
+          "score": 0.053946,
+          "config": {
+            "tp": 2,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0667260840000381,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 35,
+          "score": 0.096881,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.12859366699922248,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 36,
+          "score": 0.032484,
+          "config": {
+            "tp": 1,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06336195800031419,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 37,
+          "score": 0.077391,
+          "config": {
+            "tp": 4,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08926545800022723,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 38,
+          "score": 0.04466,
+          "config": {
+            "tp": 1,
+            "num_instances": 6,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07277745800092816,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 39,
+          "score": 0.053946,
+          "config": {
+            "tp": 2,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06643824999991921,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 40,
+          "score": 0.046137,
+          "config": {
+            "tp": 1,
+            "num_instances": 8,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07542141600060859,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 41,
+          "score": 0.046137,
+          "config": {
+            "tp": 1,
+            "num_instances": 8,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07532283299951814,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 42,
+          "score": 0.077391,
+          "config": {
+            "tp": 4,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08797804200003156,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 43,
+          "score": 0.096881,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.14557137500014505,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 44,
+          "score": 0.096881,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.13487458300005528,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 45,
+          "score": 0.053946,
+          "config": {
+            "tp": 2,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07025625000096625,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 46,
+          "score": 0.066127,
+          "config": {
+            "tp": 2,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07851454200135777,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 47,
+          "score": 0.096881,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.14255183299974306,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 48,
+          "score": 0.084888,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.11160008299884794,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 49,
+          "score": 0.096881,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.13799237499915762,
+          "best_so_far": 0.096881
+        }
+      ],
+      "wall_time_total_s": 4.245837582999229,
+      "checkpoint_best": {
+        "15": 0.096881,
+        "20": 0.096881,
+        "50": 0.096881
+      },
+      "n_evaluations": 50
+    },
+    {
+      "strategy": "random",
+      "search_seed": 44,
+      "budget": 50,
+      "best_score": 0.096881,
+      "best_config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_running": 256,
+        "max_tokens": 2048,
+        "prefill_threshold": 0,
+        "block_size": 16,
+        "routing": "round-robin",
+        "admission": "always-admit",
+        "preemption": "fcfs"
+      },
+      "evaluations": [
+        {
+          "eval_idx": 0,
+          "score": 0.066127,
+          "config": {
+            "tp": 2,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07242070800020883,
+          "best_so_far": 0.066127
+        },
+        {
+          "eval_idx": 1,
+          "score": 0.038806,
+          "config": {
+            "tp": 1,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06237599999985832,
+          "best_so_far": 0.066127
+        },
+        {
+          "eval_idx": 2,
+          "score": 0.077391,
+          "config": {
+            "tp": 4,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0816312500010099,
+          "best_so_far": 0.077391
+        },
+        {
+          "eval_idx": 3,
+          "score": 0.043316,
+          "config": {
+            "tp": 1,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06790495899986126,
+          "best_so_far": 0.077391
+        },
+        {
+          "eval_idx": 4,
+          "score": 0.061918,
+          "config": {
+            "tp": 2,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07183958399946277,
+          "best_so_far": 0.077391
+        },
+        {
+          "eval_idx": 5,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07699558300009812,
+          "best_so_far": 0.077391
+        },
+        {
+          "eval_idx": 6,
+          "score": 0.038806,
+          "config": {
+            "tp": 1,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06667495900001086,
+          "best_so_far": 0.077391
+        },
+        {
+          "eval_idx": 7,
+          "score": 0.096881,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.13029854200067348,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 8,
+          "score": 0.053946,
+          "config": {
+            "tp": 2,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07426008299989917,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 9,
+          "score": 0.041915,
+          "config": {
+            "tp": 1,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06838387499919918,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 10,
+          "score": 0.096881,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.1346318749983766,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 11,
+          "score": 0.077391,
+          "config": {
+            "tp": 4,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07923945900074614,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 12,
+          "score": 0.032484,
+          "config": {
+            "tp": 1,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06225412499952654,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 13,
+          "score": 0.041915,
+          "config": {
+            "tp": 1,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07235766600024363,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 14,
+          "score": 0.038806,
+          "config": {
+            "tp": 1,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07085570799972629,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 15,
+          "score": 0.04466,
+          "config": {
+            "tp": 1,
+            "num_instances": 6,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07660604199918453,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 16,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0769453329994576,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 17,
+          "score": 0.066127,
+          "config": {
+            "tp": 2,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07745712500036461,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 18,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08944433299984667,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 19,
+          "score": 0.061918,
+          "config": {
+            "tp": 2,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07306691699886869,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 20,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07371212500038382,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 21,
+          "score": 0.096881,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.13390724999953818,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 22,
+          "score": 0.04466,
+          "config": {
+            "tp": 1,
+            "num_instances": 6,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07520770799965248,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 23,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07111891599925002,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 24,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07469624999976077,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 25,
+          "score": 0.096881,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.14166237499921408,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 26,
+          "score": 0.096881,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.13653141599934315,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 27,
+          "score": 0.084888,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.10216529199897195,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 28,
+          "score": 0.053946,
+          "config": {
+            "tp": 2,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07314716699875135,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 29,
+          "score": 0.066127,
+          "config": {
+            "tp": 2,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07909183300034783,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 30,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07390083300015249,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 31,
+          "score": 0.032484,
+          "config": {
+            "tp": 1,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0672895410007186,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 32,
+          "score": 0.053946,
+          "config": {
+            "tp": 2,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07298491700021259,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 33,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08706454200000735,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 34,
+          "score": 0.038806,
+          "config": {
+            "tp": 1,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0720153330003086,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 35,
+          "score": 0.084888,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.10492762499961827,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 36,
+          "score": 0.053946,
+          "config": {
+            "tp": 2,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06571274999987509,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 37,
+          "score": 0.046137,
+          "config": {
+            "tp": 1,
+            "num_instances": 8,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07112737500028743,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 38,
+          "score": 0.077391,
+          "config": {
+            "tp": 4,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08201050000025134,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 39,
+          "score": 0.041915,
+          "config": {
+            "tp": 1,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07368820900046558,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 40,
+          "score": 0.096881,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.13562850000016624,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 41,
+          "score": 0.041915,
+          "config": {
+            "tp": 1,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07087883399981365,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 42,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08615916700000525,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 43,
+          "score": 0.077391,
+          "config": {
+            "tp": 4,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08273216700035846,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 44,
+          "score": 0.061918,
+          "config": {
+            "tp": 2,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07829233299889893,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 45,
+          "score": 0.038806,
+          "config": {
+            "tp": 1,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06901333300083934,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 46,
+          "score": 0.066127,
+          "config": {
+            "tp": 2,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07905762500013225,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 47,
+          "score": 0.053946,
+          "config": {
+            "tp": 2,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07518004099983955,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 48,
+          "score": 0.096881,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.13679054100066423,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 49,
+          "score": 0.043316,
+          "config": {
+            "tp": 1,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06799266699999862,
+          "best_so_far": 0.096881
+        }
+      ],
+      "wall_time_total_s": 4.20878575000097,
+      "checkpoint_best": {
+        "15": 0.096881,
+        "20": 0.096881,
+        "50": 0.096881
+      },
+      "n_evaluations": 50
+    },
+    {
+      "strategy": "random",
+      "search_seed": 45,
+      "budget": 50,
+      "best_score": 0.096881,
+      "best_config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_running": 256,
+        "max_tokens": 2048,
+        "prefill_threshold": 0,
+        "block_size": 16,
+        "routing": "round-robin",
+        "admission": "always-admit",
+        "preemption": "fcfs"
+      },
+      "evaluations": [
+        {
+          "eval_idx": 0,
+          "score": 0.084888,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.09624649999932444,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 1,
+          "score": 0.053946,
+          "config": {
+            "tp": 2,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06521020800028055,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 2,
+          "score": 0.066127,
+          "config": {
+            "tp": 2,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.076835083998958,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 3,
+          "score": 0.046137,
+          "config": {
+            "tp": 1,
+            "num_instances": 8,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07243091700001969,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 4,
+          "score": 0.046137,
+          "config": {
+            "tp": 1,
+            "num_instances": 8,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06808579199969245,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 5,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08644599999934144,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 6,
+          "score": 0.066127,
+          "config": {
+            "tp": 2,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07705116700162762,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 7,
+          "score": 0.077391,
+          "config": {
+            "tp": 4,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08199241700094717,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 8,
+          "score": 0.053946,
+          "config": {
+            "tp": 2,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07183383300071,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 9,
+          "score": 0.046137,
+          "config": {
+            "tp": 1,
+            "num_instances": 8,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07784666699990339,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 10,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07657495899911737,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 11,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0821626249999099,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 12,
+          "score": 0.053946,
+          "config": {
+            "tp": 2,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06520820799960347,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 13,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08030933300142351,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 14,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08089362499958952,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 15,
+          "score": 0.053946,
+          "config": {
+            "tp": 2,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06934466700113262,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 16,
+          "score": 0.044846,
+          "config": {
+            "tp": 1,
+            "num_instances": 5,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07571241700134124,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 17,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0747455410000839,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 18,
+          "score": 0.053946,
+          "config": {
+            "tp": 2,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06610675000047195,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 19,
+          "score": 0.066127,
+          "config": {
+            "tp": 2,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08365449999837438,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 20,
+          "score": 0.046137,
+          "config": {
+            "tp": 1,
+            "num_instances": 8,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07639099999869359,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 21,
+          "score": 0.061918,
+          "config": {
+            "tp": 2,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08331291600006807,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 22,
+          "score": 0.077391,
+          "config": {
+            "tp": 4,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0824451250009588,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 23,
+          "score": 0.077391,
+          "config": {
+            "tp": 4,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08228937499916356,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 24,
+          "score": 0.038806,
+          "config": {
+            "tp": 1,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06641270799991617,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 25,
+          "score": 0.066127,
+          "config": {
+            "tp": 2,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08040583299953141,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 26,
+          "score": 0.096881,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.13660266700026114,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 27,
+          "score": 0.046137,
+          "config": {
+            "tp": 1,
+            "num_instances": 8,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07756120799967903,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 28,
+          "score": 0.053946,
+          "config": {
+            "tp": 2,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0716482919997361,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 29,
+          "score": 0.096881,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.13795775000107824,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 30,
+          "score": 0.046137,
+          "config": {
+            "tp": 1,
+            "num_instances": 8,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07297912499961967,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 31,
+          "score": 0.046137,
+          "config": {
+            "tp": 1,
+            "num_instances": 8,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07468825000069046,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 32,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07155383399913262,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 33,
+          "score": 0.077391,
+          "config": {
+            "tp": 4,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07990404200063494,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 34,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08462950000102865,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 35,
+          "score": 0.077391,
+          "config": {
+            "tp": 4,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07967545800056541,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 36,
+          "score": 0.04466,
+          "config": {
+            "tp": 1,
+            "num_instances": 6,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07459266600017145,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 37,
+          "score": 0.061918,
+          "config": {
+            "tp": 2,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0737839579996944,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 38,
+          "score": 0.077391,
+          "config": {
+            "tp": 4,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08151891700072156,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 39,
+          "score": 0.032484,
+          "config": {
+            "tp": 1,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06831312500071363,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 40,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08414124999944761,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 41,
+          "score": 0.032484,
+          "config": {
+            "tp": 1,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06844504100081394,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 42,
+          "score": 0.044846,
+          "config": {
+            "tp": 1,
+            "num_instances": 5,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0780859579990647,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 43,
+          "score": 0.038806,
+          "config": {
+            "tp": 1,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07131570800083864,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 44,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07446700000036799,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 45,
+          "score": 0.066127,
+          "config": {
+            "tp": 2,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0804695000006177,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 46,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07852591700066114,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 47,
+          "score": 0.032484,
+          "config": {
+            "tp": 1,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06229574999997567,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 48,
+          "score": 0.04466,
+          "config": {
+            "tp": 1,
+            "num_instances": 6,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07551270800104248,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 49,
+          "score": 0.066127,
+          "config": {
+            "tp": 2,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07849304100091103,
+          "best_so_far": 0.096881
+        }
+      ],
+      "wall_time_total_s": 3.945876124998904,
+      "checkpoint_best": {
+        "15": 0.084888,
+        "20": 0.084888,
+        "50": 0.096881
+      },
+      "n_evaluations": 50
+    },
+    {
+      "strategy": "random",
+      "search_seed": 46,
+      "budget": 50,
+      "best_score": 0.096881,
+      "best_config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_running": 256,
+        "max_tokens": 2048,
+        "prefill_threshold": 0,
+        "block_size": 16,
+        "routing": "round-robin",
+        "admission": "always-admit",
+        "preemption": "fcfs"
+      },
+      "evaluations": [
+        {
+          "eval_idx": 0,
+          "score": 0.046137,
+          "config": {
+            "tp": 1,
+            "num_instances": 8,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07356075000097917,
+          "best_so_far": 0.046137
+        },
+        {
+          "eval_idx": 1,
+          "score": 0.084888,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0992459589997452,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 2,
+          "score": 0.043316,
+          "config": {
+            "tp": 1,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07058937500005413,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 3,
+          "score": 0.038806,
+          "config": {
+            "tp": 1,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07028899999932037,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 4,
+          "score": 0.053946,
+          "config": {
+            "tp": 2,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07316670799991698,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 5,
+          "score": 0.044846,
+          "config": {
+            "tp": 1,
+            "num_instances": 5,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06874812500063854,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 6,
+          "score": 0.043316,
+          "config": {
+            "tp": 1,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06788091700036603,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 7,
+          "score": 0.061918,
+          "config": {
+            "tp": 2,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07769579100022383,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 8,
+          "score": 0.041915,
+          "config": {
+            "tp": 1,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07190579199959757,
+          "best_so_far": 0.084888
+        },
+        {
+          "eval_idx": 9,
+          "score": 0.096881,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.14518525000130467,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 10,
+          "score": 0.077391,
+          "config": {
+            "tp": 4,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08200579099866445,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 11,
+          "score": 0.038806,
+          "config": {
+            "tp": 1,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07094950000100653,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 12,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08176908299901697,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 13,
+          "score": 0.061918,
+          "config": {
+            "tp": 2,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07678058300007251,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 14,
+          "score": 0.077391,
+          "config": {
+            "tp": 4,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08359629200094787,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 15,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.09315699999933713,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 16,
+          "score": 0.043316,
+          "config": {
+            "tp": 1,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07204570800058718,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 17,
+          "score": 0.046137,
+          "config": {
+            "tp": 1,
+            "num_instances": 8,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07470170899978257,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 18,
+          "score": 0.046147,
+          "config": {
+            "tp": 1,
+            "num_instances": 7,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07620037500055332,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 19,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08353887500015844,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 20,
+          "score": 0.066127,
+          "config": {
+            "tp": 2,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07206074999885459,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 21,
+          "score": 0.084888,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.09822787499979313,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 22,
+          "score": 0.053946,
+          "config": {
+            "tp": 2,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06922191699959512,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 23,
+          "score": 0.046137,
+          "config": {
+            "tp": 1,
+            "num_instances": 8,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07195333399977244,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 24,
+          "score": 0.046137,
+          "config": {
+            "tp": 1,
+            "num_instances": 8,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07183058299960976,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 25,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08003350000035425,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 26,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08455954199962434,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 27,
+          "score": 0.032484,
+          "config": {
+            "tp": 1,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06375641600061499,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 28,
+          "score": 0.061918,
+          "config": {
+            "tp": 2,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07633320800050569,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 29,
+          "score": 0.066127,
+          "config": {
+            "tp": 2,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08370204200036824,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 30,
+          "score": 0.041915,
+          "config": {
+            "tp": 1,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0794426669999666,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 31,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08718845800103736,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 32,
+          "score": 0.06739,
+          "config": {
+            "tp": 2,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08400224999968486,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 33,
+          "score": 0.032484,
+          "config": {
+            "tp": 1,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06495516700124426,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 34,
+          "score": 0.084888,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.14296079099949566,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 35,
+          "score": 0.038806,
+          "config": {
+            "tp": 1,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07516958300038823,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 36,
+          "score": 0.043316,
+          "config": {
+            "tp": 1,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07814945800055284,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 37,
+          "score": 0.04466,
+          "config": {
+            "tp": 1,
+            "num_instances": 6,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08139570800085494,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 38,
+          "score": 0.044846,
+          "config": {
+            "tp": 1,
+            "num_instances": 5,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07049637500131212,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 39,
+          "score": 0.044846,
+          "config": {
+            "tp": 1,
+            "num_instances": 5,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.0720334580000781,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 40,
+          "score": 0.084888,
+          "config": {
+            "tp": 4,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.10379924999870127,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 41,
+          "score": 0.043316,
+          "config": {
+            "tp": 1,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.08101766700019652,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 42,
+          "score": 0.044846,
+          "config": {
+            "tp": 1,
+            "num_instances": 5,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07305137500043202,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 43,
+          "score": 0.077391,
+          "config": {
+            "tp": 4,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.09244245900117676,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 44,
+          "score": 0.096881,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.15510591699967335,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 45,
+          "score": 0.032484,
+          "config": {
+            "tp": 1,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07400958300058846,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 46,
+          "score": 0.043316,
+          "config": {
+            "tp": 1,
+            "num_instances": 4,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07268833300076949,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 47,
+          "score": 0.041915,
+          "config": {
+            "tp": 1,
+            "num_instances": 3,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.06753104100062046,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 48,
+          "score": 0.04466,
+          "config": {
+            "tp": 1,
+            "num_instances": 6,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07950158300081966,
+          "best_so_far": 0.096881
+        },
+        {
+          "eval_idx": 49,
+          "score": 0.061918,
+          "config": {
+            "tp": 2,
+            "num_instances": 2,
+            "scheduler": "fcfs",
+            "max_running": 256,
+            "max_tokens": 2048,
+            "prefill_threshold": 0,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.07914054200045939,
+          "best_so_far": 0.096881
+        }
+      ],
+      "wall_time_total_s": 4.108883958000661,
+      "checkpoint_best": {
+        "15": 0.096881,
+        "20": 0.096881,
+        "50": 0.096881
+      },
+      "n_evaluations": 50
+    }
+  ],
+  "total_wall_time_s": 20.48313270899962
+}

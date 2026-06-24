@@ -1,0 +1,11 @@
+{
+  "gate_type": "continue",
+  "summary": "Five iterations have validated that the bracket K=1 hierarchical search reliably identifies the optimal tensor-parallelism configuration across models, hardware, and request rates \u2014 including a newly discovered rate-dependent TP winner crossover on H100 where TP=8 wins at low load (\u2264125 req/s) and TP=4 wins at high load (\u2265150 req/s). All four arms in iteration 5 were confirmed with no failures. The next iteration should map whether this crossover phenomenon extends to other hardware (A100-SXM, L40S) and larger models.",
+  "key_points": [
+    "Rate-TP crossover confirmed on H100 (qwen3-14b): TP=8/1inst wins at rate\u2264125 req/s (5\u20136.4% margin across 5 seeds), TP=4/2inst wins at rate\u2265150 req/s. The crossover at rate=125 is near-zero margin (0\u20130.81%), effectively a coin-flip.",
+    "Bracket K=1 adapts to rate without any algorithm changes: evals_to_best=4 when TP=8 wins (rate=100), evals_to_best=3 at the crossover (rate=125), and evals_to_best=3 when TP=4 wins (rate\u2265150). All 25 seed combinations (5 blis_seeds \u00d7 5 search_seeds) confirmed deterministically.",
+    "Critical interaction (RP-13): The rate-dependent TP=8 advantage only appears with max_running_reqs\u2265256 (max-profile). Under default params (max_running=64), TP=4/2inst wins at ALL rates by 14.8\u201315.7% \u2014 validating that bracket Phase 1's max-profile design is essential for exposing true hardware dynamics.",
+    "Still unknown: (1) Whether the TP crossover rate differs on A100-SXM and L40S (bandwidth differs significantly \u2014 2.0 vs 0.86 TB/s vs H100's 3.35 TB/s). (2) Whether larger models (qwen3-32b) shift the crossover rate. (3) Exact crossover rate for llama-3.1-8b on H100 (known to be between 100 and 500 req/s, not yet narrowed).",
+    "Recommended next iteration: Run a 3-hardware \u00d7 3-rate matrix (H100/A100-SXM/L40S at rates 100/300/500) to map the full TP-winner surface. This requires new global_best probes for A100-SXM and L40S at rate=100, but would complete the generalization picture needed before packaging bracket K=1 as a production capacity-planning tool."
+  ]
+}

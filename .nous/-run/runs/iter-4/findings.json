@@ -1,0 +1,41 @@
+{
+  "iteration": 4,
+  "bundle_ref": "runs/iter-4/bundle.yaml",
+  "arms": [
+    {
+      "arm_type": "h-main",
+      "predicted": "Bracket K=1 on A100-SXM hard qwen3-14b (blis_seed=42) correctly identifies TP=4/2inst as Phase 1 winner on all 5 search seeds, with evals_to_best=3. Phase 1 max-profile scores: TP1=0.085746, TP2=0.115450, TP4=0.138290, TP8=0.136812. Global best 0.138820 reached in Phase 2 via round-robin routing discovery.",
+      "observed": "5/5 search seeds: Phase 1 winner=TP4/2inst. evals_to_best=3 on all 5 seeds (deterministic). Phase 1 max scores: TP1=0.085746, TP2=0.11545, TP4=0.13829, TP8=0.136812 — exactly matching predictions. Best scores: seeds 43,44,45,46 all reach global best 0.138820; seed=42 reaches 0.138669 (within 1% threshold 0.137432). Phase 2 adds 0.38% improvement (round-robin routing discovery) in 4/5 seeds.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "All predictions confirmed. The 1.07% TP=4 margin over TP=8 is sufficient for unambiguous Phase 1 identification — TP4 Phase 1 score (0.138290) exceeds threshold (0.137432) at eval 3. Matrix completion: A100-SXM follows H100 behavior (TP=4 for qwen3-14b), not L40S (TP=8). Phase 2 TPE finds the round-robin routing improvement in 4/5 seeds, confirming Phase 2 adds value on A100-SXM (first regime where Phase 1 alone does not find global best). seed=42 search_seed=42 reaches only 0.138669 due to TPE exploration variance — still within threshold."
+    },
+    {
+      "arm_type": "h-robustness",
+      "predicted": "Bracket K=1 achieves 25/25 correct Phase 1 identification of TP=4/2inst across 5 blis_seeds x 5 search seeds. evals_to_best=3 at all 25 combinations. All Phase 1 TP4 scores exceed threshold 0.137432.",
+      "observed": "25/25 Phase 1 correctness (TP4/2inst on all combinations). 25/25 evals_to_best=3 (perfectly deterministic). Per-blis_seed Phase 2 best scores: seed=42 [0.138669,0.138820,0.138820,0.138820,0.138820], seed=43 [0.143632,0.143632,0.143488,0.143632,0.143632], seed=44 [0.139832×5], seed=45 [0.148275,0.149221,0.149221,0.148275,0.149221], seed=46 [0.147057×5]. All Phase 1 TP4 scores confirmed above threshold 0.137432.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "Perfect 25/25 result. The determinism (evals_to_best=3 on all combinations) confirms RP-9: Phase 1 is deterministic per blis_seed regardless of search_seed. Seeds 42 and 44 have the tightest TP=4 Phase 1 margins in the campaign (1.07% and 1.24%), yet bracket achieves evals_to_best=3 deterministically. For seeds 45,46, Phase 2 discovers better scores than Phase 1 (e.g., seed=45 best goes to 0.149221 vs Phase 1 max 0.147744); for seed=46, Phase 2 cannot improve over Phase 1's least-loaded score (0.147057), likely because round-robin is slightly worse at seed=46."
+    },
+    {
+      "arm_type": "h-ablation",
+      "predicted": "Flat TPE on A100-SXM hard qwen3-14b at blis_seed=42 (1.07% TP margin) shows poor convergence: ≤2/5 seeds reach exact global best (0.138820), median evals_to_best >50 (possibly failure). Bracket K=1's evals_to_best=3 is strictly better.",
+      "observed": "5/5 seeds within-threshold (threshold=0.137432). 3/5 seeds reach exact global best 0.138820 (seeds 43,45,46); 2 seeds reach 0.137795 and 0.138130 (within threshold). evals_to_best: [49,4,30,26,23], median=26. Bracket K=1 is still strictly better (evals_to_best=3 vs median=26).",
+      "status": "PARTIALLY_CONFIRMED",
+      "error_type": "magnitude",
+      "diagnostic_note": "Direction confirmed: TPE is slower than bracket at 1.07% margin (median 26 vs 3). But magnitude prediction was wrong: all 5 seeds pass within-threshold (predicted ≤2/5 exact, median >50). A100-SXM qwen at 1.07% margin is NOT a failure regime for flat TPE. The key difference from L40S llama at 2.1% (where 4/5 failed): A100-SXM's absolute fitness landscape is higher and the threshold (0.137432 = 0.99×0.138820) is crossed by multiple TP4/2inst configurations — not just the max-profile config. On L40S llama at 2.1%, the threshold was likely harder to reach with non-max configs. This reveals that TPE convergence at tight margins depends on BOTH relative margin width AND hardware-specific landscape structure (how many configs fall above the threshold)."
+    },
+    {
+      "arm_type": "h-control-negative",
+      "predicted": "Flat TPE on A100-SXM hard qwen3-14b at blis_seed=46 (4.47% TP margin) shows markedly better convergence: ≥3/5 seeds within-1% threshold, median evals_to_best in 5-15 range.",
+      "observed": "5/5 seeds within-threshold. evals_to_best: [8,4,6,1,6], median=6. Best scores: 4/5 seeds reach 0.146765, 1 seed reaches 0.146307. seed=45 achieves evals_to_best=1 (first TPE eval exceeded threshold). All results well within predicted range.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "5/5 within-threshold, median=6 — exactly within predicted range. Sharp contrast with h-ablation: 6 vs 26 median evals_to_best confirms margin width has a causal effect on TPE convergence speed. evals_to_best=1 for seed=45 is notable: TPE's first eval (completely random, before any Bayesian model is built) happened to land on a TP4/2inst config scoring above 0.137432. This is a lucky draw at the wide margin seed where many configs score high. Within-hardware comparison confirms: margin width is a causal variable for TPE convergence speed (holding hardware/model fixed)."
+    }
+  ],
+  "experiment_valid": true,
+  "discrepancy_analysis": "Three of four arms confirmed; h-ablation partially confirmed with a magnitude discrepancy. The main unexpected finding: flat TPE on A100-SXM at 1.07% TP margin (the tightest TP=4 margin in the campaign) is NOT a failure regime — all 5 seeds pass the within-1% threshold with median evals_to_best=26. This contrasts with L40S llama at 2.1% margin where 4/5 seeds failed. The implication is that the TPE convergence threshold is hardware/model-specific: A100-SXM qwen's landscape allows more configurations to exceed the threshold than L40S llama's. The [2.1%, 5.1%] bound from RP-22 is specific to L40S hardware and cannot be universally applied. Within A100-SXM (same hardware, different seeds): margin width still has a strong causal effect on convergence speed (median evals_to_best 26 vs 6 at 1.07% vs 4.47% margin).",
+  "dominant_component_pct": null
+}

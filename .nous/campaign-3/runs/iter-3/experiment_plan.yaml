@@ -1,0 +1,33 @@
+metadata:
+  iteration: 3
+  bundle_ref: "runs/iter-3/bundle.yaml"
+  description: "Test whether total_kv_blocks as a searchable parameter creates a harder 4-objective search problem where NSGA-II outperforms random search."
+
+setup:
+  - cmd: "go build -o blis main.go"
+    description: "Build blis binary"
+
+arms:
+  - arm_id: "h-main"
+    conditions:
+      - name: "nsga2-4obj"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-3/inputs/search_nsga2_4obj.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-3/results/h-main/pareto_front.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-3/inputs/search_nsga2_4obj.py"
+
+  - arm_id: "h-control-negative"
+    conditions:
+      - name: "random-4obj"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-3/inputs/search_random_4obj.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-3/results/h-control-negative/pareto_front.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-3/inputs/search_random_4obj.py"
+
+  - arm_id: "h-robustness"
+    conditions:
+      - name: "nsga2-3obj"
+        cmd: "python3 /Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-3/inputs/search_nsga2_3obj.py"
+        output: "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-3/results/h-robustness/pareto_front.json"
+        inputs:
+          - "/Users/jchen/go/src/inference-sim/inference-sim/.nous/campaign-3/runs/iter-3/inputs/search_nsga2_3obj.py"

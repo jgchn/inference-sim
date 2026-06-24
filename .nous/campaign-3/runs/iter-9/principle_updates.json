@@ -1,0 +1,72 @@
+[
+  {
+    "id": "RP-11",
+    "statement": "NSGA-II's convergence speed advantage over random search is NOT solely determined by model architecture. It is primarily determined by the load regime (arrival rate) relative to the model's KV capacity threshold. Qwen3-14B consistently shows positive NSGA-II gaps at all tested rates (rate=50: +4.6, rate=75: +31.0, rate=100: +62.3). Llama-3.1-8B shows rate-dependent behavior: negative gaps at rates 50-75 (random wins: -22.9, -25.3), but POSITIVE gap at rate=100 (+40.3, NSGA-II wins). The Llama-random-wins pattern has a rate breakpoint between 75 and 100 req/s where Llama enters a KV-stressed regime with exploitable landscape structure.",
+    "confidence": "high",
+    "regime": "BLIS 6-parameter 4-objective space. Qwen3-14B and Llama-3.1-8B on H100. Rate 50-100 req/s.",
+    "evidence": ["iteration-7-h-main", "iteration-7-h-ablation", "iteration-8-h-main", "iteration-8-h-ablation", "iteration-9-h-main", "iteration-9-h-ablation"],
+    "contradicts": [],
+    "extraction_iteration": 9,
+    "mechanism": "Llama's faster throughput (1.5-1.7x vs Qwen) means it takes higher arrival rates to saturate KV capacity. At rate<=75, Llama's effective KV token usage is below the stress threshold, creating a smooth landscape where random search's diversity is competitive. At rate=100, Llama's KV cache becomes heavily stressed (90 preemptions at tp=2,i=2,kv=3000), creating sharp threshold effects with kv_blocks NDR=0.727 that NSGA-II's crossover can exploit. Qwen crosses this threshold at lower rates due to its slower token generation.",
+    "applicability_bounds": "Breakpoint is between 75 and 100 req/s for Llama on H100. Other hardware or prefix lengths may shift the breakpoint. The pattern likely generalizes: faster-decoding models have higher rate breakpoints.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-14",
+    "statement": "NSGA-II's convergence advantage in BLIS is driven by MULTIPLE exploitable landscape axes, not exclusively by KV threshold effects. The KV cliff (kv_blocks axis) is the primary individual contributor (NDR ~0.71-0.73 for both Qwen and Llama at rate=100), but the batch size axis (max_num_running_reqs, NDR ~0.50), block size axis (block_size_in_tokens, NDR ~0.26), and scheduler axis (NDR ~0.22) also provide exploitable gradients. Removing the KV cliff entirely (fixing kv=10000) reduces but does not eliminate NSGA-II's advantage: gap drops from +62.3 to +29.0 for Qwen, confirming multi-axis exploitability. The tp and num_instances axes have NDR=0 for both models because changing GPU count creates inescapable resource-performance tradeoffs rather than clean dominance relationships.",
+    "confidence": "high",
+    "regime": "BLIS 6-parameter space (4-objective or 3-objective). Rate=100 req/s. H100 hardware.",
+    "evidence": ["iteration-9-h-robustness", "iteration-9-h-main", "iteration-9-h-control-negative"],
+    "contradicts": [],
+    "extraction_iteration": 9,
+    "mechanism": "Each high-NDR axis creates dominance relationships where one config strictly improves ALL objectives simultaneously. For kv_blocks: low-kv configs in the stress-free regime are dominated by higher-kv configs when the performance gain (lower TTFT) is so large it offsets the kv_blocks cost increase — wait, actually kv_blocks IS an objective. Rather, kv_blocks axis NDR comes from configs where changing kv doesn't change performance (both in stress-free regime), so lower kv strictly dominates (same-or-better objectives, fewer blocks). For max_num_running_reqs: similar mechanism where batch size beyond a threshold doesn't improve performance but wastes memory. NSGA-II's crossover recombines 'good gene' values (high kv, right batch size) from fit parents to rapidly locate the frontier.",
+    "applicability_bounds": "Applies at high load rates where KV stress is present. At low rates, KV axis contributes less NDR and the landscape may become smoother, reducing NSGA-II's advantage. The cliff-free experiment confirms a +29 baseline NSGA-II advantage from non-KV axes alone at rate=100.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-15",
+    "statement": "Overall Neighbor Dominance Rate (NDR) is NOT a reliable predictor of NSGA-II vs random search gap direction or magnitude across different models. Qwen and Llama have nearly identical overall NDR (~35.6% and ~35.75% respectively) at rate=100 despite having different gap magnitudes (Qwen=+62.3, Llama=+40.3). NDR equality does not imply gap equality. The per-axis NDR breakdown is more informative: axes with NDR>0.5 (kv_blocks: ~0.71-0.73; max_batch: ~0.50) are the primary gap drivers, but their relative contribution depends on how KV-stressed the model is at the given rate.",
+    "confidence": "medium",
+    "regime": "BLIS multi-objective search. Two model architectures (Qwen3-14B, Llama-3.1-8B) at rate=100.",
+    "evidence": ["iteration-9-h-robustness", "iteration-9-h-main", "iteration-9-h-ablation"],
+    "contradicts": ["RP-12-partial"],
+    "extraction_iteration": 9,
+    "mechanism": "Overall NDR aggregates across all axes. Two landscapes can have similar overall NDR but different exploitability if one has NDR concentrated on a small number of highly-correlated axes (easier for crossover to exploit) vs distributed across many axes. The concentration of NDR matters as much as the magnitude. Future experiments should measure NDR concentration (Herfindahl-Hirschman Index across axes) as a more predictive metric.",
+    "applicability_bounds": "Measured at rate=100 only. At lower rates, models may diverge in overall NDR. The equal-NDR-but-different-gap finding is a rate=100 specific observation; at rate=75, Qwen had density 6.06% and Llama 4.83% (different), suggesting NDR may diverge at lower rates.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-16",
+    "statement": "At high load (rate=100 req/s on H100), NSGA-II has a universal structural advantage in BLIS's 6-parameter 4-objective space for both Qwen3-14B (+62.3 evals) and Llama-3.1-8B (+40.3 evals). The NSGA-II advantage is not model-specific at rate=100; it becomes model-specific only at lower rates where lighter models (Llama) are below the KV-stress threshold. Pareto density at rate=100: Qwen=6.89%, Llama=5.89% — both in the 5-7% range associated with moderate NSGA-II advantage. The cliff-free subspace (kv=10000 fixed, 3 objectives) shows a +29 eval baseline advantage, establishing a floor for NSGA-II benefit from non-KV axes alone.",
+    "confidence": "high",
+    "regime": "BLIS 6-parameter 4-objective space. Rate=100 req/s. H100. Both Qwen3-14B and Llama-3.1-8B.",
+    "evidence": ["iteration-9-h-main", "iteration-9-h-ablation", "iteration-9-h-control-negative"],
+    "contradicts": [],
+    "extraction_iteration": 9,
+    "mechanism": "At rate=100, both models have sufficient KV stress to create high-NDR axes that NSGA-II's crossover exploits. The baseline multi-axis structure (batch size, scheduler, block_size interactions) provides a +29 eval floor advantage. KV stress adds an additional +33 evals for Qwen (the KV-cliff-sensitive model at rate=100). Llama, transitioning into KV stress at rate=100, has an intermediate advantage: baseline +29 plus some KV contribution ≈ +40, while Qwen has baseline +29 plus full KV contribution ≈ +62.",
+    "applicability_bounds": "Rate=100 on H100. May not hold at rate<75 for Llama. Qwen pattern established at all rates 50-100. Cliff-free floor (+29) may change with different model architectures or hardware.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-1",
+    "statement": "Multi-objective search algorithm comparison (NSGA-II vs random) requires both a non-trivial Pareto frontier AND a sparse Pareto-optimal configuration set. In BLIS's corrected 6-parameter 4-objective space: Pareto density at rate=50 is 4.5% (Qwen) and 5.33% (Llama), at rate=75 is 6.06% (Qwen) and 4.83% (Llama), and at rate=100 is 6.89% (Qwen) and 5.89% (Llama). Higher Pareto density at higher rates is confirmed for Qwen. For Llama, density is non-monotonic (5.33%→4.83%→5.89%). The density threshold guidance for NSGA-II advantage magnitude (>5% = moderate advantage, <5% = decisive advantage) is no longer reliable at rate=100: both models are near 6-7% density yet show large NSGA-II gaps (+40 to +62 evals). The convergence gap is primarily determined by landscape structure (multi-axis NDR), not density alone.",
+    "confidence": "high",
+    "regime": "BLIS 6-parameter 4-objective corrected space. Rates 50-100 req/s. Qwen3-14B and Llama-3.1-8B.",
+    "evidence": ["iteration-7-h-robustness", "iteration-8-h-robustness", "iteration-9-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 9,
+    "mechanism": "Pareto density measures the output of landscape structure (fraction of configs on the Pareto front) but not the exploitability of that structure. Two landscapes with the same density can have very different NDR values and different NSGA-II advantages. At rate=100, both models have 5-7% density (formerly 'moderate advantage' regime) but show large gaps (+40-62), because the KV-cliff axis and batch-size axis provide strong directional gradients that NSGA-II exploits.",
+    "applicability_bounds": "Revised guidance: density alone predicts gap magnitude unreliably at high rates. Use per-axis NDR (especially kv_blocks NDR > 0.5 implies strong NSGA-II advantage) in addition to density. The density-based thresholds from RP-2 should be treated as approximate heuristics, not hard rules.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  }
+]

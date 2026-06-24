@@ -1,0 +1,12 @@
+{
+  "arm": "h-main",
+  "name": "A100-SXM-r5000-tp8i1-b128-s42",
+  "hardware": "A100-SXM",
+  "tp": 8,
+  "instances": 1,
+  "rate": 5000,
+  "nreq": 2000,
+  "batch": 128,
+  "seed": 42,
+  "score": 0.105526
+}

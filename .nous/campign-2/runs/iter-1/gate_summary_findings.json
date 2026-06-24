@@ -1,0 +1,11 @@
+{
+  "gate_type": "findings",
+  "summary": "The main hypothesis that hierarchical search would achieve \u226520% more hypervolume than random search was decisively refuted: both strategies achieved identical hypervolume (7.754e+08, ratio = 1.000). The Pareto optimization problem turned out to be degenerate \u2014 a single configuration (TP=8, 1 instance) dominates all others on both throughput (14,232 tok/s) and latency (4,719ms P99), so there is no genuine tradeoff frontier for hierarchical search to exploit.",
+  "key_points": [
+    "H-MAIN REFUTED: HV_hierarchical / HV_random = 1.000 (predicted \u22651.20). The entire Pareto front collapses to one point: TP=8/1-instance at 14,232 tok/s and 4,719ms P99. Random search finds this with 9.2% probability per eval (46/500 hits), making concentrated budget allocation irrelevant.",
+    "H-CONTROL PARTIALLY CONFIRMED: At rate=5, no hierarchical advantage exists (HV ratio = 1.000 as predicted), but the mechanism was wrong \u2014 TP=8 still dominates other tiers by 47% on latency rather than all tiers being equivalent. Secondary knobs produce zero variance within tiers at low rate.",
+    "H-ROBUSTNESS CONFIRMED: Phase 1 tier ranking ([8x1, 4x2, 4x1]) is perfectly stable across all 5 seeds. The hierarchical screening step reliably identifies dominant tiers (CV of HV ~7.8% across seeds), but this capability provides no advantage when the Pareto problem is degenerate.",
+    "ROOT CAUSE: The experimental design assumed genuine throughput-vs-latency tradeoffs at rate=50, but TP=8/1-inst simultaneously wins both objectives at this load level. A regime with real tradeoffs likely requires rate >> 100 req/s where high-TP configurations saturate and queue, while multi-instance lower-TP configs maintain lower latency at reduced throughput.",
+    "BLIS simulation performance: ~86ms per evaluation, 1000 total evals completed in under 50s wall time, confirming the simulator is practical for large-scale search experiments."
+  ]
+}

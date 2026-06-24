@@ -1,0 +1,150 @@
+metadata:
+  iteration: 7
+  family: "lean-bracket-budget-reduction"
+  research_question: "Can bracket K=1 be reduced from 100 evaluations to 2 (Phase 1 over TP={4,8} only, no Phase 2) while maintaining 1% accuracy across all tested regimes? TP=1 and TP=2 are structurally excluded (11-38% below winner at all rates 100-5000), and Phase 2 contributes at most 0.7% improvement — always within the 1% tolerance."
+
+# Arms chosen:
+# - h-main: Tests the core claim — lean bracket (2 evals) across 4 diverse regimes
+# - h-control-negative: Validates mechanism — min-profile breaks lean bracket by inverting the TP ranking,
+#   confirming that the max-profile is essential (not just any 2-eval scheme)
+# - h-ablation: Tests whether mini Phase 2 (10 trials) can recover routing improvements
+#   on the one regime where Phase 2 adds value (A100-SXM crossover)
+# - h-robustness: Tests lean bracket stability across 5 BLIS workload seeds
+
+arms:
+  - type: h-main
+    prediction: >
+      Lean bracket (TP={4,8} max-profile only, budget=2, no Phase 2) achieves within 1% of
+      global best on all 4 tested regimes. evals_to_best=1 for TP=4-winner regimes (H100 rate=500:
+      score=0.178063, threshold=0.177409; A100-SXM rate=500: score=0.138290, threshold=0.137432).
+      evals_to_best=2 for TP=8-winner regimes (H100 rate=100: score=0.164680, threshold=0.163033;
+      A100-SXM rate=100: score=0.130754, threshold=0.129446). All 5 search seeds produce
+      byte-identical results per regime (deterministic, no Phase 2 RNG). Total wall time per
+      regime: <300ms (2 BLIS evaluations at ~100ms each).
+    mechanism: >
+      TP=1 and TP=2 are structurally excluded because bandwidth-per-GPU at TP<4 is insufficient
+      for competitive per-token latency. At TP=2, each GPU has 1/4 of TP=8's bandwidth (e.g.,
+      H100: 0.84 TB/s per GPU at TP=2 vs 3.35 TB/s at TP=8). The 2x instance count advantage
+      (4 vs 2 instances) cannot compensate for the ~2x per-request latency penalty. Probed at
+      rates 100-5000: TP=2 gap is consistently 11-19% below winner. Phase 2 is unnecessary
+      because the max-profile (mr=512, mt=8192, pf=4096) already captures the optimal secondary
+      parameters within 1% — Phase 2's routing discovery (0.1-0.7% improvement) falls within
+      tolerance.
+    diagnostic: >
+      If lean bracket fails the 1% threshold on any regime: (1) Check whether the global best
+      was updated since the last iteration — a new higher global best could push the Phase 1
+      max-profile below the 1% threshold. (2) If evals_to_best differs from prediction, check
+      Phase 1 evaluation order — TP=4 must be evaluated before TP=8 in the lean bracket.
+      (3) If search seeds produce different results, a Phase 2 RNG leak exists.
+    code_changes:
+      - file: "search_blis_iter7.py"
+        intent: >
+          Copy search_blis_iter6.py to search_blis_iter7.py. Add --tp-candidates CLI flag with
+          choices 'all' (default: TP=1,2,4,8) and 'lean' (TP=4,8 only). When 'lean', filter
+          PHASE1_TP_CONFIGS to only include (4,2) and (8,1). Add --skip-phase2 boolean flag.
+          When set, return immediately after Phase 1 without running Phase 2 TPE. Update
+          GLOBAL_BEST_TABLE with new entries: (qwen3-14b, H100, 100, 1000): 0.164680,
+          (qwen3-14b, H100, 125, 1000): 0.162182, (llama-3.1-8b, H100, 100, 1000): 0.182394,
+          (qwen3-14b, A100-SXM, 100, 1000): 0.130754, (llama-3.1-8b, A100-SXM, 100, 1000):
+          0.160845, (qwen3-14b, A100-SXM, 200, 1000): 0.135440, and update
+          (qwen3-14b, A100-SXM, 500, 1000) from 0.138290 to 0.138820.
+        rationale: >
+          The lean bracket hypothesis requires evaluating only TP=4 and TP=8 in Phase 1 and
+          skipping Phase 2. The code changes are minimal: filter the TP config list and add
+          an early return. GLOBAL_BEST_TABLE updates incorporate findings from iterations 5-6.
+
+  - type: h-control-negative
+    prediction: >
+      Lean bracket with min-profile (mr=32, mt=2048, pf=0) on H100 qwen rate=500 selects a
+      suboptimal configuration. With min-profile, TP=4/2inst scores ~0.077 and TP=8/1inst scores
+      ~0.063 — both far below the max-profile TP=4 score of 0.178063. The min-profile lean
+      bracket best score will be >50% below the max-profile lean bracket best score. This
+      confirms the max-profile is essential: lean bracket's correctness depends on the
+      compute-saturated regime where bandwidth-per-GPU dominates, not instance count.
+    mechanism: >
+      The min-profile (mr=32) creates a capacity-limited regime where each instance can only
+      process 32 concurrent requests. With TP=4/2inst, total capacity is 2x32=64. With
+      TP=2/4inst, total capacity is 4x32=128. In this regime, instance count (concurrency)
+      dominates over bandwidth-per-GPU, inverting the TP ranking. Since lean bracket excludes
+      TP=2, it cannot find the min-profile winner, and the configs it does evaluate (TP=4, TP=8)
+      score poorly because they are bandwidth-rich but capacity-starved.
+    diagnostic: >
+      If min-profile lean bracket somehow achieves within 1% of global best: check whether
+      the min-profile scores are higher than expected — the fitness function's latency
+      normalization might compensate for the low throughput in unexpected ways. Re-probe with
+      explicit throughput metric comparison.
+    code_changes:
+      - file: "search_blis_iter7.py"
+        intent: >
+          Use the same script as h-main with --tp-candidates lean --skip-phase2
+          --phase1-profiles bracket-min-only. The bracket-min-only profile type already exists
+          in the iter-6 codebase and produces {mr=32, mt=2048, pf=0}. No additional code
+          changes needed beyond h-main changes.
+        rationale: >
+          Tests lean bracket with the wrong profile to validate the mechanism. bracket-min-only
+          is already implemented; we just combine it with --tp-candidates lean.
+
+  - type: h-ablation
+    prediction: >
+      Lean bracket + mini Phase 2 (budget=12: 2 Phase 1 + 10 Phase 2 TPE trials) on A100-SXM
+      qwen rate=200 (the routing-sensitive crossover regime). Phase 1 max-profile gives
+      0.134488 (least-loaded routing). Phase 2 discovers routing improvement on at least 3/5
+      search seeds within 10 trials, achieving score > 0.134488. Based on prior data (iter-6):
+      seeds 44 (trial 3), 45 (trial 6), 46 (trial 1) find improvement within budget; seeds
+      42 (trial 37) and 43 (trial 19) likely do not. All seeds remain within 1% of global
+      best (0.135440) regardless of Phase 2 success, since Phase 1 score 0.134488 already
+      exceeds the 1% threshold (0.134086).
+    mechanism: >
+      Phase 2's value comes exclusively from routing policy discovery in multi-instance configs.
+      The max-profile uses least-loaded routing (set by make_adaptive_phase1_configs for
+      multi-instance), but round-robin and weighted routing can outperform least-loaded by
+      0.3-0.7% at the TP=4/2inst crossover regime. Mini Phase 2 (10 trials) samples
+      the 3-option routing space enough to discover this improvement on most seeds, but TPE's
+      random initialization phase means some seeds may not explore the right routing option
+      within 10 trials.
+    diagnostic: >
+      If fewer than 3/5 seeds improve: check whether TPE's first 10 trials are exploring
+      routing (categorical parameter). If TPE is spending trials on scheduler/mr/mt variations
+      instead of routing, the mini budget may be insufficient. If more than 3/5 seeds improve:
+      the routing discovery is easier than expected, which strengthens the lean bracket case.
+    code_changes:
+      - file: "search_blis_iter7.py"
+        intent: >
+          Use the same script as h-main with --tp-candidates lean --phase1-profiles bracket
+          --phase1-k 1 --budget 12. The --skip-phase2 flag is NOT set, so Phase 2 runs with
+          remaining budget (12-2=10 trials). No additional code changes needed.
+        rationale: >
+          Tests whether a very small Phase 2 budget (10 trials) can recover the routing
+          improvement that full Phase 2 (96 trials) discovers. This determines whether lean
+          bracket needs any Phase 2 at all for multi-instance regimes.
+
+  - type: h-robustness
+    prediction: >
+      Lean bracket (TP={4,8} max-profile, budget=2) on H100 qwen rate=500 across 5 blis_seeds
+      (42-46) and 5 search_seeds (42-46) — 25 total combinations. All 25 achieve within 1%
+      of the per-seed global best. evals_to_best=1 on all 25 (TP=4/2inst wins at rate=500
+      on all blis_seeds). Within each blis_seed, all 5 search_seeds produce identical results
+      (determinism). Phase 1 TP=4 scores range 0.176-0.180 across blis_seeds (workload variation),
+      all exceeding their respective 1% thresholds. Total wall time for all 25 combinations:
+      <8s (25 x 2 evals x ~100ms).
+    mechanism: >
+      Lean bracket is deterministic (no RNG in Phase 1, no Phase 2). The only source of
+      variation is the BLIS workload seed, which affects request arrival patterns and
+      token lengths. Prior iterations (RP-20) show bracket K=1 is robust to workload
+      variation: TP=4's margin over TP=8 ranges 3.7-5.2% across seeds on A100-SXM.
+      On H100 at rate=500, TP=4's margin should be similarly stable, keeping all seeds
+      well above the 1% threshold.
+    diagnostic: >
+      If any blis_seed fails: check whether that seed produces an unusually tight TP=4/TP=8
+      margin (<1%). If so, lean bracket is sensitive to workload variance at borderline
+      margins. If search_seeds differ within a blis_seed: there is a hidden RNG source
+      that should be eliminated (bug in the search script).
+    code_changes:
+      - file: "search_blis_iter7.py"
+        intent: >
+          Use the same script as h-main with --tp-candidates lean --skip-phase2
+          --phase1-profiles bracket --phase1-k 1. Run with --blis-seed 42 through 46
+          (5 separate runs, or add --blis-seeds flag for multi-seed support).
+        rationale: >
+          Tests lean bracket stability across workload realizations. The script already
+          supports --blis-seed; run 5 times with different values.

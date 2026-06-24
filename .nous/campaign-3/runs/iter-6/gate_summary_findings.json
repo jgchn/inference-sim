@@ -1,0 +1,11 @@
+{
+  "gate_type": "findings",
+  "summary": "The central hypothesis \u2014 that higher arrival rates reduce Pareto density and amplify NSGA-II's advantage over random search \u2014 was directionally wrong. Pareto density actually increases with load (4.5% \u2192 6.06% \u2192 6.89% across rates 50/75/100), and NSGA-II's convergence advantage weakens rather than strengthens under higher load. However, NSGA-II still reliably reaches 95% of exhaustive hypervolume well within 200 evaluations at all tested rates.",
+  "key_points": [
+    "Robustness arm REFUTED: Pareto density at rate=100 was 6.89% (124/1800 configs), not \u22644.5% as predicted. Higher load opens new cost-performance tradeoff regions (e.g., throughput-limited tp=1 configs become Pareto-optimal at low-cost operating points) rather than collapsing the frontier.",
+    "Main hypothesis PARTIALLY CONFIRMED: NSGA-II reaches 95% exhaustive HV at ~103 evals (criterion 1 passes), but the convergence gap vs random was only 57 evals (just below the 60-eval threshold) and the final HV gap was only 1.46% (well below the predicted 4.9%). The mechanism was wrong \u2014 denser Pareto fronts at higher load make random search more competitive, not less.",
+    "Control-negative REFUTED: Random search reached 97.31% of exhaustive HV at 200 evals (crossing 95% at eval ~160), far exceeding the predicted plateau of 91-95%. The higher-than-expected density (6.89%) gave random ~13.8 expected Pareto hits vs the predicted 9.",
+    "Monotonicity hypothesis REFUTED: The gap ordering across rates is non-monotonic (rate=50: 91 evals, rate=100: 57 evals, rate=75: 48 evals), suggesting qualitative structural differences in the Pareto landscape between rates rather than a simple quantitative scaling.",
+    "Key takeaway for the framework: NSGA-II's advantage is portable across workload rates (always faster to 95% than random) but the margin shrinks under load. The practical benefit over random is ~57-91 fewer evaluations to reach 95% HV \u2014 meaningful given ~100-250ms per eval, but not as large as initially theorized for high-load regimes."
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "gate_type": "design",
+  "summary": "Iteration 4 completes the 2\u00d73 model\u00d7hardware matrix by testing bracket K=1 on the last untested cell (A100-SXM + qwen3-14b), and uses the natural margin variation across BLIS seeds (1.07%\u20134.47%) to isolate margin width as the causal variable determining whether flat TPE converges reliably.",
+  "key_points": [
+    "h-main: Bracket K=1 on A100-SXM qwen3-14b (seed=42, tightest 1.07% TP=4 margin in the campaign) should identify TP=4/2inst as winner at eval 3 on all 5 search seeds. The corrected global best (0.138820 via round-robin routing) produces a threshold of 0.137432 that cleanly separates TP=4 (0.138290) from TP=8 (0.136812). Failure if TP=8 is selected, which would invalidate the bandwidth-threshold hypothesis (A100's 2.039 TB/s should favor TP=4).",
+    "h-robustness: Bracket K=1 tested across all 5 blis_seeds \u00d7 5 search seeds (25 runs) should achieve 25/25 correct TP=4 identification with evals_to_best=3. All probed TP=4 max-profile scores (0.138290\u20130.147744) exceed the threshold (0.137432). This confirms bracket's deterministic Phase 1 is immune to margin variation (RP-9).",
+    "h-ablation + h-control-negative form a paired margin experiment: flat TPE at 1.07% margin (seed=42) is predicted to fail (\u22642/5 seeds converge, median evals_to_best >50), while flat TPE at 4.47% margin (seed=46) is predicted to succeed (\u22653/5 seeds, median 5\u201315 evals). Since hardware, model, and algorithm are identical between the two arms, a significant performance difference would confirm margin width \u2014 not hardware or model \u2014 as the causal variable for TPE convergence. This narrows the critical margin threshold to the [2.1%, 4.47%] or [4.47%, 5.1%] range depending on seed=46 results.",
+    "Only code change: update GLOBAL_BEST_TABLE for A100-SXM qwen3-14b from 0.138290 to 0.138820 (round-robin routing discovered via probing). No algorithmic changes. The stale value would have placed TP=8's score dangerously close to the threshold, potentially distorting evals_to_best metrics."
+  ]
+}

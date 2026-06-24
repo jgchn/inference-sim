@@ -1,0 +1,72 @@
+[
+  {
+    "id": "RP-1",
+    "statement": "Multi-objective search algorithm comparison (NSGA-II vs random) requires both a non-trivial Pareto frontier AND a sparse Pareto-optimal configuration set. In BLIS's corrected 6-parameter 4-objective space, Pareto density dropped to ~4.5% (vs iter-4's 26.4%), creating a large and consistent convergence speed gap: NSGA-II reaches 95% of exhaustive HV at ~eval 109 while random never reaches 95% within 200 evals. When density is <5%, NSGA-II's exploitation advantage over random becomes decisive rather than marginal.",
+    "confidence": "high",
+    "regime": "BLIS, qwen3-14b on H100, rate=50, 4-objective space including block_size, kv_blocks, tp, gpu_count, budget=200 on 1800-config corrected space",
+    "evidence": ["iteration-5-h-main", "iteration-5-h-control-negative", "iteration-5-h-robustness"],
+    "contradicts": [],
+    "extraction_iteration": 5,
+    "mechanism": "With 4.5% Pareto density (81/1800 configs), random search at 11.1% coverage (200/1800) has insufficient probability of discovering the narrow Pareto-optimal band. NSGA-II's crossover exploits the block_size × kv_blocks × tp interaction structure to rapidly propagate high-tp + block_size=32 + low-kv genes into the population, converging on the Pareto band in 3-4 generations. The final HV gap (NSGA-II 99.2% vs random 94.3%) is 4.9% of exhaustive — nearly 3x iter-4's 1.7% gap.",
+    "applicability_bounds": "Amplification requires true parameter interaction that creates dominance structures (not just orthogonal objectives). The block_size effect is BLIS-specific and tied to the KV cache threshold mechanism. Density below 5% appears sufficient for a decisive algorithm gap. Above ~22% density (iter-4), the gap shrinks to ~1.7% and random can compete.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-2",
+    "statement": "Before running a search algorithm comparison on BLIS, validate BOTH objective diversity AND Pareto set density. When block_size_in_tokens is included as a co-variate with total_kv_blocks, Pareto density drops to ~4.5% for the 4-objective space — well below the ~5% threshold where NSGA-II shows a decisive convergence speed advantage. Density threshold guidance: >20% = algorithms equivalent, 5-20% = moderate NSGA-II advantage (~1.7-4.9% final HV gap), <5% = decisive NSGA-II advantage (convergence speed gap >80 evals at budget=200 on 1800-config space).",
+    "confidence": "high",
+    "regime": "BLIS multi-objective search experiments, 4-objective formulation with (neg_rps, ttft_p99, gpu_count, total_kv_blocks)",
+    "evidence": ["iteration-5-h-robustness", "iteration-4-h-main", "iteration-3-h-main"],
+    "contradicts": [],
+    "extraction_iteration": 5,
+    "mechanism": "Pareto density determines how accessible the optimal region is to random sampling. At density=4.5%, each random eval has only a 4.5% chance of hitting a Pareto-optimal config. With budget=200 on 1800 configs (11.1% coverage), random expects ~9 Pareto-optimal finds, insufficient to cover the 81-point front. NSGA-II's population-based search can propagate Pareto-optimal genes systematically.",
+    "applicability_bounds": "Density estimates depend on both the objective formulation and the parameter space. Adding block_size as a parameter (effectively doubling the space) while it creates strong dominance relationships can dramatically reduce density. This guidance is calibrated for BLIS's qwen3-14b/H100 configuration.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-6",
+    "statement": "In BLIS's corrected 6-parameter 4-objective search space (including block_size_in_tokens), NSGA-II's convergence advantage over random search is decisive: a >80-eval gap to 95% of exhaustive HV at budget=200 (vs ~47 evals in iter-4's 5-parameter space). Including block_size amplifies the gap by creating a 3-way interaction (tp × kv_blocks × block_size) that: (1) reduces Pareto density from 26.4% to 4.5%, and (2) provides NSGA-II's crossover with more exploitable gene structure. At budget=200 on 1800 configs (11.1% coverage), random never reaches 95% of exhaustive HV while NSGA-II reaches 99.2%.",
+    "confidence": "high",
+    "regime": "BLIS, 6-parameter corrected space: tp, num_instances, scheduler, max_batch, total_kv_blocks, block_size_in_tokens; 4 objectives; budget=200",
+    "evidence": ["iteration-5-h-main", "iteration-5-h-control-negative"],
+    "contradicts": [],
+    "extraction_iteration": 5,
+    "mechanism": "The tp × kv_blocks × block_size interaction means optimal configs occupy a narrow 3D ridge: high-tp + block_size=32 + threshold kv_blocks. Random must independently discover this combination (probability ~4.5% per eval). NSGA-II's crossover can combine 'use high-tp' from one parent and 'use block_size=32' from another to create the optimal configuration. The 4-generation evolution (4×40 evals = 160 offspring) is sufficient to propagate and refine the optimal gene combination.",
+    "applicability_bounds": "The gap amplification is specific to the corrected space including block_size. In iter-4's reduced space (block_size fixed at 16), the gap was only ~47 evals because all configs used the same block_size and the interaction structure was absent. The gap magnitude (>80 evals) may change at different rates or hardware configs.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-7",
+    "statement": "In BLIS's 4-objective KV-constrained space, adding both total_kv_blocks AND block_size_in_tokens as searchable parameters reduces Pareto density dramatically: from ~65% (3-obj) to ~26% (4-obj, kv only) to ~4.5% (4-obj, kv+block_size corrected space). Each parameter that creates strong dominance relationships via threshold effects reduces density by 3-6x. At 4.5% density and 11.1% coverage (200/1800), NSGA-II achieves a decisive convergence speed advantage (>80 eval gap) while random plateaus at 94.3% of exhaustive HV.",
+    "confidence": "high",
+    "regime": "BLIS 4-objective optimization experiments across iter-1 through iter-5",
+    "evidence": ["iteration-5-h-robustness", "iteration-4-h-robustness", "iteration-3-h-main"],
+    "contradicts": [],
+    "extraction_iteration": 5,
+    "mechanism": "block_size=32 dominates block_size=16 at the same kv_blocks when the KV threshold (effective_tokens = kv_blocks × block_size) is the binding constraint. Additionally, higher-TP configs dominate lower-TP configs at the same gpu_count when block_size is large enough to unlock their throughput. These cascading dominance relationships (block_size dominates kv_blocks equivalents; high-TP dominates low-TP) thin the Pareto front to only 4.5% of all configs.",
+    "applicability_bounds": "Density reduction via block_size is specific to the KV threshold mechanism. If block_size were not a threshold-crossing parameter (e.g., if performance were linear in block_size), it would not thin the Pareto front. The same mechanism would apply to any parameter that multiplies an existing constrained resource.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  },
+  {
+    "id": "RP-9",
+    "statement": "At budget=100 on the 1800-config corrected space (5.6% coverage), NSGA-II (pop=20, 4 gens) achieves 95.0% of exhaustive HV while random achieves 91.9% — a 3.1% gap. Despite the ultra-sparse Pareto front (4.5% density), the gap at half-budget is smaller than at full budget (3.1% vs 4.9%) because: (1) random with 100 evals has ~4.5 expected Pareto-optimal hits, sufficient for ~90% HV coverage, and (2) NSGA-II with pop=20 has reduced diversity that limits discovery in early generations. The algorithm advantage GROWS with budget rather than being maximized at low budgets, contrary to the prediction.",
+    "confidence": "medium",
+    "regime": "BLIS, 1800-config corrected space, budget=100, comparison of NSGA-II (pop=20) vs random",
+    "evidence": ["iteration-5-h-ablation"],
+    "contradicts": [],
+    "extraction_iteration": 5,
+    "mechanism": "With 4.5% Pareto density, even 100 random evals discover ~4-5 Pareto-optimal configs, which may include high-value tp=8/bs=32 configs that contribute large HV contributions. The few high-value Pareto configs (particularly tp=8, block_size=32, large-kv combinations) dominate the HV calculation, making HV sensitive to single lucky random discoveries. NSGA-II with pop=20 has fewer diverse parents for crossover, limiting the exploration-exploitation balance vs pop=40.",
+    "applicability_bounds": "The 'gap grows with budget' finding may be specific to this particular Pareto front structure (concentrated high-HV configs accessible from multiple starting points). For more distributed Pareto fronts, NSGA-II might maintain a larger advantage at low budgets.",
+    "superseded_by": null,
+    "category": "domain",
+    "status": "active"
+  }
+]

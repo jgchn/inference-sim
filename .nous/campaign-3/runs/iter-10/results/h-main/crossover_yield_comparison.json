@@ -1,0 +1,86 @@
+{
+  "conditions": {
+    "qwen_r50": {
+      "model": "qwen/qwen3-14b",
+      "rate": 50,
+      "pareto_size": 81,
+      "total_configs": 1800,
+      "pareto_density": 0.045,
+      "crossover_yield": 0.7561,
+      "yield_advantage": 16.802222222222223,
+      "valid_offspring": 10000,
+      "pareto_offspring": 7561,
+      "pareto_entropy": 0.659977531186993,
+      "closure_ratio": 0.2109375,
+      "n_samples": 10000,
+      "known_gap": 4.6,
+      "gap_positive": true,
+      "ya_predicts_positive": true,
+      "prediction_correct": true
+    },
+    "llama_r50": {
+      "model": "meta-llama/llama-3.1-8b-instruct",
+      "rate": 50,
+      "pareto_size": 96,
+      "total_configs": 1800,
+      "pareto_density": 0.05333333333333334,
+      "crossover_yield": 0.7862,
+      "yield_advantage": 14.741249999999999,
+      "valid_offspring": 10000,
+      "pareto_offspring": 7862,
+      "pareto_entropy": 0.6661319844824358,
+      "closure_ratio": 0.25,
+      "n_samples": 10000,
+      "known_gap": -22.9,
+      "gap_positive": false,
+      "ya_predicts_positive": true,
+      "prediction_correct": false
+    },
+    "qwen_r100": {
+      "model": "qwen/qwen3-14b",
+      "rate": 100,
+      "pareto_size": 124,
+      "total_configs": 1800,
+      "pareto_density": 0.06888888888888889,
+      "crossover_yield": 0.6705,
+      "yield_advantage": 9.733064516129032,
+      "valid_offspring": 10000,
+      "pareto_offspring": 6705,
+      "pareto_entropy": 0.7394967199614266,
+      "closure_ratio": 0.096875,
+      "n_samples": 10000,
+      "known_gap": 62.3,
+      "gap_positive": true,
+      "ya_predicts_positive": true,
+      "prediction_correct": true
+    },
+    "llama_r100": {
+      "model": "meta-llama/llama-3.1-8b-instruct",
+      "rate": 100,
+      "pareto_size": 106,
+      "total_configs": 1800,
+      "pareto_density": 0.058888888888888886,
+      "crossover_yield": 0.6496,
+      "yield_advantage": 11.030943396226414,
+      "valid_offspring": 10000,
+      "pareto_offspring": 6496,
+      "pareto_entropy": 0.7285943317522784,
+      "closure_ratio": 0.0828125,
+      "n_samples": 10000,
+      "known_gap": 40.3,
+      "gap_positive": true,
+      "ya_predicts_positive": true,
+      "prediction_correct": true
+    }
+  },
+  "summary": {
+    "all_sign_predictions_correct": false,
+    "sign_prediction_results": {
+      "qwen_r50": true,
+      "llama_r50": false,
+      "qwen_r100": true,
+      "llama_r100": true
+    },
+    "yield_advantage_threshold_used": 5.0
+  }
+}

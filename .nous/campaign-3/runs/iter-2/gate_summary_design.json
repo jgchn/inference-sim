@@ -1,0 +1,11 @@
+{
+  "gate_type": "design",
+  "summary": "Testing whether NSGA-II converges to a 3-objective Pareto frontier (maximize throughput, minimize P99 TTFT, minimize GPU count) faster than random sampling and TPE, after iteration 1 likely showed that 2-objective optimization was too easy for any method to differentiate. Adding GPU cost as a third objective creates a genuine multi-dimensional tradeoff surface with distinct optimal configurations at each GPU tier (1, 2, 4, 8 GPUs).",
+  "key_points": [
+    "Three arms: NSGA-II (pop=50, 11 generations), uniform random search, and multi-objective TPE \u2014 all with 550 total evaluations over the same BLIS config space with 3 objectives and identical hypervolume reference point (0, 40000, 9).",
+    "Primary metric is convergence speed: NSGA-II predicted to reach 95% of final 3D hypervolume by ~200 evals (gen 4), random by ~300-400 evals, and TPE by ~100-150 evals. Final HV values should be within 2% across all methods.",
+    "Confirmation: NSGA-II converges measurably faster than random (\u2265100 eval advantage to 95% HV). Refutation: if the Pareto frontier has too few points or non-dominated configs are >5% of the space, all methods converge at similar rates \u2014 diagnosed by checking non-dominated fraction and frontier point count per GPU tier.",
+    "Key design improvement over iteration 1: the 3rd objective (gpu_count = TP \u00d7 instances) guarantees a multi-point frontier spanning 4 GPU cost tiers, preventing the 'frontier saturation from initial population' failure mode observed previously.",
+    "Diagnostic checks built in: generation-by-generation HV curves, infeasible offspring rate from cross-tier crossover, per-tier non-dominated fraction, and TPE acquisition concentration analysis."
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "gate_type": "design",
+  "summary": "We are testing whether the BLIS configuration search budget can be reduced from 100 evaluations down to just 2 (evaluating only TP=4 and TP=8 with max-profile settings, skipping Phase 2 optimization) while staying within 1% of the global best score across all tested GPU/model/rate regimes. This builds on 6 prior iterations showing TP=1 and TP=2 are structurally 11-38% below winners and Phase 2 contributes at most 0.7%.",
+  "key_points": [
+    "h-main: Lean bracket (2 evals, TP={4,8} only, no Phase 2) tested on 4 regimes \u2014 expects scores within 1% of global best (e.g., H100 rate=500: 0.178063 vs threshold 0.177409; A100-SXM rate=100: 0.130754 vs threshold 0.129446). Deterministic: all 5 search seeds must produce identical results.",
+    "h-control-negative: Validates the mechanism by running lean bracket with min-profile (mr=32, mt=2048) instead of max-profile \u2014 expects >50% degradation (scores ~0.077 vs 0.178), confirming that the max-profile (bandwidth-saturated regime) is what makes TP ranking stable, not just any 2-eval scheme.",
+    "h-ablation: Tests whether adding 10 Phase 2 TPE trials (total budget=12) on the one routing-sensitive regime (A100-SXM rate=200) can recover the 0.3-0.7% routing improvement. Predicts 3/5 seeds find improvement within 10 trials, but all seeds already pass the 1% threshold without Phase 2 (0.134488 > 0.134086 threshold).",
+    "h-robustness: Runs lean bracket across 25 combinations (5 blis_seeds \u00d7 5 search_seeds) on H100 rate=500. All 25 must stay within 1% of per-seed global best. Within each blis_seed, all search_seeds must be byte-identical (proving determinism). Total runtime: <8 seconds.",
+    "Confirmation criteria: h-main passes all 4 regimes within 1%; h-control-negative shows >50% gap (proving max-profile necessity); h-robustness shows zero variance across search seeds. Refutation: any regime falling below 1% threshold, or unexpected seed-dependent variation in the deterministic lean bracket."
+  ]
+}

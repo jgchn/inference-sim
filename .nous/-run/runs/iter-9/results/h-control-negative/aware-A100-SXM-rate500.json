@@ -1,0 +1,79 @@
+{
+  "config": {
+    "budget": 100,
+    "seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "blis_seed": 42,
+    "num_requests": 1000,
+    "rate": 500.0,
+    "model": "meta-llama/llama-3.1-70b-instruct",
+    "hardware": "A100-SXM",
+    "global_best": 0.063991,
+    "phase1_k": 3,
+    "phase1_profiles": "strategic",
+    "tp_candidates": "all",
+    "skip_phase2": false
+  },
+  "runs": [
+    {
+      "strategy": "model-aware-predict",
+      "hardware": "A100-SXM",
+      "hw_bandwidth_TBs": 2.039,
+      "model_params_b": 70,
+      "load_index": 34.330554193231976,
+      "load_index_threshold": 12.0,
+      "no_crossover_regime": true,
+      "crossover_rate": 196.174595389897,
+      "predicted_tp": 8,
+      "predicted_instances": 1,
+      "score": 0.063991,
+      "global_best": 0.063991,
+      "threshold": 0.06335109,
+      "formula_correct": true,
+      "config": {
+        "tp": 8,
+        "num_instances": 1,
+        "scheduler": "fcfs",
+        "max_running": 512,
+        "max_tokens": 8192,
+        "prefill_threshold": 4096,
+        "block_size": 16,
+        "routing": "round-robin",
+        "admission": "always-admit",
+        "preemption": "fcfs"
+      },
+      "wall_time_s": 0.2377952499955427,
+      "evaluations": [
+        {
+          "eval_idx": 0,
+          "score": 0.063991,
+          "config": {
+            "tp": 8,
+            "num_instances": 1,
+            "scheduler": "fcfs",
+            "max_running": 512,
+            "max_tokens": 8192,
+            "prefill_threshold": 4096,
+            "block_size": 16,
+            "routing": "round-robin",
+            "admission": "always-admit",
+            "preemption": "fcfs"
+          },
+          "wall_time_s": 0.23747074999846518,
+          "best_so_far": 0.063991
+        }
+      ],
+      "wall_time_total_s": 0.23780716701003257,
+      "n_evaluations": 1,
+      "search_seed": 42,
+      "best_score": 0.063991,
+      "evals_to_best": 1
+    }
+  ],
+  "total_wall_time_s": 0.23855170799652115
+}

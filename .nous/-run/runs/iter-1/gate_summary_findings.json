@@ -1,0 +1,11 @@
+{
+  "gate_type": "findings",
+  "summary": "TPE-based Bayesian optimization consistently outperforms random search for BLIS configuration tuning, confirmed across two load levels. The advantage is moderate (+5-7% better fitness at budget=50) and disappears by budget=100 as all strategies converge to the same global optimum. A negative-control hypothesis was refuted: TPE still provides a 2.2x speedup even in a tiny 15-point search space.",
+  "key_points": [
+    "H-main CONFIRMED: At budget=50, TPE finds the global best in 5/5 seeds (mean fitness 0.0969) vs random 3/5 seeds (mean 0.0920), a +5.36% gap. All strategies converge by budget=100, faster than the predicted budget=1000.",
+    "H-robustness CONFIRMED: Under high load (rate=200), TPE advantage grows to +6.87% at budget=50, supporting the hypothesis that sharper fitness landscapes amplify Bayesian optimization's edge.",
+    "H-control-negative REFUTED: Even in the restricted 15-combination space, TPE finds the optimum in 6.2 evals vs random's 13.6 (2.2x faster). The TP=8 configuration dominates so strongly (+13% above median) that TPE's model detects and exploits this peak even in tiny spaces.",
+    "Surprise finding: Latin Hypercube Sampling (LHS) matched TPE at budget=50 (mean best 0.0969), suggesting stratified coverage is equally effective for this structured, unimodal landscape \u2014 the dominance of TP=8 means any strategy that samples it early wins.",
+    "The global optimum is tp=8, num_instances=1, max_running=256 \u2014 accounting for 87% of the performance variance via the TP/parallelism dimension alone. Full 500-eval sweeps complete in ~35s, well within operational constraints."
+  ]
+}

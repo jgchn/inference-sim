@@ -1,0 +1,11 @@
+{
+  "gate_type": "design",
+  "summary": "Iteration 2 tests whether the bracket K=1 hierarchical search algorithm (which proved effective on H100 and A100 in iteration 1) generalizes to L40S hardware \u2014 where the margin between the best and second-best TP configuration is only 2.1% \u2014 and whether it remains robust across 5 different BLIS workload seeds on H100. Four arms systematically probe generalization, robustness, a negative control, and a flat-TPE ablation.",
+  "key_points": [
+    "h-main: Bracket K=1 on L40S (hard llama, 1000 req, rate=500) should correctly identify TP=4/2inst as Phase 1 winner on all 5 search seeds with evals_to_best=3, despite the tightest TP margin yet tested (2.1% gap between TP=4 score 0.1097 and TP=8 score 0.1074). Confirmation = 5/5 correct Phase 1 picks; refutation = any seed picking TP=8 instead.",
+    "h-robustness: Bracket K=1 on H100 should achieve 25/25 correct Phase 1 identifications across all combinations of 5 blis_seeds (42-46) \u00d7 5 search_seeds, with evals_to_best=3 at every seed. TP=4 margins range 7.6\u20139.5% across seeds. Confirmation = 25/25; refutation = any (blis_seed, search_seed) pair failing, which would indicate workload-dependent instability.",
+    "h-control-negative: Min-profile-only bracket on L40S should fail to find the correct TP level on all 5 seeds, selecting TP=2/4inst instead of TP=4/2inst (a different failure mode than H100's TP=1/8inst failure). This validates that the max-profile evaluation in bracket K=1 is essential, not just helpful.",
+    "h-ablation: Flat TPE on L40S should require substantially more evaluations (predicted median ~26+) than bracket K=1's 3 to reach the global best, confirming at least a 5x efficiency advantage. The tight 2.1% TP margin may make flat TPE even slower than on H100.",
+    "Code changes: search_blis_iter7.py adds L40S global-best entries to GLOBAL_BEST_TABLE and replaces single --blis-seed with multi-seed --blis-seeds support for the robustness arm's nested (blis_seed \u00d7 search_seed) loop."
+  ]
+}

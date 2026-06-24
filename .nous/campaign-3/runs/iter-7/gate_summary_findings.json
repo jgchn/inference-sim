@@ -1,0 +1,11 @@
+{
+  "gate_type": "findings",
+  "summary": "Iteration 7 tested whether NSGA-II's convergence advantage over random search ports from Qwen3-14B to Llama-3.1-8B. The core finding is surprising: random search reaches 95% of exhaustive hypervolume ~23 evals FASTER than NSGA-II for Llama, reversing the predicted direction. NSGA-II still achieves superior final coverage (99.87% vs 98.21% of exhaustive HV), but the early-convergence speed advantage disappears at Llama's Pareto density.",
+  "key_points": [
+    "Llama-3.1-8B Pareto density: 5.33% (96/1800 configs are Pareto-optimal). This is above Qwen's 4.5% but below the predicted 6-12% range \u2014 partially confirmed (h-robustness).",
+    "NSGA-II portability PARTIALLY REFUTED: random search hits 95% exhaustive HV at ~91 evals vs NSGA-II at ~114 evals (random wins by 22.9 evals). Prediction was NSGA-II would be 40-70 evals faster. However, NSGA-II final HV (99.87%) beats random (98.21%), so it still extracts value with sufficient budget.",
+    "Exhaustive HV for Llama (7.754e10) is 32% larger than Qwen (5.857e10), confirming that higher throughput ceiling (31.67 rps) drives a larger objective space \u2014 correctly predicted.",
+    "Infrastructure validation passed: Qwen eval=40 checkpoint matches iter-5 exactly (87.4%), confirming BLIS binary and model configs unchanged. Gap reproduction failed due to a code change in offspring generation between iterations (not a BLIS issue).",
+    "Key insight: at ~5% Pareto density with 200-eval budgets, random search is competitive or superior for early convergence. NSGA-II's advantage is in final-quality coverage (last 1-2% of HV), suggesting the algorithm's value depends on density regime \u2014 below ~4.5% density NSGA-II wins early, above ~5% random wins early."
+  ]
+}

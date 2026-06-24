@@ -1,0 +1,64 @@
+{
+  "conditions": {
+    "qwen_r50": {
+      "model": "qwen/qwen3-14b",
+      "rate": 50,
+      "observed_crossover_yield": 0.7486,
+      "pareto_density": 0.045,
+      "null_yield_mean": 0.213922,
+      "null_yield_std": 0.007930442358405992,
+      "null_yield_min": 0.1974,
+      "null_yield_max": 0.2364,
+      "observed_vs_null_ratio": 3.4994063256701042,
+      "null_within_2x_density": false,
+      "actual_pareto_size": 81,
+      "total_configs": 1800
+    },
+    "llama_r50": {
+      "model": "meta-llama/llama-3.1-8b-instruct",
+      "rate": 50,
+      "observed_crossover_yield": 0.7898,
+      "pareto_density": 0.05333333333333334,
+      "null_yield_mean": 0.21931599999999998,
+      "null_yield_std": 0.008870904350741247,
+      "null_yield_min": 0.1972,
+      "null_yield_max": 0.2488,
+      "observed_vs_null_ratio": 3.60119644713564,
+      "null_within_2x_density": false,
+      "actual_pareto_size": 96,
+      "total_configs": 1800
+    },
+    "qwen_r100": {
+      "model": "qwen/qwen3-14b",
+      "rate": 100,
+      "observed_crossover_yield": 0.675,
+      "pareto_density": 0.06888888888888889,
+      "null_yield_mean": 0.228716,
+      "null_yield_std": 0.008296706816562823,
+      "null_yield_min": 0.2082,
+      "null_yield_max": 0.244,
+      "observed_vs_null_ratio": 2.95125832910684,
+      "null_within_2x_density": false,
+      "actual_pareto_size": 124,
+      "total_configs": 1800
+    },
+    "llama_r100": {
+      "model": "meta-llama/llama-3.1-8b-instruct",
+      "rate": 100,
+      "observed_crossover_yield": 0.6478,
+      "pareto_density": 0.058888888888888886,
+      "null_yield_mean": 0.22243200000000002,
+      "null_yield_std": 0.008357019564414097,
+      "null_yield_min": 0.2024,
+      "null_yield_max": 0.2486,
+      "observed_vs_null_ratio": 2.9123507409005898,
+      "null_within_2x_density": false,
+      "actual_pareto_size": 106,
+      "total_configs": 1800
+    }
+  },
+  "summary": {
+    "all_null_within_2x_density": false,
+    "prediction": "Null model yield \u2248 pareto_density (within 2x), observed yield 5-10x higher"
+  }
+}

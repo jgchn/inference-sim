@@ -1,0 +1,9 @@
+{
+  "gate_type": "continue",
+  "summary": "After 9 iterations, the lean bracket search algorithm (TP={4,8}, max-profile, 2 evaluations) has been validated across all tested models (8B\u201370B), 3 GPU types (H100, A100-SXM, L40S), and 2 arrival rates with a perfect 75/75 success rate. A model-aware formula (load_index = model_params/bandwidth > 12 \u2192 always predict TP=8) now achieves 100% accuracy (24/24) for zero-cost TP prediction, up from 75% for the prior bandwidth-only formula. The next iteration should explore whether lean bracket holds under workload distribution shifts and whether it can be packaged as a native BLIS CLI command.",
+  "key_points": [
+    "Lean bracket is validated: 75/75 correct TP winner identifications across all iterations, including 30/30 for llama-3.1-70b (all 3 hardware \u00d7 2 rates \u00d7 5 search seeds). TP=8 wins on 70B everywhere with margins of 9\u201310% on H100, 7\u201314% on A100-SXM, and 18\u201320% on L40S \u2014 no rate-dependent crossover exists for 70B at any tested rate (100\u20132000).",
+    "Model-aware formula (load_index threshold = 12) corrects all 6 prior failures of the bandwidth-only formula, achieving 24/24 (100%) on the test grid. The threshold cleanly separates regimes where a TP=4/TP=8 crossover exists (load_index \u2264 9.6) from those where it does not (load_index \u2265 15.7), enabling a zero-evaluation TP prediction heuristic.",
+    "Key remaining unknowns: (1) whether default-profile lean bracket preserves TP=8 on A100-SXM and L40S for 70B (only H100 was confirmed); (2) whether the load_index threshold generalizes beyond the 4 tested model families; (3) whether lean bracket's TP winner is stable under workload distribution shifts (bursty arrivals, different prompt length distributions). Suggested next steps are packaging lean bracket as a native `blis search` subcommand and testing workload diversity."
+  ]
+}

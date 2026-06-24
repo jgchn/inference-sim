@@ -1,0 +1,96 @@
+{
+  "iteration": 1,
+  "bundle_ref": "runs/iter-1/bundle.yaml",
+  "experiment_valid": true,
+  "arms": [
+    {
+      "arm_type": "h-main",
+      "predicted": "Hierarchical search achieves \u226520% more hypervolume than random search at 500 evaluations by concentrating budget on high-TP parallelism tiers that dominate the Pareto frontier.",
+      "observed": "Both strategies achieved identical hypervolume: HV_random = HV_hierarchical = 7.7544e+08. HV ratio = 1.000 (+0.00%). The entire global Pareto front collapsed to a single unique configuration: TP=8/ni=1 at (14232 tok/s, 4719ms). All 128 Pareto-optimal points found by both strategies are TP=8/1-inst configs at essentially the same coordinates. Hierarchical search allocated 163 evals to TP=8/1-inst (top tier) and 162/161 to TP=4/2 and TP=4/1, vs random's 46/500 to TP=8/1-inst. Despite the allocation advantage, hierarchical achieved no HV improvement because finding even a single TP=8/1-inst config (as random does at ~9% sampling rate) already achieves the maximum possible HV \u2014 the Pareto problem is degenerate. Wall time: random 38.7s, hierarchical 48.1s (1000 total BLIS evals at ~86ms each).",
+      "status": "REFUTED",
+      "error_type": "regime",
+      "diagnostic_note": "The hypothesis premise failed: at rate=50, TP=8/1-inst SIMULTANEOUSLY achieves the highest throughput (14232 vs 12024 for TP=4/2-inst) AND the lowest latency (4719ms vs 6230ms for TP=4/2-inst). This means TP=8/1-inst strictly dominates ALL other tiers in BOTH objectives, collapsing the Pareto frontier to a single cluster. The 'genuine tradeoffs' claimed in the designer handoff (11,985 vs 14,232 tok/s; 6,326 vs 4,719ms) are NOT tradeoffs \u2014 TP=8/1-inst wins on both. Within TP=8/1-inst, secondary knobs produce ~6K tok/s variation but the maximum-throughput config also achieves minimum latency (both are compute-bound monotonically correlated at rate=50). The hierarchical strategy correctly identifies the dominant tier (Phase 1 top-3: [8x1, 4x2, 4x1]) but gains no HV advantage because random search finds the same single-point maximum with sufficient probability (46 out of 500 evals = 9.2% hit TP=8/1-inst, enough to discover the global maximum).",
+      "metadata": {
+        "metrics": {
+          "hv_random": 775435900.0,
+          "hv_hierarchical": 775435900.0,
+          "hv_ratio": 1.0,
+          "pareto_size_random": 30,
+          "pareto_size_hierarchical": 98,
+          "unique_pareto_points": 1,
+          "best_config": "tp=8/ni=1, tokens_per_sec=14232, e2e_p99_ms=4719",
+          "evals_successful_random": 500,
+          "evals_successful_hierarchical": 500,
+          "wall_time_random_s": 38.7,
+          "wall_time_hierarchical_s": 48.1,
+          "phase1_top_tiers": [
+            "8x1",
+            "4x2",
+            "4x1"
+          ],
+          "phase1_scores_tok_per_sec": {
+            "1x1": 3989,
+            "1x2": 4868,
+            "1x3": 5261,
+            "1x4": 5444,
+            "1x5": 5538,
+            "1x6": 5657,
+            "1x7": 5708,
+            "1x8": 5740,
+            "2x1": 6993,
+            "2x2": 8343,
+            "2x3": 8861,
+            "2x4": 8989,
+            "4x1": 10787,
+            "4x2": 11985,
+            "8x1": 14232
+          }
+        }
+      }
+    },
+    {
+      "arm_type": "h-control-negative",
+      "predicted": "At rate=5 (unsaturated), hierarchical search's advantage vanishes because all parallelism tiers achieve similar throughput (arrival-rate-limited), so concentrating budget on top tiers provides no benefit.",
+      "observed": "HV ratio = 1.000 (+0.00%) at rate=5, confirming no advantage for hierarchical. However, the mechanism differs from prediction: TP=8/1-inst STILL uniquely dominates all other tiers at rate=5 (TP=8/1-inst: 2489 tok/s, 3507ms vs TP=4/2-inst: 2412 tok/s, 5163ms). Within each tier, ALL secondary knobs produce IDENTICAL results at rate=5 (completely arrival-rate-limited: no queuing, no batching effect). The TP=8 Phase 1 screening advantage still identifies TP=8/1-inst as top tier, but random search trivially finds it too (18/200 evals = 9% rate). Best observed: TP=8/1-inst at (2489 tok/s, 3507ms). Reference latency: 47412ms. HV_random = HV_hierarchical = 1.0930e+08.",
+      "status": "PARTIALLY_CONFIRMED",
+      "error_type": "regime",
+      "diagnostic_note": "The prediction's OUTCOME (advantage vanishes) is confirmed but the MECHANISM is wrong. At rate=5: (1) arrival-rate-limited regime IS confirmed (all secondary knobs produce identical results within each tier \u2014 verified by zero variance in TP=8/1-inst metrics across 18 different-knob configs), (2) BUT the Pareto frontier is NOT flat \u2014 TP=8/1-inst still dominates all other tiers by significant margins (TP=8: 2489 tok/s vs TP=4: 2412, a 3% throughput difference; and TP=8 latency 3507ms vs TP=4 latency 5163ms \u2014 a 47% advantage). The 'all tiers achieve similar throughput' claim was only approximately true for throughput (3% difference) but completely wrong for latency. The control condition correctly demonstrates no HV advantage but for a different reason: both strategies find the TP=8/1-inst maximum with equal ease because secondary knobs don't matter (all configs within a tier are identical).",
+      "metadata": {
+        "metrics": {
+          "hv_random": 109300000.0,
+          "hv_hierarchical": 109300000.0,
+          "hv_ratio": 1.0,
+          "best_config": "tp=8/ni=1, tokens_per_sec=2489, e2e_p99_ms=3507",
+          "rate": 5.0,
+          "tp8_vs_tp4_latency_ratio": 0.68,
+          "secondary_knob_variance_within_tier": 0.0
+        }
+      }
+    },
+    {
+      "arm_type": "h-robustness",
+      "predicted": "Hierarchical search's Phase 1 tier identification remains stable across 5 seeds (42, 123, 456, 789, 1024), confirming the structural advantage is not a workload-specific artifact.",
+      "observed": "Phase 1 tier ranking is PERFECTLY STABLE across all 5 seeds: top-3 tiers are [8x1, 4x2, 4x1] for every seed tested. Phase 1 scores (tok/s): 8x1=13456-14965, 4x2=11540-12024, 4x1=10449-10787 across seeds. Hierarchical HV across seeds: {42: 3.186e+08, 123: 2.607e+08, 456: 2.961e+08, 789: 2.959e+08, 1024: 2.739e+08} \u2014 coefficient of variation ~7.8%. Best throughput varies 13456-14965 tok/s; best latency varies 3911-4719ms across seeds, reflecting different workload request-length distributions.",
+      "status": "CONFIRMED",
+      "error_type": null,
+      "diagnostic_note": "The robustness prediction is fully confirmed: Phase 1 tier identification is invariant to workload seed. The 8% HV variation across seeds reflects workload sampling effects (different request lengths change absolute throughput/latency values but not the relative tier ordering). The prediction's mechanism is correct: TP-tier dominance is structural (determined by GPU compute capacity = TP \u00d7 memory bandwidth), not workload-specific. Even though the hierarchical HV advantage over random is zero (both find the same degenerate maximum), the structural stability of tier identification holds \u2014 which is a prerequisite condition for hierarchical search to work if genuine Pareto tradeoffs existed.",
+      "metadata": {
+        "metrics": {
+          "tier_ranking_stability": "100% \u2014 identical [8x1, 4x2, 4x1] across all 5 seeds",
+          "hv_by_seed": {
+            "42": 318580000.0,
+            "123": 260730000.0,
+            "456": 296140000.0,
+            "789": 295880000.0,
+            "1024": 273890000.0
+          },
+          "hv_coefficient_of_variation": 0.078,
+          "best_throughput_range": "13456-14965 tok/s",
+          "best_latency_range_ms": "3911-4719 ms"
+        }
+      }
+    }
+  ],
+  "discrepancy_analysis": "The central failure of h-main traces to an incorrect premise in the problem framing: the claim that 'genuine Pareto tradeoffs emerge at rate=50' was false. At rate=50 on H100 with qwen3-14b, TP=8/1-inst configuration dominates ALL other parallelism tiers simultaneously in BOTH throughput and latency. This makes the Pareto problem degenerate (single dominant cluster). The hypothesis predicted hierarchical search would concentrate budget on 'productive regions' to find a wider Pareto frontier \u2014 but no wider Pareto frontier exists. The hypervolume metric is insensitive to this failure mode because it measures area dominated by the Pareto front: once the global maximum is found (which random achieves with ~9% per-tier probability after 500 evals), HV is maximized. For genuine bi-objective search advantages to emerge, the system needs a rate regime where TP=8/1-inst saturates (high queue depth, high latency) while lower-TP multi-instance configs maintain lower latency at reduced throughput \u2014 this likely requires rate >> 100 req/s. The h-robustness arm was correctly predicted, but its confirmation is moot given the degenerate Pareto structure.",
+  "dominant_component_pct": null
+}

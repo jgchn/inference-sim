@@ -1,0 +1,10 @@
+{
+  "gate_type": "findings",
+  "summary": "Iteration 5 confirms that NSGA-II significantly outperforms random search on the full 1800-config BLIS space: NSGA-II reaches 95% of exhaustive hypervolume at ~eval 109 while random never reaches 95% within 200 evaluations. The exhaustive hypervolume (5.857e+10) exceeded the previous iteration's reference as predicted, and the evolutionary algorithm achieved 99.2% coverage at eval 200 versus random's 94.3%.",
+  "key_points": [
+    "Main hypothesis CONFIRMED: NSGA-II crosses 95% exhaustive HV ~91 evals before random (which never reaches 95%), far exceeding the predicted >60-eval gap. Final NSGA-II HV: 99.2% vs random's 94.3% \u2014 a 4.9% gap (predicted >1.7%).",
+    "Pareto density was dramatically lower than predicted: 4.5% (81/1800 configs) vs predicted 15-22%. Block_size=32 creates stronger dominance cascades than modeled, and high-TP configs (tp=4, tp=8) dominate lower-TP at same GPU count, compressing the Pareto front into a narrow band.",
+    "Budget=100 ablation partially confirmed: NSGA-II reached 95.0% vs random's 91.9% (gap=3.1%), falling short of the predicted >5% gap because the concentrated Pareto front means random can still stumble onto high-value configs at reasonable rates (~4.5% per eval).",
+    "Key structural insight: the optimal configs cluster in a narrow band (high TP, block_size=32, low kv_blocks, batch\u2265256), which NSGA-II exploits via crossover within 3-4 generations but random struggles to fully cover due to the sparse 4.5% Pareto density."
+  ]
+}

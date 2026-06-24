@@ -1,0 +1,25 @@
+metadata:
+  iteration: 5
+  family: "search-algorithm-corrected-space"
+  research_question: "Does including block_size_in_tokens as a searchable parameter (creating a 1800-config space with the tp×kv_blocks×block_size three-way interaction) amplify NSGA-II's convergence speed advantage over random search compared to iter-4's 47-eval gap on the 900-config space?"
+
+arms:
+  - type: h-robustness
+    prediction: "Exhaustive sweep of 1800 configs produces Pareto density 15-22% (lower than iter-4's 26.4% on 900 configs). The block_size=32 configs at low kv_blocks dominate block_size=16 configs at higher kv_blocks (same performance, lower cost), thinning the Pareto front. Reference HV will exceed iter-4's reduced-space exhaustive (5.2962e+10) because block_size=32 unlocks superior tp=8 performance at low kv cost."
+    mechanism: "block_size=32 doubles effective KV token capacity at fixed block count. For tp=8 at kv=3000: block_size=32 gives 96k tokens (0 preemptions, ttft=25ms) while block_size=16 gives 48k tokens (107 preemptions, ttft=2323ms). The block_size=32 configs dominate corresponding block_size=16 configs at same or higher kv_blocks, reducing Pareto density. Meanwhile, new Pareto-optimal points emerge at (tp=8, kv=3000, bs=32) that didn't exist in the iter-4 reduced space."
+    diagnostic: "If density is >26%, check whether block_size=16 and block_size=32 configs at same (tp, kv) produce identical performance (would mean block_size doesn't differentiate for some tiers). If HV doesn't exceed iter-4's, check whether tp=8,bs=32 configs are actually reaching the Pareto front."
+
+  - type: h-main
+    prediction: "NSGA-II on the 1800-config corrected space reaches 95% of exhaustive HV more than 60 evaluations before random search (exceeding iter-4's 47-eval gap). At eval=200, NSGA-II achieves >97% of exhaustive HV while random achieves <95%. The final HV gap (NSGA-II minus random, as % of exhaustive) exceeds iter-4's 1.7% gap."
+    mechanism: "The three-way interaction (tp × kv_blocks × block_size) provides NSGA-II's crossover with exploitable structure. A parent with (tp=8, batch=512) and another with (kv=3000, bs=32) can produce offspring (tp=8, kv=3000, bs=32, batch=512) — the optimal tp=8 config. Random must independently discover this 3-gene combination with probability 1/1800 per eval. The lower coverage ratio (11.1% vs iter-4's 22%) further disadvantages random while NSGA-II's guided search remains effective."
+    diagnostic: "If gap < 47 evals (worse than iter-4): check whether block_size=32 is trivially easy for random to discover (only 2 values → 50% chance). If NSGA-II doesn't exploit the interaction, check crossover patterns — are block_size genes being inherited or mutated away? If random reaches >95% within budget, the 11.1% coverage may still be sufficient for the sparser Pareto front."
+
+  - type: h-control-negative
+    prediction: "Random search on the 1800-config space fails to reach 95% of exhaustive HV within 200 evaluations (or reaches it only in the final 20 evals, at eval>180). At eval=120, random achieves <90% of exhaustive. Final HV at eval=200 is 93-95% of exhaustive."
+    mechanism: "With 11.1% coverage (200/1800), random explores only ~200 distinct configs from a space of 1800. The Pareto-optimal configs are concentrated in a narrow band where block_size and kv_blocks interact correctly for each GPU tier. Random must independently discover the right block_size for each tier — there is no information propagation between evaluations. The 6 kv_blocks values × 2 block_sizes = 12 (blocks, bs) combinations per tier, of which only 2-3 are Pareto-optimal."
+    diagnostic: "If random reaches 95% before eval=160: Pareto density may be higher than predicted (>22%), making the front trivially accessible. Check the actual density from h-robustness and verify block_size is truly creating dominance relationships."
+
+  - type: h-ablation
+    prediction: "At budget=100 (5.6% coverage), the NSGA-II vs random final HV gap exceeds 5% of exhaustive reference — substantially larger than the gap at budget=200. NSGA-II at eval=100 achieves >90% of exhaustive while random at eval=100 achieves <85%. This demonstrates that NSGA-II's advantage scales inversely with budget-to-space ratio."
+    mechanism: "At 5.6% coverage, random explores only ~100 configs from 1800 — insufficient to reliably sample the narrow Pareto-optimal band for each GPU tier. NSGA-II with pop=20 and 4 generations can still propagate good (block_size, kv_blocks) genes through crossover. The smaller population means more generations relative to population size (4 gens at pop=20 is the same ratio as 4 gens at pop=40), preserving the evolutionary pressure while random's disadvantage grows proportionally."
+    diagnostic: "If gap at budget=100 is not larger than at budget=200: the space may be too easy even at 5.6% coverage (e.g., if half of all configs are near-Pareto-optimal). Check if pop=20 is too small for effective tournament selection (insufficient diversity may offset crossover advantage)."
