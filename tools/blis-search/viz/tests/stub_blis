@@ -1,0 +1,20 @@
+#!/usr/bin/env python3
+"""Deterministic stand-in for the blis binary, for the search.py contract test.
+
+It ignores every flag it is handed and writes a metrics JSON whose values are a
+hash of the argv, which is enough for search.py to build a Pareto front. Being a
+single executable file matters: search.py's --blis-binary is one token.
+"""
+import hashlib
+import json
+import sys
+
+argv = sys.argv[1:]
+path = argv[argv.index("--metrics-path") + 1]
+seed = int(hashlib.sha256(" ".join(argv).encode()).hexdigest()[:8], 16)
+with open(path, "w") as f:
+    json.dump({
+        "responses_per_sec": 10.0 + seed % 100,
+        "ttft_p99_ms": 20.0 + seed % 700,
+        "e2e_p99_ms": 100.0 + seed % 900,
+    }, f)

@@ -1,0 +1,121 @@
+# Full-stack configuration search: routing + admission control + P/D disaggregation.
+#
+# The infrastructure block drives topology enumeration: the search tool explores
+# all valid (tp × instances) combinations up to gpu_budget, and when explore_pd
+# is true, also generates pure-disjoint P/D splits for each multi-instance topology.
+# gpus_used (= tp × instances) is reported alongside performance metrics so users
+# can identify the cheapest config that meets their SLOs.
+#
+# Usage:
+#   python3 tools/blis-search/search.py \
+#     --model qwen/qwen3-14b --hardware H100 \
+#     --workload chatbot --rate 200 --num-requests 2000 \
+#     --search-space tools/blis-search/full-stack.yaml \
+#     --budget 1000 --workers 8
+
+infrastructure:
+  gpu_budget: 8
+  tp: [1, 2, 4, 8]
+  explore_pd: true
+  pd_transfer_bandwidth: 25.0  # GB/s (NIXL RDMA default, fixed hardware constant)
+
+parameters:
+  # ── Instance scheduling ──
+  scheduler:
+    flag: "--scheduler"
+    values: [fcfs, priority-fcfs, sjf]
+  max_batch:
+    flag: "--max-num-running-reqs"
+    values: [64, 128, 256, 512]
+  max_scheduled_tokens:
+    flag: "--max-num-scheduled-tokens"
+    values: [2048, 4096, 8192]
+  long_prefill:
+    flag: "--long-prefill-token-threshold"
+    values: [0, 512, 1024, 2048, 4096]
+  block_size:
+    flag: "--block-size-in-tokens"
+    values: [16, 32]
+  gpu_mem_util:
+    flag: "--gpu-memory-utilization"
+    values: [0.85, 0.9, 0.95]
+  preemption_policy:
+    flag: "--preemption-policy"
+    values: [fcfs, priority]
+  snapshot_refresh:
+    flag: "--snapshot-refresh-interval"
+    values: [0, 25000, 50000]
+
+  # ── Routing & admission ──
+  routing_policy:
+    flag: "--routing-policy"
+    values: [round-robin, least-loaded, weighted]
+  admission_policy:
+    flag: "--admission-policy"
+    values: [always-admit, tier-shed]
+
+constraints:
+  - "long_prefill == 0 or long_prefill < max_scheduled_tokens"
+
+conditional_subsystems:
+  # ── Weighted routing: scorer combos with weights 1-5 ──
+  routing_scorers:
+    enabled_when: "routing_policy == 'weighted'"
+    flag: "--routing-scorers"
+    format_b:
+      scorers:
+        - queue-depth
+        - kv-utilization
+        - precise-prefix-cache
+        - active-requests
+        - load-balance
+        - no-hit-lru
+      weights: [1, 2, 3, 4, 5]
+
+  # ── Flow control (gateway queue) ──
+  flow_control:
+    enabled_when: "admission_policy == 'tier-shed'"
+    probability: 0.6
+    flag: "--flow-control"
+    parameters:
+      saturation_detector:
+        flag: "--saturation-detector"
+        values: [utilization, concurrency]
+      queue_depth_threshold:
+        flag: "--queue-depth-threshold"
+        values: [3, 5, 10, 20]
+      kv_util_threshold:
+        flag: "--kv-cache-util-threshold"
+        values: [0.7, 0.8, 0.9]
+      dispatch_order:
+        flag: "--dispatch-order"
+        values: [fifo, priority, slo-deadline]
+      max_gateway_queue_depth:
+        flag: "--max-gateway-queue-depth"
+        values: [0, 100, 500, 1000]
+      request_ttl:
+        flag: "--request-ttl"
+        values: [0, 3000000, 5000000, 10000000]
+
+diversity_safe:
+  routing_policy: [round-robin, least-loaded, weighted]
+  admission_policy: [always-admit, tier-shed]
+  scheduler: [fcfs, priority-fcfs]
+
+objectives:
+  - metric: responses_per_sec
+    direction: maximize
+  - metric: ttft_p99_ms
+    direction: minimize
+
+secondary_metrics:
+  - e2e_p99_ms
+  - itl_mean_ms
+  - scheduling_delay_p99_ms
+  - preemption_count
+  - goodput_rps
+  - gpus_used
+
+hypervolume_reference:
+  responses_per_sec: 200.0
+  ttft_p99_ms: 50000.0

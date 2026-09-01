@@ -1,0 +1,510 @@
+# moonshotai/Kimi-K3 × H200 × 16 GPUs (2 nodes) — INFRASTRUCTURE SWEEP over a
+# REPLAYED agentic trace. Single instance, no P/D.
+#
+#   trace   tools/blis-search/workloads/weka.{yaml,csv}  (TraceV2 v3, accumulate)
+#   model   moonshotai/Kimi-K3   hardware  H200 141 GiB   budget  16 GPUs / 2 nodes
+#   goal    maximize throughput (tokens_per_sec) vs ttft_p99_ms
+#
+# SIBLING: weka-kimi-k3.yaml (32 × H100). That file carries the long-form
+# derivations this one does not repeat — trace properties, the amputation
+# mechanism, the EP no-op proof, the seven fidelity warnings, the eval-timeout
+# argument. READ IT ONCE; everything there still applies. This file documents only
+# what 16 × H200 changes, which is the topology space and the dp bound.
+#
+#   go build -o blis main.go
+#   python3 tools/blis-search/search.py \
+#     --model moonshotai/Kimi-K3 --hardware H200 \
+#     --search-space tools/blis-search/weka-kimi-k3-h200x16.yaml \
+#     --budget 300 --workers 4 --eval-timeout 7200 \
+#     --blis-binary tools/blis-search/blis-replay-shim.sh \
+#     --slo "dropped_unservable<1" \
+#     --output weka-kimi-k3-h200x16.json --output-all --verbose
+#
+# PREREQUISITE: the committed hardware_config.json has NO H200 entry, so
+# `--hardware H200` is a hard fatal ('GPU "H200" not found ... available:
+# [A100-80 A100-SXM H100 L40S]') and every eval would be recorded INVALID in
+# 0.1 s. This space therefore passes --hardware-config
+# tools/blis-search/hardware_config_h200.json as a single-valued parameter. That
+# sidecar copies the four committed GPUs verbatim and adds H200 = H100 compute
+# (same GH100 die, so TFlops and MFU carry over) with 141 GiB @ 4.8 TB/s. Its MFU
+# values are UNCALIBRATED — there is no H200 equivalent of the Discussion #589
+# H100 calibration — so step time here is an H100-derived estimate.
+#
+# ═════════════════════════════════════════════════════════════════════════════
+# THE TOPOLOGY SPACE: 3 POINTS, AND dp ∈ {1, 2, 4}
+# ═════════════════════════════════════════════════════════════════════════════
+# Kimi-K3 weights split into 1,267.88 GiB of routed experts (mxfp4) and 106.48 GiB
+# of everything else (bf16). A DP rank REPLICATES the non-expert weights and holds
+# 1/dp of the experts, so per-GPU weights are
+#
+#   W/gpu(tp, dp) = 106.48/tp  +  1267.88/(tp·dp)
+#                   ^^^^^^^^^     ^^^^^^^^^^^^^^^
+#                   replicated    sharded over the flattened tp·dp MoE group
+#                   per DP rank   (sim/config.go:EffectiveMoEGroupSize)
+#
+# At full budget tp·dp = 16 the expert term is FIXED at 79.24 GiB/GPU whatever the
+# split, so the whole topology question is how much replicated non-expert weight
+# you are willing to pay. Against 141 × 0.90 = 126.90 GiB/GPU, minus MoE
+# activation (8.0/tp per GPU) and non-torch (0.6/GPU):
+#
+#   tp  dp  W/gpu     KV/gpu   blk/rank   blk×dp    tokens     shape
+#    1  16  185.7 GiB  —       INFEASIBLE                     —
+#    2   8  132.5 GiB  —       INFEASIBLE                     —
+#    4   4  105.9 GiB  18.4     44,648    178,592  2,857,472   2 DP ranks per node
+#    8   2   92.6 GiB  32.7     79,298    158,596  2,537,536   TP in-node, DP across
+#   16   1   85.9 GiB  39.9     96,624     96,624  1,545,984   TP spans both nodes
+#
+# ── ANSWER TO "WHAT dp SHOULD WE SWEEP": dp ∈ {1, 2, 4}. ────────────────────
+# dp is bounded ABOVE by NON-EXPERT REPLICATION, not by the GPU budget. Going to
+# dp 8 means tp 2, and 106.48/2 = 53.24 GiB of replicated non-expert weight lands
+# on every GPU on top of the 79.24 GiB of experts — 132.5 GiB against a 126.90 GiB
+# budget, infeasible before a single KV block is allocated. dp 16 (tp 1) is 185.7
+# GiB/GPU, not close. So the sweep is dp 1, 2, 4 and nothing above, and since
+# tp = 16/dp the dp axis IS the topology axis: there is no (tp, dp) freedom left
+# once you spend the whole budget on one instance.
+#
+# This is the interesting structural difference from 32 × H100, where the same
+# model admitted dp up to 8 (tp4×dp8) because doubling the GPU count halves the
+# expert term and leaves room for more replication. Halving the fleet does not
+# halve the dp ceiling — it cuts it by 2× from BOTH directions at once.
+#
+# ── TWO NODES IS FORCED, NOT CHOSEN ────────────────────────────────────────
+# One 8-GPU node cannot hold this model on H200 at all: tp8/dp1 is 13.31 + 158.49
+# = 171.8 GiB/GPU. The smallest world that fits anywhere is 12 GPUs (tp12/dp1,
+# 114.5 GiB/GPU), which already spans two nodes. So yes — 16 GPUs is two nodes,
+# and there is no single-node option to compare against. It also means
+# num_instances is structurally 1 (two instances would need ≥24 GPUs), which is
+# what you asked for anyway, and which makes the entire routing subsystem inert
+# (replicas == 1 gates the scorer framework off and the sampler force-sets
+# round-robin) — so no routing knobs appear below.
+#
+# The three shapes differ in how they cross the node boundary, and BLIS CANNOT
+# SEE THAT DIFFERENCE: there is no interconnect-topology term, so tp16 pays
+# nothing for running tensor-parallel all-reduces over InfiniBand instead of
+# NVLink. Reality would penalize it substantially. tp16×dp1 is therefore
+# SYSTEMATICALLY FLATTERED here; it is in the space to be measured, not because it
+# is deployable. tp8×dp2 (TP inside each node, DP across the pair) is the shape
+# vLLM recipes actually use, and the one to believe.
+#
+# ── THE MEMORY READING REORDERS THE TOP TWO — CHECK THIS BEFORE BELIEVING A WIN ──
+# NVIDIA markets H200 as "141GB". Read as GiB (the convention this repo already
+# applies to H100's "80GB" → MemoryGiB 80.0) that is 126.90 GiB usable at util
+# 0.90. Read as decimal GB it is 131.3 GiB → 118.17 GiB usable. The feasible SET
+# is identical either way, but the aggregate-KV ranking of the top two FLIPS:
+#
+#              blk×dp @ 126.90      blk×dp @ 118.17
+#   tp4×dp4        178,592   (1st)       94,032   (2nd)
+#   tp8×dp2        158,596   (2nd)      116,318   (1st)
+#   tp16×dp1        96,624               75,484
+#
+# The crossover is at 122.77 GiB usable (MemoryGiB 136.4), which sits BETWEEN the
+# two readings. So "is tp4×dp4 or tp8×dp2 the higher-capacity topology" is decided
+# by a unit convention, not by physics. If the front separates those two on KV-bound
+# behaviour, re-run with MemoryGiB 131.3 in the sidecar before drawing a conclusion.
+# The block counts pinned below use 126.90 (MemoryGiB 141.0).
+#
+# ── AND tp4×dp4 IS EXACTLY WHERE BLIS'S dp MODEL IS MOST OPTIMISTIC ─────────
+# BLIS models the dp ranks as ONE KV pool and ONE scheduler; real vLLM runs dp
+# independent EngineCores and a sequence lives entirely on ONE rank. Per-rank
+# single-sequence ceilings (blk/rank × 16) against this corpus's 824,580-token
+# maximum:
+#
+#   tp4×dp4     714,368 tokens/rank  →  BELOW the corpus max: real hardware DROPS
+#                                       the longest rounds, BLIS serves them
+#   tp8×dp2   1,268,768 tokens/rank  →  clears it
+#   tp16×dp1  1,545,984 tokens/rank  →  clears it
+#
+# So the topology that wins on aggregate KV is the one whose win is most likely to
+# be an artifact of the aggregation error. If tp4×dp4 tops the front, that is the
+# first thing to attack.
+#
+# ═════════════════════════════════════════════════════════════════════════════
+# WHICH BLIS KNOBS ACTUALLY MATTER FOR A MODEL THIS SHAPE
+# ═════════════════════════════════════════════════════════════════════════════
+# Kimi-K3 is three things at once, and each one turns a different set of knobs on
+# and off. Sorting the surface by which of the three it touches is the fastest way
+# to see why this space looks nothing like a dense-model space:
+#
+#   (A) A 1.37 TiB MoE  →  parallelism and comm knobs are the whole game
+#   (B) An MLA model    →  KV is 27,714 B/token and TP-replicated, so capacity
+#                          knobs behave unlike GQA
+#   (C) Run on a 100k+  →  prefill-scheduling knobs dominate step time
+#       token agentic trace
+#
+# LIVE AND SEARCHED HERE
+#   --dp                      (A) the axis above. Scopes routed-expert weight and
+#                             compute to moeGroup = tp·dp, divides every
+#                             token-population term by dp, and GATES the MoE
+#                             dispatch/combine comm term (dp > 1). The single most
+#                             consequential flag for this model.
+#   --moe-comm-backend        (A) THE MoE-specific latency knob, and the one worth
+#                             sweeping most. Selects the all-to-all dispatch/combine
+#                             VOLUME family, charged only at dp > 1. Seven accepted
+#                             vLLM names collapse to exactly TWO cost families in
+#                             BLIS (moe_comm_backend.go:42) — allgather
+#                             {naive, allgather_reducescatter} and all2all {pplx,
+#                             deepep_*, mori, flashinfer_all2allv} — so the space
+#                             carries one representative each and the other five
+#                             would buy duplicate simulations. With 16 experts
+#                             routed per token out of 896, dispatch volume is a real
+#                             term here in a way it never is for a dense model.
+#   --max-num-batched-tokens  (C) per-step prefill budget; on the reference model
+#                             the biggest scalar lever by far. Interacts with dp:
+#                             see AGGREGATE vs PER-RANK below.
+#   --long-prefill-token-threshold  (C) chunked-prefill trigger. p99 input delta is
+#                             150,133 tokens and the max is 824,580, so whether and
+#                             where prefills chunk is a first-order question.
+#   --max-num-seqs            (C) batch-slot ceiling; binds at the 32/64 concurrency
+#                             rungs.
+#   --gpu-memory-utilization  (B) how much HBM vLLM may claim, hence how much is left
+#                             for KV after 1.37 TiB of weights. LIVE here only via the
+#                             total_kv_blocks grid — the flag itself cannot act while
+#                             blocks are pinned. 0.95 is not deployable (CUDA-graph
+#                             capture deadlocks at TP >= 4); it bounds headroom only.
+#   --scheduler fcfs|sjf      (C) input length spans four orders of magnitude
+#                             (137 → 824,580), so shortest-job-first has material.
+#                             The two SLO-ranking schedulers degrade to fcfs
+#                             (slo_class is empty trace-wide) and `priority` is not
+#                             a valid name at all — it is a hard fatal.
+#   --concurrent-sessions     the load axis. Closed-loop, so throughput measures
+#                             real capacity rather than "kept up with an offered rate".
+#
+# PINNED, NOT SEARCHED — and each for a specific reason
+#   --total-kv-blocks         (B) MANDATORY, per topology. BLIS's auto-calc is wrong
+#                             twice for this model: it charges the FULL model weight
+#                             against tp GPUs (dp never divides the weight term, only
+#                             multiplies the final block count), which hard-fatals
+#                             every topology here; and its MLA path does not divide
+#                             the latent by TP while dividing TP-summed memory by it,
+#                             over-crediting KV by ~tp×. Passing the flag makes
+#                             Changed() true and skips the branch entirely. The
+#                             pinned values already include the ×dp aggregation,
+#                             because an EXPLICIT value is not dp-scaled.
+#   --block-size-in-tokens    (B) a divisor in that arithmetic — changing it
+#                             invalidates all three block counts. A live knob; needs
+#                             its own campaign.
+#   --gpu-memory-utilization  MOVED TO THE SEARCHED LIST. The FLAG is inert once
+#                             --total-kv-blocks is explicit (its only consumers are
+#                             the auto-calc and the node-pool recalc), but the
+#                             DIMENSION is real and is swept as one axis of the
+#                             total_kv_blocks grid: 0.85 / 0.90 / 0.95 give
+#                             different capacity at the same topology. The flag is
+#                             still emitted so each front entry says which util row
+#                             its block count came from. See the parameter.
+#   --enable-expert-parallel  (A) PROVABLY DEAD, pinned on for realism.
+#                             EffectiveEP() has zero production callers; the
+#                             trained-physics model says so itself
+#                             (trained_physics_model.go:160). Expert weight and
+#                             compute are scoped to tp·dp in BOTH modes, and the
+#                             dispatch gate is dp > 1, not EP. Both values are
+#                             byte-identical, so searching it buys nothing.
+#   --max-model-len           1,048,576 = the model's max_position_embeddings. Every
+#                             topology's KV ceiling exceeds it (min 1,545,984 tokens
+#                             at tp16×dp1), so unlike the 32 × H100 case NO topology
+#                             gets capped and all three are compared on an identical
+#                             servability ceiling. The corpus max of 824,580 is
+#                             servable everywhere ⇒ dropped_unservable should be 0.
+#
+# WANTED BUT UNAVAILABLE — the honest gap list for a model this shape
+#   --kv-offload-config       (B) THE most interesting subsystem for a 1.37 TiB model
+#                             that leaves 18-40 GiB/GPU for KV and replays 824k-token
+#                             contexts, and it is a HARD ERROR on this corpus: "the
+#                             trace was captured without a kv_offload config;
+#                             --kv-offload-config cannot add one on replay of a
+#                             sim-generated trace (INV-13)". weka.yaml is
+#                             mode: generated and the header is authoritative on
+#                             replay. Unlocking it needs a re-captured (observe,
+#                             mode: real) or re-converted corpus — a different
+#                             experiment, and arguably the next one to run.
+#   expert placement / EPLB   (A) no CLI flag; every run uses BalancedPlacement, i.e.
+#                             perfectly balanced expert load. Real wide-EP is
+#                             imbalanced and imbalance is exactly what EPLB exists to
+#                             fix, so the busiest-GPU MoE term is optimistic by an
+#                             unmodeled factor. This is the biggest missing MoE knob.
+#   --kv-cpu-blocks (legacy)  runs, but probes on the reference model each exceeded
+#                             55 min against a 3-7 min baseline (>10×); at any sane
+#                             timeout every config would be silently INVALID.
+#   node/interconnect topology no term exists, which is why tp16 is free (above).
+#   --detectors               not a search dimension (its output is a string label,
+#                             which evaluator.py skips), but for a "is 16 GPUs
+#                             enough" question it is worth adding by hand to the
+#                             winning configs: `--detectors peak-rate
+#                             --saturation-report sat.json` gives a per-run
+#                             saturation verdict with no capacity estimate or latency
+#                             target to tune.
+#
+# INERT FOR TRACE/TOPOLOGY REASONS (same as the sibling file, not repeated here)
+#   all routing knobs and scorer profiles (replicas == 1); admission, flow control
+#   and every gateway knob (always-admit, closed loop); all SLO-tier-aware knobs
+#   (slo_class empty trace-wide); --encode-* (zero image/audio/video tokens);
+#   --lora-* (no adapter column); P/D (needs ≥2 instances).
+#
+# UNSAFE FOR A THROUGHPUT OBJECTIVE
+#   --request-ttl, --queue-shedding, --in-flight-eviction, token-bucket/reject-all
+#   admission. Each cancels requests, and a cancelled round ends its session (up to
+#   1,991 remaining rounds), so a config can "win" by serving a cheaper population.
+#
+# ── AGGREGATE vs PER-RANK: THE ONE TRANSLATION TRAP ────────────────────────
+# --max-num-seqs and --max-num-batched-tokens are AGGREGATE-per-instance in BLIS
+# but PER-ENGINE in vLLM. The step-time model divides token population by dp, so a
+# BLIS budget of T at dp = D behaves like a per-rank budget of T/D. The ranges
+# below are chosen wide enough to span the realistic per-rank band at every dp in
+# {1, 2, 4}, and the search optimizes the aggregate — the right free variable for
+# capacity planning. TO TURN A FRONT ENTRY INTO vLLM FLAGS, DIVIDE BOTH BY dp.
+#
+# This also makes dp × max-num-batched-tokens the most informative 2-way
+# interaction in the space, and the thing this campaign can genuinely learn: dp
+# raises MoE dispatch volume and shrinks per-rank token work simultaneously, and
+# the per-step token budget decides which of those two dominates.
+#
+# ═════════════════════════════════════════════════════════════════════════════
+
+infrastructure:
+  # dp is an INFRASTRUCTURE axis here, not a policy parameter, so generate_topologies
+  # enumerates (tp, dp, replicas) with tp × dp × replicas <= gpu_budget and records
+  # gpus_used = tp × dp × replicas. That means the GPU budget is enforced by the
+  # ENUMERATOR rather than by a rejection constraint, and gpus_used is CORRECT — an
+  # instance occupies tp × dp GPUs, and pretending otherwise understated the fleet by
+  # up to 4× here. The alternative form (dp under `parameters`) samples dp
+  # independently of the topology and is why the 32 × H100 sibling used to carry a
+  # "gpus_used in the output is wrong" warning.
+  gpu_budget: 16
+
+  # The complete full-budget set. Integer dp with tp·dp == 16 forces tp | 16, and
+  # tp1 (185.7 GiB/GPU) and tp2 (132.5 GiB/GPU) exceed the 126.90 GiB budget on
+  # weights alone. tp values that do not tile 16 (tp12, tp6, tp3) fit at 12-15 GPUs
+  # but strand GPUs no second instance can use, and are dominated for a
+  # maximize-throughput objective.
+  tp: [1, 2, 4, 8, 16]
+
+  # dp ∈ {1, 2, 4}. Bounded above by NON-EXPERT REPLICATION (106.48/tp GiB per GPU),
+  # not by the 16-GPU budget: dp 8 needs tp 2 and lands at 132.5 GiB/GPU against a
+  # 126.90 GiB budget. Since tp × dp == 16 is required to spend the whole budget on
+  # one instance, this list and `tp` above describe the same three topologies from
+  # opposite directions — dp = 16/tp.
+  dp: [1, 2, 4, 8, 16]
+
+  explore_pd: false
+
+parameters:
+  # ── Injection: trace, hardware, capacity ──────────────────────────────────
+  trace_header:
+    flag: "--trace-header"
+    values: ["tools/blis-search/workloads/weka.yaml"]
+
+  trace_data:
+    flag: "--trace-data"
+    values: ["tools/blis-search/workloads/weka.csv"]
+
+  # Supplies the H200 entry the committed hardware_config.json lacks. Without this
+  # every eval dies in 0.1 s and is recorded INVALID.
+  hardware_config:
+    flag: "--hardware-config"
+    values: ["tools/blis-search/hardware_config_h200.json"]
+
+  # ── THE TOPOLOGY AXIS lives in `infrastructure` above (tp × dp), so that the
+  # GPU budget counts dp and gpus_used is right. --dp is emitted from the topology.
+  #
+  # Pinned on: what a real wide-EP deployment runs, and provably inert in BLIS
+  # (EffectiveEP has no production callers). A bare flag is emitted for True.
+  enable_expert_parallel:
+    flag: "--enable-expert-parallel"
+    values: [true]
+
+  # Per (topology, gpu_memory_utilization) — the full grid. 16 × H200, MemoryGiB
+  # 141, block_size 16, honest mxfp4/bf16 weight split. INSTANCE-level counts
+  # (per-rank blocks × dp), because an explicit --total-kv-blocks is NOT dp-scaled
+  # by BLIS (the ×dp in CalculateKVBlocks Step 6 runs only on the auto-calc path).
+  #
+  # blocks (KV GiB/GPU):
+  #   tp  dp |     u=0.85          u=0.90          u=0.95
+  #    4   4 |  110,304 (11.4)  178,592 (18.4)  246,876 (25.5)
+  #    8   2 |  124,454 (25.7)  158,596 (32.7)  192,740 (39.8)
+  #   16   1 |   79,552 (32.9)   96,624 (39.9)  113,695 (47.0)
+  #
+  # ALL NINE COMBINATIONS ARE FEASIBLE on H200 — util moves capacity, never
+  # feasibility. But it MOVES THE tp4-vs-tp8 RANKING: tp8×dp2 leads on aggregate KV
+  # at 0.85 (124,454 vs 110,304) while tp4×dp4 leads at 0.90 and 0.95. That is the
+  # SAME crossover the GiB-vs-GB reading straddles (it sits at 122.77 GiB usable,
+  # and 141 × 0.85 = 119.85 falls below it, 141 × 0.90 = 126.90 above). So the util
+  # sweep now probes that boundary empirically instead of leaving it a footnote —
+  # which is the strongest reason to have this dimension at all.
+  #
+  # Coupled to (tp, gpu_memory_utilization) by the two constraints below. Recompute
+  # — do not scale — if the GPU, block size, or model config changes.
+  total_kv_blocks:
+    flag: "--total-kv-blocks"
+    values: [110304, 124454, 79552, 178592, 158596, 96624, 246876, 192740, 113695]
+
+  block_size:
+    flag: "--block-size-in-tokens"
+    values: [16]
+
+  # ── GPU memory utilization ────────────────────────────────────────────────
+  # A REAL DIMENSION THAT ACTS THROUGH total_kv_blocks, NOT THROUGH ITS OWN FLAG.
+  # --gpu-memory-utilization is a provable no-op once --total-kv-blocks is explicit:
+  # its only consumers are the KV auto-calc branch (skipped when the flag is
+  # Changed()) and the node-pool per-instance recalc (node pools are rejected on
+  # replay). Passing three values alone would give three byte-identical runs.
+  #
+  # So util is swept the only way it can be honest here: it is one axis of the
+  # total_kv_blocks grid above, coupled by constraint. The flag is still emitted, for
+  # two reasons — it makes each front entry self-documenting (a bare
+  # `total_kv_blocks: 158596` does not say which util row it came from), and it stays
+  # correct if someone later drops --total-kv-blocks and lets auto-calc take over.
+  #
+  # ⚠ 0.95 IS NOT DEPLOYABLE in practice: it deadlocks CUDA-graph capture at TP ≥ 4
+  # on real hardware, and BLIS has no failure mode that represents this. Treat a
+  # front entry that wins at 0.95 as unrealizable — it is in the sweep to bound the
+  # headroom, not to be shipped.
+  gpu_memory_utilization:
+    flag: "--gpu-memory-utilization"
+    values: [0.85, 0.90, 0.95]
+
+  # Every topology's KV ceiling exceeds this, so no topology is capped and all three
+  # share one servability ceiling. Corpus max 824,580 is servable everywhere.
+  max_model_len:
+    flag: "--max-model-len"
+    values: [1048576]
+
+  # ── MoE communication: the knob to sweep ──────────────────────────────────
+  # One representative per cost family; the other five vLLM names are aliases.
+  # Live only at dp > 1, so pinned to the default at tp16 (dp 1) by a constraint.
+  moe_comm_backend:
+    flag: "--moe-comm-backend"
+    values: [allgather_reducescatter, deepep_high_throughput]
+
+  # ── Load ──────────────────────────────────────────────────────────────────
+  concurrent_sessions:
+    flag: "--concurrent-sessions"
+    values: [1, 2, 4, 8, 16, 32, 64, 128, 512]
+
+  total_sessions:
+    flag: "--total-sessions"
+    values: [10]
+
+  # Seeded-random 100-of-219 subset; held fixed so configs share one population.
+  # Changing --seed changes the subset, so results are not comparable across seeds.
+  shuffle_corpus:
+    flag: "--shuffle-corpus"
+    values: [true]
+
+  # ── Prefill scheduling: aggregate-per-instance, divide by dp for vLLM ─────
+  max_num_seqs:
+    flag: "--max-num-seqs"
+    values: [256, 512, 1024, 2048]
+
+  max_scheduled_tokens:
+    flag: "--max-num-batched-tokens"
+    values: [8192, 16384, 32768, 65536, 131072]
+
+  # Top rung is 32768, not 131072: the constraint requires strictly less than
+  # max_scheduled_tokens, so 131072 could never be valid and would only reject draws.
+  long_prefill:
+    flag: "--long-prefill-token-threshold"
+    values: [0, 8192, 32768]
+
+  # fcfs and priority-fcfs. NOTE: `priority` is NOT a valid --scheduler value — it
+  # is a hard fatal ("Unknown scheduler. Valid: fcfs, priority-fcfs,
+  # reverse-priority, sjf"), and because evaluator.py cannot distinguish that fatal
+  # from an invalid config it would silently record ~half of every campaign as
+  # INVALID. `priority` IS valid for --preemption-policy; that is a different knob.
+  #
+  # ⚠ ON THIS CORPUS priority-fcfs IS BYTE-IDENTICAL TO fcfs, so this axis carries
+  # one value and costs two. PriorityFCFSScheduler sorts by Request.Priority, which
+  # comes from slo_class via SLOPriorityMap.InvertForVLLM, and Priority() returns the
+  # default (3 = Standard) for an EMPTY or unknown class. slo_class is empty in all
+  # 37,732 rows of weka.csv, so every request gets the same priority and the stable
+  # sort collapses to (arrival, ID) — exactly FCFS order. Do not read a
+  # priority-fcfs entry on the front as evidence that priority scheduling helped.
+  #
+  # To make the axis live, pick one:
+  #   * give the corpus real tiers (re-convert with slo_class populated), which makes
+  #     priority-fcfs — and the whole tier-aware family, including
+  #     --admission-policy tier-shed and --dispatch-order slo-deadline — meaningful;
+  #   * use --preemption-policy [fcfs, priority] instead. That one is NOT provably
+  #     inert even with empty slo_class: it picks the victim by
+  #     max(Priority, ArrivalTime) rather than popping the tail of the running list,
+  #     so it can evict a different request. It only bites when preemption actually
+  #     occurs, though, and preemption_count was ~0 across the reference campaign;
+  #   * or use sjf, the one value that discriminates on THIS corpus as captured —
+  #     it orders the wait queue by input length, which here spans 137 to 824,580
+  #     tokens. Starves long requests under sustained load (sim/scheduler.go:43).
+  scheduler:
+    flag: "--scheduler"
+    values: [fcfs, priority-fcfs]
+
+constraints:
+  # NOTE: there is no `tp * dp * replicas <= 16` constraint. With dp declared in
+  # `infrastructure`, generate_topologies already enforces the budget when it
+  # enumerates, so every sampled topology is in-budget by construction — which is
+  # exactly what `is_valid_config` assumes in infrastructure mode ("topology is
+  # pre-validated by generate_topologies"). The two constraints below are narrower
+  # facts the enumerator cannot know, because both come from the model's memory
+  # footprint rather than from GPU arithmetic.
+  #
+  # The smallest world that fits is 12 GPUs, so a second instance needs ≥24 —
+  # single instance is structural here, not just a preference. This is also what
+  # makes the routing subsystem inert.
+  - "replicas == 1"
+
+  # Spend the whole budget on the one instance: pins the three topologies
+  # (tp4×dp4, tp8×dp2, tp16×dp1) and makes dp = 16/tp.
+  - "tp * dp == 16"
+
+  # KV capacity must match the topology. The sampler draws tp and total_kv_blocks
+  # independently, so without this a tp16 config could run with tp4's 178,592
+  # blocks — a silent capacity error nothing else would catch.
+  # (tp, util) FEASIBILITY. Not every combination fits — see the grid above. An
+  # infeasible pair is excluded EXPLICITLY rather than left to raise a KeyError
+  # inside the block-map lookup below: eval_condition swallows exceptions as False,
+  # so an unstated exclusion would be indistinguishable from a constraint miss, and
+  # that is exactly the silence R1 forbids.
+  - "(tp, gpu_memory_utilization) in [(4, 0.85), (8, 0.85), (16, 0.85), (4, 0.9), (8, 0.9), (16, 0.9), (4, 0.95), (8, 0.95), (16, 0.95)]"
+
+  # KV capacity must match BOTH the topology and the util. tp, dp, util and
+  # total_kv_blocks are drawn independently, so without this a tp16 config could run
+  # with tp4's block count — a silent capacity error nothing else would catch.
+  - "total_kv_blocks == {(4, 0.85): 110304, (8, 0.85): 124454, (16, 0.85): 79552, (4, 0.9): 178592,  (8, 0.9): 158596,  (16, 0.9): 96624, (4, 0.95): 246876, (8, 0.95): 192740, (16, 0.95): 113695}[(tp, gpu_memory_utilization)]"
+
+  - "long_prefill == 0 or long_prefill < max_scheduled_tokens"
+  - "concurrent_sessions <= total_sessions"
+
+  # The dispatch/combine term is charged only at dp > 1, so at tp16 both backend
+  # values simulate identically. Pin the default rather than pay for duplicates.
+  - "dp > 1 or moe_comm_backend == 'allgather_reducescatter'"
+
+diversity_safe: {}
+
+objectives:
+  # EXACTLY TWO — compute_hypervolume_2d returns 0.0 for any other count, which
+  # flatlines HV and makes the convergence detector fire immediately.
+  - metric: tokens_per_sec
+    direction: maximize
+  - metric: gpus_used
+    direction: minimize
+
+secondary_metrics:
+  - responses_per_sec
+  - completed_requests
+  - e2e_p99_ms
+  - itl_mean_ms
+  - scheduling_delay_p99_ms
+  - preemption_count
+  - cache_hit_rate
+  # Guards. dropped_unservable should be 0 at every topology here (all three clear
+  # the corpus max); if it is not, the capacity arithmetic is wrong. timed_out is
+  # real saturation and still cancels sessions.
+  - dropped_unservable
+  - timed_out_requests
+  - total_output_tokens
+
+hypervolume_reference:
+  # ⚠ UNCALIBRATED, and doubly so here: no Kimi-K3 eval has been run, and the H200
+  # MFUs are themselves uncalibrated. RE-CALIBRATE AFTER ~20 EVALS. Err HIGH on
+  # ttft_p99_ms — if every observed TTFT exceeds it, max(0, (ref-v)/ref) clips the
+  # axis to zero, HV goes flat, and convergence fires immediately.
+  # H200's 4.8 TB/s vs H100's 3.35 should lift decode throughput, so these start
+  # above the 32 × H100 file's values rather than below despite half the fleet.
+  tokens_per_sec: 2500.0
+  ttft_p99_ms: 600000.0

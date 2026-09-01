@@ -1,0 +1,67 @@
+parameters:
+  tp:
+    flag: "--tp"
+    values: [1, 2, 4, 8]
+  replicas:
+    flag: "--num-instances"
+    # Dynamic: max replicas = floor(8 / tp)
+    max_replicas_by_tp: {1: 8, 2: 4, 4: 2, 8: 1}
+  scheduler:
+    flag: "--scheduler"
+    values: [fcfs, priority-fcfs, sjf, reverse-priority]
+  max_batch:
+    flag: "--max-num-running-reqs"
+    values: [32, 64, 128, 256, 512]
+  max_scheduled_tokens:
+    flag: "--max-num-scheduled-tokens"
+    values: [2048, 4096, 8192]
+  long_prefill:
+    flag: "--long-prefill-token-threshold"
+    values: [0, 1024, 2048, 4096]
+  block_size:
+    flag: "--block-size-in-tokens"
+    values: [16, 32]
+  routing_policy:
+    flag: "--routing-policy"
+    values: [round-robin, least-loaded, weighted, always-busiest]
+  admission_policy:
+    flag: "--admission-policy"
+    values: [always-admit, token-bucket, reject-all, tier-shed]
+  preemption_policy:
+    flag: "--preemption-policy"
+    values: [fcfs, priority]
+  gpu_mem_util:
+    flag: "--gpu-memory-utilization"
+    values: [0.85, 0.9, 0.95]
+
+constraints:
+  # tp * replicas <= 8 (single-node GPU limit)
+  - "tp * replicas <= 8"
+  # Single instance forces fixed routing and admission
+  - "replicas == 1 -> routing_policy == 'round-robin'"
+  - "replicas == 1 -> admission_policy == 'always-admit'"
+  # Chunked prefill must be less than max scheduled tokens (or disabled=0)
+  - "long_prefill == 0 or long_prefill < max_scheduled_tokens"
+
+conditional_subsystems:
+  routing_scorers:
+    enabled_when: "routing_policy == 'weighted' and replicas > 1"
+    flag: "--routing-scorers"
+    format_b:
+      scorers: [queue-depth, kv-utilization, load-balance]
+      weights: [1, 2]
+
+# Diversity Phase 2: safe parameter values for targeted sampling
+diversity_safe:
+  routing_policy: [round-robin, least-loaded, weighted]
+  admission_policy: [always-admit, tier-shed]
+
+objectives:
+  - metric: responses_per_sec
+    direction: maximize
+  - metric: ttft_p99_ms
+    direction: minimize
+
+hypervolume_reference:
+  responses_per_sec: 100.0
+  ttft_p99_ms: 50000.0

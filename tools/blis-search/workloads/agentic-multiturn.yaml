@@ -1,0 +1,127 @@
+# Agentic multi-turn workload — tool-calling agent traffic.
+#
+# WHY THIS SHAPE: an agentic request is not a chat turn. Each round is a
+# tool-call cycle: the model emits a short structured call (few output tokens),
+# an external tool runs (short think time, NOT human-scale), and the tool
+# result is appended to the context. Consequences that drive the search:
+#
+#   1. Prompt-heavy, output-light  -> prefill dominates; chunked-prefill and
+#      P/D disaggregation knobs matter far more than in `chatbot`.
+#   2. Context accumulates per round -> KV footprint grows superlinearly over a
+#      session; KV capacity (block size, gpu-mem-util, CPU offload) binds.
+#   3. Sessions are sticky -> a cache miss re-prefills the whole accumulated
+#      context, so prefix-aware routing is worth real throughput.
+#   4. Think time is 100-600ms (tool exec), not 500ms-30s (human), so many
+#      sessions are concurrently resident -> high KV pressure, not idle gaps.
+#
+# closed_loop is left unset: it defaults to TRUE for multi-turn clients, so
+# round N+1 arrives at round N completion + think time. Follow-up load is
+# therefore load-adaptive (INV-10), and `responses_per_sec` measures real
+# round-completion capacity rather than just echoing the offered rate.
+#
+# aggregate_rate is the ARRIVAL rate, and for a multi-turn client one arrival
+# starts a whole session. Offered REQUEST rate is therefore
+# aggregate_rate x mean_rounds_per_arrival = 18 x 5.35 = ~96 req/s, which is
+# above the best 8-GPU capacity measured here (62.7 req/s) -- so every topology
+# in the search is genuinely saturated and responses_per_sec reports capacity
+# rather than echoing the offered rate.
+#
+# rate_fraction is a share of ARRIVALS, not of requests. Because a session
+# arrival yields 5-12 requests and a single-shot arrival yields 1, the
+# single-shot client needs a large arrival share to hold a meaningful share of
+# the request stream: 0.50 of arrivals = 9.3% of requests.
+
+version: "2"
+seed: 42
+category: reasoning
+aggregate_rate: 18.0     # arrivals/sec; x 5.35 mean rounds = ~96 req/s offered
+num_requests: 4000       # total rounds across all sessions
+
+clients:
+  # ── Tool-loop agent (dominant): ReAct-style, many cheap rounds ──
+  # System prompt + tool schemas = 2048 shared prefix tokens (cache-resident).
+  # Each round appends a tool result (~300 tok) and emits a call (~90 tok).
+  # By round 12 the accumulated context is ~2048 + 12*390 ~= 6.7k tokens.
+  - id: "tool-loop-agent"
+    tenant_id: "agents"
+    slo_class: "standard"
+    rate_fraction: 0.28
+    streaming: true
+    arrival:
+      process: poisson
+    input_distribution:
+      type: gaussian
+      params: {mean: 300, std_dev: 120, min: 40, max: 900}
+    output_distribution:
+      type: gaussian
+      params: {mean: 90, std_dev: 40, min: 8, max: 300}
+    prefix_group: "agent-tool-schemas"
+    prefix_length: 2048
+    reasoning:
+      multi_turn:
+        max_rounds: 12
+        think_time_us: 150000     # 150ms tool execution
+        context_growth: accumulate
+
+  # ── Code agent: repo context prefix, patch-sized outputs, test-run pauses ──
+  - id: "code-agent"
+    tenant_id: "agents"
+    slo_class: "standard"
+    rate_fraction: 0.13
+    streaming: true
+    arrival:
+      process: poisson
+    input_distribution:
+      type: gaussian
+      params: {mean: 420, std_dev: 180, min: 60, max: 1200}
+    output_distribution:
+      type: gaussian
+      params: {mean: 280, std_dev: 120, min: 16, max: 800}
+    prefix_group: "code-agent-repo-context"
+    prefix_length: 4096
+    reasoning:
+      multi_turn:
+        max_rounds: 8
+        think_time_us: 500000     # 500ms: run tests / lint between rounds
+        context_growth: accumulate
+
+  # ── Deep-research agent: large retrieved documents per round, few rounds ──
+  # Heaviest prefill; this is the client that makes P/D splits pay off.
+  - id: "research-agent"
+    tenant_id: "agents"
+    slo_class: "batch"
+    rate_fraction: 0.09
+    streaming: true
+    arrival:
+      process: poisson
+    input_distribution:
+      type: gaussian
+      params: {mean: 1600, std_dev: 600, min: 200, max: 4096}
+    output_distribution:
+      type: gaussian
+      params: {mean: 220, std_dev: 90, min: 16, max: 700}
+    prefix_group: "research-agent-tools"
+    prefix_length: 2048
+    reasoning:
+      multi_turn:
+        max_rounds: 5
+        think_time_us: 300000     # 300ms retrieval
+        context_growth: accumulate
+
+  # ── Interactive single-shot API sharing the same cluster ──
+  # Latency-critical and NOT a session. Keeps admission control / flow-control /
+  # dispatch-order knobs meaningful: without a class worth protecting,
+  # tier-shed and slo-deadline ordering are no-ops.
+  - id: "interactive-api"
+    tenant_id: "apps"
+    slo_class: "critical"
+    rate_fraction: 0.50
+    streaming: true
+    arrival:
+      process: poisson
+    input_distribution:
+      type: gaussian
+      params: {mean: 260, std_dev: 90, min: 30, max: 800}
+    output_distribution:
+      type: gaussian
+      params: {mean: 120, std_dev: 50, min: 8, max: 400}

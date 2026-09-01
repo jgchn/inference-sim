@@ -1,0 +1,643 @@
+# meta-llama/Llama-3.1-70B-Instruct × H100 — CONCURRENCY SWEEP over a REPLAYED
+# agentic trace.
+#
+#   trace   tools/blis-search/workloads/weka.{yaml,csv}
+#           (TraceV2 v3, mode: generated, session_context_growth: accumulate)
+#   source  semianalysisai/cc-traces-weka-with-subagents-051926, via `blis convert weka`
+#   model   meta-llama/Llama-3.1-70B-Instruct   hardware  H100   budget  8 GPUs
+#
+# RETARGETED 2026-08-27 from qwen/qwen3-14b. The filename still says qwen3-14b;
+# the model, topology space, and load point do not. Three things changed, and
+# each invalidated something that used to be true here:
+#   * MODEL 14B -> 70B. 131.42 GiB of weights on an 80 GiB H100 means tp1 is a
+#     hard fatal and tp2 amputates the workload, so the topology space is now
+#     {tp4 x1, tp4 x2, tp8 x1} instead of a full tp 1-8 sweep (finding D).
+#   * CONCURRENCY became a swept DIMENSION (1..128) instead of a pinned load
+#     point. The front is now a capacity curve; see `concurrent_sessions`.
+#   * SHUFFLE-CORPUS is on, so the 100-of-219-session subset is seeded-random
+#     rather than a fixed corpus prefix.
+# Everything under MEASURED KNOB SENSITIVITY was measured on qwen3-14b at
+# concurrency 8 and has NOT been re-measured on this model. It is retained as a
+# guide to which knobs are live at all, not as effect sizes. See the STALE
+# CALIBRATION warning on that section.
+#
+# This space drives `blis replay`, NOT `blis run`: the workload is a captured
+# trace, which only replay accepts.
+#
+# ═════════════════════════════════════════════════════════════════════════════
+# HOW TO RUN
+# ═════════════════════════════════════════════════════════════════════════════
+# `evaluator.py` hardcodes `[blis_binary, "run"]`, so point --blis-binary at the
+# shim: it rewrites the subcommand to `replay` and strips the four run-only
+# flags. Run from the repo root — `blis replay` resolves --defaults-filepath
+# from cwd, so ./defaults.yaml must exist.
+#
+#   go build -o blis main.go
+#   python3 tools/blis-search/search.py \
+#     --model meta-llama/Llama-3.1-70B-Instruct --hardware H100 \
+#     --search-space tools/blis-search/weka-qwen3-14b.yaml \
+#     --budget 300 --workers 8 --eval-timeout 5400 \
+#     --blis-binary tools/blis-search/blis-replay-shim.sh \
+#     --output weka-llama3-70b.json --output-all --verbose
+#
+# The model resolves from model_configs/llama-3.1-70b-instruct/config.json (80
+# layers, 8 KV heads, head_dim 128, bf16). It is NOT listed in defaults.yaml's
+# model map, which is fine — resolution falls through to model_configs/ — but it
+# means there is no committed alpha/beta calibration for it; step time comes from
+# trained-physics basis functions.
+#
+# --workload/--rate/--num-requests are NOT required and should be OMITTED. This
+# space declares a `--trace-header` parameter, which search.py detects as trace
+# mode: the three flags become optional, are dropped from `fixed_params`, and so
+# never reach the shim. The trace governs arrivals entirely. Two notes:
+#   * because they are omitted, the output's `spec` block no longer claims a
+#     workload preset the run never used — it carries only model / hardware /
+#     latency-model / seed. `spec` still does NOT carry the trace; real
+#     provenance is per-config: `pareto_front[].config.trace_header` /
+#     `.trace_data` (and the same fields under `all_results[]` with
+#     --output-all). Passing them anyway is still accepted and still inert (the
+#     shim strips them), but it puts the misleading values back into `spec`.
+#   * --objectives / --slo are optional — the `objectives:` block below is the
+#     default. Any --slo metric must also be an objective or a secondary metric.
+#
+# --eval-timeout 5400 (90 min), NOT the 900 this file used to carry. Measured
+# 2026-08-27 on this model at total_sessions 100: tp4 x2 took 147 s at
+# concurrency 8 and 107 s at 16, but tp8 x1 at concurrency 16 EXCEEDED 10
+# MINUTES and was killed twice without finishing. The swept 64/128 rungs are
+# heavier still and are not characterized.
+#
+# This is the single most dangerous setting in the file, because
+# evaluator.evaluate_config swallows subprocess.TimeoutExpired as `return None`
+# — indistinguishable from an invalid config. An under-set timeout therefore
+# does not just lose evals, it BIASES THE SWEEP SYSTEMATICALLY: the slowest
+# configs are exactly the high-concurrency, high-context ones the sweep exists
+# to characterize, so they vanish from the front while the cheap low-concurrency
+# rungs survive. If valid/total is low, or if the front is suspiciously
+# concentrated at low concurrency, suspect the timeout before the space.
+#
+# Wall-clock does NOT scale monotonically with concurrency (147 s at conc 8 vs
+# 107 s at 16), because a heavier pool also cancels more sessions and so
+# simulates fewer total rounds. Do not extrapolate the timeout linearly.
+#
+# NOTE: load_search_space() is a bare yaml.safe_load — there is no schema
+# validation. A misspelled knob name or flag is silently ignored, not rejected.
+# After editing, re-check with:
+#   python3 -c "import search_space as s; sp=s.load_search_space('weka-qwen3-14b.yaml'); \
+#     print(sorted(s.get_all_param_flags(sp).values()))"
+#
+# ═════════════════════════════════════════════════════════════════════════════
+# TRACE PROPERTIES — measured on weka.csv 2026-08-26, not inherited
+# ═════════════════════════════════════════════════════════════════════════════
+#   37,732 rows · 219 sessions · rounds/session p50 107, min 20, max 1,991
+#   input_tokens   p50    137  p90  2,536  p99 150,133  max 824,580
+#   output_tokens  p50    317  p90  1,705  p99   7,561  max  36,498
+#   think_time_us  p50 1.88 s  p99 30.0 s  max 30.0 s
+#
+# Five properties decide what is worth searching:
+#
+# 1. session_context_growth: accumulate — per-round input_tokens are DELTAS, not
+#    absolute prompts. Fixed replay is REJECTED by blis with a fatal error;
+#    closed-loop is mandatory. `--concurrent-sessions` (below) implies it.
+#
+# 2. COMPACTION-AWARE conversion. 11,444 of 37,732 rows (30.3%) carry an
+#    `input_tokens_reset` marker, i.e. this CSV was converted by a post-#1609
+#    build and accumulate replay re-seeds its buffer at each compaction
+#    boundary. An older conversion lacking that column over-counts context by
+#    ~3-4x. This matters for reading old results: the pre-#1609 numbers in
+#    agentic-throughput-8.yaml (notably "118 preemptions at tp1") DO NOT
+#    reproduce here — see the measured table below, where preemption is 0 at
+#    every topology. If you re-convert the corpus, re-measure before trusting
+#    any calibration in this file.
+#
+# 3. think times are CLIPPED at 30 s — 3,558 rows (9.4%) sit exactly at
+#    30,000,000 µs, so the corpus was converted with `--max-think-time 30s`
+#    rather than the uncapped 0 that CLAUDE.md recommends for weka (its gaps are
+#    genuine away-from-keyboard times). Effective load is therefore somewhat
+#    higher than the real capture. Harmless for ranking configs against each
+#    other; do not read absolute rps as a property of the real workload.
+#
+# 4. prefix_group and prefix_length are EMPTY in all 37,732 rows — the
+#    conversion did not carry the dataset's KV block hashes into TraceV2. Cache
+#    reuse is real (0.31-0.58 measured) but arises purely from session context
+#    accumulation; the router cannot see group labels. `precise-prefix-cache`
+#    still works: it queries live instance KV state, not labels.
+#
+# 5. slo_class is EMPTY in all rows, and `model` is empty by design (routing
+#    safety). Every request lands in the default class, so every tier-aware knob
+#    is a provable no-op and is omitted below (see OMITTED KNOBS).
+#
+# ═════════════════════════════════════════════════════════════════════════════
+# MEASURED ON THIS MODEL (2026-08-27, meta-llama/Llama-3.1-70B-Instruct, H100,
+# seed 42, total 100, shuffle-corpus, max-model-len 128000, batched-tokens 8192,
+# long-prefill 0, block 16, gpu-mem-util 0.90, routing least-loaded)
+# ═════════════════════════════════════════════════════════════════════════════
+# THE CONCURRENCY CURVE at tp4 x2 — this is what the sweep exists to find:
+#
+#   conc      rps    done   ttft_p99   e2e_p99    itl    cache  drop  tmo  pre
+#      1   0.0553    3906      3.4 s   111.4 s  20.9 ms  0.475    82    1    0
+#      4   0.1867    3859      3.8 s   129.6 s  25.9 ms  0.531    78    5    0
+#      8   0.2964    3846      4.7 s   164.5 s  34.1 ms  0.535    77    6    0
+#     16   0.4042    3620      7.1 s   213.6 s  50.7 ms  0.526    66   19    0
+#     32   0.5062    3144     49.7 s   258.1 s  79.0 ms  0.424    44   42    5
+#     64   0.4593    2674    137.7 s   260.4 s  71.2 ms  0.295    33   54    0
+#
+# And the same sweep at tp8 x1, the other 8-GPU topology:
+#
+#   conc      rps    done   ttft_p99    cache  drop  tmo  pre
+#     16   0.5008    3770      5.5 s    0.685    73   11    0
+#     32   0.6313    3290     14.7 s    0.691    53   33    0
+#     64   0.6663    2805     46.3 s    0.708    41   46    0
+#
+# Five things these tables establish:
+#
+# A. FEWER, FATTER INSTANCES WIN — MORE STRONGLY THAN AT 14B. tp8 x1 beats
+#    tp4 x2 on EVERY axis at matched concurrency: at conc 16, rps 0.501 vs 0.404,
+#    done 3,770 vs 3,620, ttft_p99 5.5 s vs 7.1 s, itl 40.5 vs 50.7 ms, cache
+#    0.685 vs 0.526. Same mechanism as at 14B — consolidating sessions onto one
+#    instance maximizes session-affinity reuse, and with 100k+ accumulated
+#    contexts reuse dominates load balancing.
+#
+#    CONSEQUENCE FOR THE SEARCH SPACE: the winning topology has replicas == 1,
+#    where routing is INERT (the sampler forces round-robin and the scorer
+#    subsystem is gated off by `replicas > 1`). So the entire routing half of
+#    this space — routing_policy, snapshot_refresh_interval, and all 1,295 scorer
+#    profiles — cannot influence the best config. It is retained to characterize
+#    tp4 x2, not because it can win. If you only care about the optimum, pin
+#    tp8 x1 and drop the routing knobs; if you keep them, expect most of the
+#    budget to be spent on a dominated topology.
+#
+# B. THE KNEE IS REAL AND THE SWEEP FINDS IT. At tp4 x2 rps peaks at conc 32
+#    (0.5062) and FALLS at 64 (0.4593) — the metric is not merely saturating, it
+#    degrades. tp8 x1 is still climbing at 64 (0.666), so its knee is past the
+#    top rung and the 64 value is a lower bound, not a peak. Meanwhile:
+#      * completed_requests falls MONOTONICALLY, 3,906 -> 2,674 (-32%)
+#      * ttft_p99 rises 40x, 3.4 s -> 137.7 s
+#      * cache_hit_rate collapses past the knee, 0.535 -> 0.295 at tp4 x2
+#    This validates `completed_requests` as the second objective: it is the axis
+#    that moves in the opposite direction to rps, so the front shows the
+#    tradeoff instead of just picking the heaviest pool. Note it does NOT fully
+#    protect the front — rps and completed_requests both favour ~conc 32 over
+#    conc 64, but nothing in the objectives penalizes a 137 s TTFT. READ
+#    ttft_p99_ms ON THE FRONT MANUALLY.
+#
+# C. TIMEOUTS, NOT PREEMPTION, ARE THE FAILURE MODE. preemption_count is 0
+#    almost everywhere (5 at one point), so KV pressure never forces eviction.
+#    What actually degrades the high rungs is timed_out_requests: 1 -> 54 as
+#    concurrency rises. Because a timeout CANCELS the rest of its session
+#    (sim/workload/session.go:117) and sessions run up to 1,991 rounds, each
+#    timeout removes a long tail of expensive high-context rounds. That is also
+#    why dropped_unservable FALLS with concurrency (82 -> 33): sessions die
+#    before they accumulate enough context to breach the 128k cap. The two
+#    failure counters are ANTI-correlated here; read both.
+#
+# D. THE TOPOLOGY SPACE IS ONLY {tp4 x1, tp4 x2, tp8 x1}. A 70B in bf16 is
+#    131.42 GiB of weights, and blis reports the total overhead as 137.07 GiB
+#    (131.42 weights + 5.50 activation + 0.15 non-torch):
+#      * tp1 — HARD FATAL. "model overhead (137.07 GiB) exceeds available GPU
+#        memory (72.00 GiB = 80.0 GiB x 90% util x 1 GPUs). Minimum GPUs required
+#        per instance: 2". Every tp1 config would be recorded INVALID.
+#      * tp2 — RUNS, AMPUTATES. 2,409 blocks x 16 = 38,544 tokens of KV, and blis
+#        silently caps --max-model-len to that. Measured tp2 x4 / conc 8 /
+#        total 20: 20 of 31 requests dropped_unservable, 11 completed, and
+#        rps 6.72 against 0.076 for an honest topology — an 88x FAKE win, because
+#        round 0 of most sessions is unservable and a dropped round cancels its
+#        session. It would dominate the front outright.
+#    Both are excluded in `infrastructure.tp`. This is the main structural
+#    difference from the 14B version of this file, which searched tp 1-8.
+#
+# E. max_model_len IS NOT NEUTRAL, and it is why this file's rps numbers cannot
+#    be compared to the 14B ones. Same topology and concurrency (tp4 x2, 16),
+#    only the ceiling differs:
+#      824,580 -> 5,527 done,     0 drop, 68 tmo, rps 0.257, ttft_p99  16.7 s
+#      128,000 -> 3,620 done,    66 drop, 19 tmo, rps 0.404, ttft_p99   7.1 s
+#    The 128k cap looks 57% BETTER on rps while completing 34% FEWER requests —
+#    the amputation effect again, since 66 drops cancel 66 sessions and remove
+#    their long high-context tails. 128,000 is nonetheless the right choice
+#    because it is the model's real ceiling (max_position_embeddings 131,072);
+#    824,580 would simulate a context Llama-3.1 cannot serve. It is single-valued
+#    so it stays constant across the campaign and does not corrupt within-
+#    campaign comparisons — but never compare these absolute rps values against a
+#    run at a different ceiling.
+#
+#    CAVEAT on all capacity numbers: BLIS's KV auto-sizing overestimates capacity
+#    by ~TPx (verified 4.05x vs vLLM at TP=4). So the real KV ceiling is tighter
+#    than blis reports, "preemption is 0" is optimistic, and tp4-vs-tp8
+#    comparisons of drops/preemptions inherit a TP-proportional bias — which at
+#    TP 4 vs 8 is a 2x differential favouring tp8. Finding A's margin is large
+#    enough to survive that, but do not treat the zero-preemption column as a
+#    measurement of headroom. To pin capacity honestly, pass --total-kv-blocks
+#    from vLLM's logged "GPU KV cache size" / block_size instead.
+#
+# NOT CHARACTERIZED: tp4 x1 (the 4-GPU option — only interesting if you
+# re-enable the gpus_used objective), and every rung at concurrency 1-8 for
+# tp8 x1.
+#
+# ═════════════════════════════════════════════════════════════════════════════
+# MEASURED KNOB SENSITIVITY — STALE: qwen3-14b NUMBERS, NOT RE-MEASURED
+# ═════════════════════════════════════════════════════════════════════════════
+# !! EVERYTHING IN THIS SECTION was measured on 2026-08-26 against
+# !! qwen/qwen3-14b at concurrency 8 with max-model-len unset (see the
+# !! max_model_len bugfix note — the flag never reached blis). It has NOT been
+# !! re-measured on Llama-3.1-70B, at 128k context, or at any other concurrency
+# !! rung. A 5x larger model with 80 layers and 8 KV heads has a different
+# !! compute/bandwidth balance, and the two baselines below (tp1 x8, tp2 x4) are
+# !! now EXCLUDED TOPOLOGIES that no longer run at all.
+# !!
+# !! Use it ONLY as a list of which knobs move the simulator at all — that is
+# !! why each knob is still in the space. Do NOT read the percentages as effect
+# !! sizes for this model, and do not re-derive value ranges from them without
+# !! re-probing. The one claim below that has been re-verified on 70B is that
+# !! routing cannot matter at the winning topology (finding A), which is a
+# !! stronger statement than anything in this table.
+#
+# One-knob-at-a-time probes against two baselines, concurrent 8 / total 24 /
+# seed 42. "identical" below means every metric byte-for-byte unchanged.
+#
+# Baseline A: tp4 x2, fcfs, mnbt 8192, lpt 0, block 16, gmu 0.90, least-loaded
+#             -> rps 0.3075  ttft_p99 7,729 ms  cache 0.597  completed 2,146
+# Baseline B: tp1 x8, same knobs
+#             -> rps 0.2709  ttft_p99 9,424 ms  cache 0.353  completed 1,466
+#
+#   knob change (from A)                rps      ttft_p99   cache    verdict
+#   --max-num-batched-tokens 2048     -33.0%      +67.8%   +3.2%    LIVE, big
+#   --block-size-in-tokens 64         -32.4%      +51.6%   +2.5%    LIVE, big
+#   --snapshot-refresh-interval 0     -32.6%      +57.4%   +3.1%    LIVE, big
+#   --long-prefill-token-threshold 2048 -31.0%    +67.8%   +4.0%    LIVE, big
+#   --routing-policy weighted         -29.2%      +21.2%  +23.1%    LIVE, big
+#   --scheduler sjf                    +0.8%       -0.1%   +1.4%    LIVE, small
+#   --max-num-seqs 32                  identical                    DEAD (dropped)
+#   --gpu-memory-utilization 0.85      identical                    see below
+#   --counterfactual-k 4               identical                    DEAD
+#   --flow-control (utilization)       identical                    DEAD
+#   --cache-signal-delay 0             identical (vs weighted)      DEAD
+#
+#   knob change (from B, 8 instances)   rps      ttft_p99   cache    verdict
+#   --routing-policy weighted          -1.5%     +470.7%  +96.7%    LIVE, huge
+#   --gpu-memory-utilization 0.85      -1.6%      -23.4%   -2.8%    LIVE at low TP
+#
+# Reading these deltas: a "-33% rps" is NOT a clean knob effect. Completed
+# requests moved by up to +15.5% across these probes because a timeout or drop
+# CANCELS the rest of its session (sim/workload/session.go:117) and sessions run
+# up to 1,991 rounds — so a config that loses one round of a long session serves
+# a different, cheaper request population. Only `sjf` held completed_requests
+# fixed at 2,146, making its +0.8% the one population-clean number here. Treat
+# the table as "does this knob change behaviour at all", not as an effect size,
+# and always read completed_requests next to rps.
+#
+# --max-num-seqs was REMOVED as a knob at concurrency 8 (at most 8 requests in
+# flight, so 32 and 256 are the same simulation) and has been RESTORED for this
+# campaign, exactly as that note prescribed, because concurrency now reaches 64.
+# Expect it to stay inert on the 1-16 rungs and to bind only at 32/64.
+#
+# --gpu-memory-utilization is kept despite being inert at tp4 x2: at tp1 x8 it
+# moves the KV-feasible max-model-len cap and changes the run (-23% ttft_p99).
+# It is a low-TP-only lever here.
+#
+# ROUTING IS THE BIGGEST NON-TOPOLOGY LEVER, and it is a genuine tradeoff rather
+# than a free win. At tp1 x8, cache-affinity scoring nearly doubles reuse but
+# concentrates sessions onto single-GPU instances until KV binds:
+#
+#   scorer profile (tp1 x8, weighted)          rps     ttft_p99   cache  preempt
+#   least-loaded (no scorers, baseline B)   0.2709      9,424 ms  0.353     0
+#   ppc:2,queue-depth:1,kv-util:1           0.2667     53,780 ms  0.695     3
+#   ppc:2,no-hit-lru:2,queue-depth:1        0.2425    135,397 ms  0.695    51
+#   ppc:3,queue-depth:1                     0.2248    128,549 ms  0.661   110
+#   active-requests:2,load-balance:1        0.2690      9,278 ms  0.343     0
+#
+# Two decisions follow. (1) Scorer WEIGHTS are the high-resolution part of this
+# space — ppc:2 vs ppc:3 is the difference between 3 and 110 preemptions — so the
+# weight range was widened to 1-5 rather than 1-3 (1,295 profiles, up from 255;
+# the surrounding prose said 624, which corresponds to weights 1-4 and no longer
+# matches the `weights:` list below). (2) The
+# load-only scorers were tested and NOT added: active-requests:2,load-balance:1
+# reproduces plain least-loaded to within 1% rps with identical completed
+# requests and zero preemptions, i.e. it duplicates a routing_policy value
+# already in the space instead of adding behaviour.
+#
+# ═════════════════════════════════════════════════════════════════════════════
+# OMITTED KNOBS — measured dead, structurally unavailable, or unsafe
+# ═════════════════════════════════════════════════════════════════════════════
+# MEASURED DEAD (identical output; see the table above)
+#   (--max-num-seqs was here; RESTORED as a knob now that concurrency reaches 64)
+#   --counterfactual-k              routing-analysis only, no behavioural effect
+#   --flow-control and every gateway knob (--saturation-detector,
+#     --queue-depth-threshold, --kv-cache-util-threshold, --dispatch-order,
+#     --max-gateway-queue-depth, --dispatch-tick-interval, --per-band-capacity,
+#     --usage-limit-threshold)      admission is always-admit and a closed loop
+#                                   of 8 never builds a gateway queue
+#   --cache-signal-delay            50 ms staleness against multi-second steps
+#
+# STRUCTURALLY UNAVAILABLE ON THIS TRACE
+#   --kv-offload-config             HARD ERROR: "the trace was captured without a
+#     (and every kv_offload knob)   kv_offload config; --kv-offload-config cannot
+#                                   add one on replay of a sim-generated trace
+#                                   (INV-13)". weka.yaml is mode: generated, and
+#                                   on replay the header is authoritative for
+#                                   offload config — so offload can never be a
+#                                   search DIMENSION on any replay trace, only a
+#                                   property baked into the corpus. To search it,
+#                                   the corpus must be re-captured (observe,
+#                                   mode: real) or re-converted with the config.
+#                                   This is the one big untapped subsystem for
+#                                   100k+ token contexts; it needs a different
+#                                   experiment, not a knob here.
+#   --kv-cpu-blocks (legacy tier)   Runs, but NOT searchable: three probes each
+#     --kv-offload-threshold        exceeded 55 MINUTES against a 3-7 min
+#     --kv-transfer-bandwidth       baseline (>10x) and were killed. At
+#     --kv-transfer-base-latency    --eval-timeout 900 every CPU-tier config
+#                                   would time out and be silently recorded as
+#                                   INVALID, biasing the search against it. Raise
+#                                   the timeout to hours if you want to try.
+#   --dp, --enable-expert-parallel, MoE-only per their own help text; qwen3-14b
+#     --moe-comm-backend            is dense. --dp would also break gpus_used,
+#                                   which is tp x replicas and ignores dp.
+#   --admission-policy tier-shed /  slo_class is empty trace-wide: one band, so
+#     gaie-legacy, --preemption-    nothing to shed, rank, or gate
+#     policy priority, --scheduler
+#     priority-fcfs / reverse-
+#     priority, --fairness-policy
+#   --encode-* (encode pool)        image/audio/video token columns are all 0
+#   --lora-* / lora-affinity        no adapter column in the corpus
+#   --routing-latency,              physical constants, not deployment choices
+#     --admission-latency
+#   --max-model-len as a dimension  it is a servability ceiling that reserves
+#                                   nothing, so lowering it only adds drops
+#   --total-kv-blocks               would pin capacity honestly against the ~TPx
+#                                   overcount, but one literal value cannot be
+#                                   right across a tp 1-8 space (auto-calc is
+#                                   per-topology). Pass it in a fixed-topology
+#                                   study instead.
+#
+# UNSAFE FOR THIS OBJECTIVE (would game rps by amputating the workload)
+#   --request-ttl, --queue-shedding, --in-flight-eviction, --admission-policy
+#   token-bucket / reject-all: every one of these cancels or rejects requests,
+#   and a cancelled round ends its session (up to 1,991 remaining rounds), so a
+#   config can "win" on rps by serving a smaller, cheaper population. Keep the
+#   dropped_unservable / timed_out_requests SLO guard on regardless.
+#
+# ═════════════════════════════════════════════════════════════════════════════
+
+infrastructure:
+  gpu_budget: 8
+  # tp 1 and 2 are EXCLUDED on measured evidence, not taste (see finding D).
+  # tp1 is a hard fatal: blis refuses to auto-size KV because a 131.42 GiB
+  # weight footprint exceeds 72 GiB of usable HBM ("Minimum GPUs required per
+  # instance: 2"), so every tp1 config would be recorded INVALID and burn budget.
+  # tp2 RUNS but amputates the workload: 137 GiB of weights on 144 GiB leaves KV
+  # for only 2,409 blocks x 16 = 38,544 tokens, and blis silently caps
+  # --max-model-len to that. Measured at tp2 x4 / conc 8 / total 20: 20 of 31
+  # requests dropped_unservable, 11 completed, rps 6.72 vs 0.076 for an honest
+  # topology — an 88x FAKE win, because round 0 of most sessions is unservable
+  # and a dropped round cancels its whole session. It would dominate the front
+  # outright. Restore either only with a smaller model or a larger gpu_budget.
+  tp: [4, 8]
+  explore_pd: false
+
+parameters:
+  # ── Workload injection: the trace itself ───────────────────────────────────
+  # Single-valued on purpose — injection points, not search dimensions. These
+  # replace `workload_spec` (--workload-spec does not exist on `blis replay`).
+  trace_header:
+    flag: "--trace-header"
+    values: ["tools/blis-search/workloads/weka.yaml"]
+
+  trace_data:
+    flag: "--trace-data"
+    values: ["tools/blis-search/workloads/weka.csv"]
+
+  # Mandatory. BUGFIX: this block said `value:` (singular) until 2026-08-27.
+  # search_space.get_param_values reads `values` ONLY, so the whole parameter was
+  # silently dropped and --max-model-len NEVER reached blis — every earlier
+  # campaign ran at the model default. There is no schema validation to catch
+  # this (see the NOTE in HOW TO RUN); re-check with the flag-print snippet after
+  # any edit.
+  #
+  # 128,000 is chosen to match the model, not the trace: Llama-3.1-70B declares
+  # max_position_embeddings 131,072, so a larger ceiling would simulate a context
+  # the real model cannot serve. Accumulated contexts in this corpus reach
+  # 824,580 tokens, so rounds above 128k ARE dropped as unservable and their
+  # sessions die — that is a true property of running this trace on this model,
+  # not a config artifact. Read dropped_unservable on every result.
+  #
+  # This is a CEILING, not a reservation: blis caps it per instance to what KV
+  # can actually hold (finding C), so raising it only helps topologies whose KV
+  # capacity already exceeds it.
+  max_model_len:
+    flag: "--max-model-len"
+    values: [128000]
+
+
+  # THE SWEPT DIMENSION (2026-08-27). Closed-loop, so responses_per_sec measures
+  # how fast rounds clear (real capacity) rather than "did it keep up with an
+  # offered rate", and concurrency is the pool size that sets the offered load.
+  #
+  # Read the resulting front as a CAPACITY CURVE, not as a config ranking. This
+  # file previously pinned concurrency single-valued for a reason that still
+  # holds: rps rises with pool size until the cluster saturates, so on a
+  # maximize-rps front the highest non-collapsing concurrency wins almost
+  # regardless of the other knobs. Two consequences to respect:
+  #   * `completed_requests` was added as a second objective to catch the
+  #     collapse — at high concurrency, timeouts and drops cancel sessions (each
+  #     up to 1,991 rounds), so rps can keep climbing while the served
+  #     population shrinks. Both objectives still rise with concurrency, so the
+  #     front does NOT self-correct; it only makes the collapse visible.
+  #   * to compare POLICY knobs rather than load points, re-pin this to one
+  #     value and re-run. The sweep answers "where is the knee", not "which
+  #     scorer profile is best".
+  # The top rung is 64, NOT 128. concurrency > total_sessions is a HARD FATAL:
+  # "Failed to build session pool: total (100) must be >= concurrent (128)".
+  # It is not pool-limited or clamped — the eval dies in 0.1 s and
+  # evaluator.py records it as INVALID, so a 128 rung would silently burn 1/7 of
+  # the budget. Raise total_sessions first if you want a higher rung; the
+  # constraint below enforces the relationship.
+  concurrent_sessions:
+    flag: "--concurrent-sessions"
+    values: [1, 4, 8, 16, 32, 64]
+
+  # 100 sessions x ~107 median rounds, measured 5,527-7,670 completed per eval.
+  # The corpus holds 219 sessions, so 100 needs no duplication (beyond 219 blis
+  # duplicates with cache-busting). Raising it improves metric stability and
+  # increases eval wall-clock roughly linearly.
+  total_sessions:
+    flag: "--total-sessions"
+    values: [10]
+
+  # Seeded-random corpus subset + admission order. With total_sessions 100 < the
+  # corpus's 219, the UNSHUFFLED default takes a deterministic prefix of the
+  # corpus, so the 119 unused sessions are always the same ones and the measured
+  # load point is a property of corpus ORDER. Shuffling draws a seeded-random
+  # 100-of-219 instead. Requires --concurrent-sessions > 0 (hard error
+  # otherwise), which every rung above satisfies.
+  #
+  # Boolean, single-valued: evaluator.build_command emits a bare flag for True
+  # and omits it entirely for False, so `values: [true]` pins it on. It is NOT a
+  # search dimension — the subset is held fixed so configs are compared on one
+  # population. The permutation is seeded from --seed, so it is identical across
+  # every config in a campaign, and identical to `blis observe --shuffle-corpus`
+  # at the same seed (calibration parity, #1480). CHANGING --seed CHANGES THE
+  # SUBSET, so results are not comparable across seeds.
+  shuffle_corpus:
+    flag: "--shuffle-corpus"
+    values: [true]
+
+  # ── Instance scheduling ───────────────────────────────────────────────────
+  # RESTORED 2026-08-27, exactly as the previous version of this file instructed
+  # ("Restore it if you raise concurrent_sessions"). It was dropped as measured-
+  # DEAD only because concurrency was pinned at 8, which caps in-flight requests
+  # at 8 and makes 32 and 256 the same simulation. With concurrency now swept to
+  # 128 the batch-slot ceiling binds again at the top rungs. It remains inert at
+  # the low rungs — expect no effect below concurrency 32, and read it only on
+  # the 64/128 rungs.
+  max_num_seqs:
+    flag: "--max-num-seqs"
+    values: [32, 64, 128, 256]
+
+  # Per-step token budget: how fast a round's prefill clears. This trace is
+  # prefill-heavy (p99 delta 150k tokens), so the high end should matter more
+  # here than on a synthetic spec.
+  # Measured the single biggest scalar lever from baseline A (-33% rps at 2048),
+  # so it carries the finest resolution in the space.
+  max_scheduled_tokens:
+    flag: "--max-num-batched-tokens"
+    values: [2048, 4096, 8192, 16384, 32768]
+
+  # Measured -31% rps / +68% ttft at 2048, i.e. chunking these huge prefills is
+  # costly here. Widened around the measured cliff.
+  long_prefill:
+    flag: "--long-prefill-token-threshold"
+    values: [0, 1024, 2048, 4096, 8192]
+
+  # Input length spans 4 orders of magnitude (137 -> 824,580), so shortest-job
+  # -first has real material to work with.
+  #
+  # REVERTED 2026-08-27 from `priority`, which is NOT A VALID VALUE and is a hard
+  # fatal: `Unknown scheduler "priority". Valid: fcfs, priority-fcfs,
+  # reverse-priority, sjf`. Because evaluator.py cannot distinguish that fatal
+  # from an invalid config, it would have silently recorded ~half of every
+  # campaign as INVALID.
+  #
+  # The two SLO-ranking schedulers are deliberately omitted rather than mistyped:
+  # priority-fcfs and reverse-priority both rank by SLO tier, and slo_class is
+  # EMPTY in all 37,732 rows of this trace, so every request lands in one band
+  # and both degrade to fcfs — real values that simulate nothing new. Only
+  # fcfs vs sjf discriminates on this corpus.
+  scheduler:
+    flag: "--scheduler"
+    values: [fcfs, priority]
+
+  # Prefix-reuse granularity. 64 included because the source dataset hashed KV
+  # at 64-token blocks and contexts here are ~1000x a synthetic spec, so coarser
+  # blocks cut per-block bookkeeping. The trace carries no hash_ids, so this
+  # only affects BLIS-side cache accounting.
+  block_size:
+    flag: "--block-size-in-tokens"
+    values: [16, 32, 64]
+
+  # Kept for its effect on the KV-feasible max-model-len cap, not for preemption
+  # — preemption is 0 almost everywhere on this model (finding C). At 70B it is
+  # more consequential than at 14B: weights alone are 131.42 of the 137.07 GiB
+  # overhead, so the utilization fraction moves what little is left for KV, and
+  # at tp4 it is the difference between clearing the 128k ceiling and being
+  # capped below it.
+  #
+  # NOTE 0.95 is retained here but is NOT deployable in practice — it deadlocks
+  # CUDA-graph capture at TP=4 on real hardware, and BLIS has no failure mode
+  # that represents this. Treat a front entry that wins at 0.95 as unrealizable.
+  gpu_memory_utilization:
+    flag: "--gpu-memory-utilization"
+    values: [0.85, 0.90, 0.95]
+
+  # ── Routing ───────────────────────────────────────────────────────────────
+  # Signal freshness for the load-based routing signals (QueueDepth/BatchSize/
+  # KVUtilization; INV-7). ADDED on evidence: an earlier version of this file
+  # omitted it on the reasoning that 25-50 ms of staleness cannot matter against
+  # multi-second steps. That reasoning was WRONG — 0 (immediate) measured -32.6%
+  # rps / +57% ttft_p99 vs the 50 ms default, one of the largest single-knob
+  # effects here. Fresher signals make load-based routing chase instantaneous
+  # state and break session affinity. Inert at replicas == 1.
+  snapshot_refresh_interval:
+    flag: "--snapshot-refresh-interval"
+    values: [0, 25000, 50000, 100000]
+
+  # Inert at replicas == 1; the sampler forces round-robin there.
+  routing_policy:
+    flag: "--routing-policy"
+    values: [round-robin, least-loaded, weighted]
+
+constraints:
+  - "long_prefill == 0 or long_prefill < max_scheduled_tokens"
+  # blis fatals when the pool target is smaller than the concurrency ("total
+  # (100) must be >= concurrent (128)"), and evaluator.py cannot tell that fatal
+  # from an invalid config. Enforce it in the sampler so a future edit to either
+  # list cannot silently poison the campaign.
+  - "concurrent_sessions <= total_sessions"
+
+conditional_subsystems:
+  # Measured the biggest non-topology lever (see MEASURED KNOB SENSITIVITY):
+  # cache-affinity scoring nearly doubles reuse at tp1 x8 but drives TTFT p99
+  # from 9.4 s to 54-135 s and preemptions from 0 to 110. The tradeoff is
+  # weight-sensitive — ppc:2 gives 3 preemptions, ppc:3 gives 110 — so weights
+  # run 1-5 rather than 1-3, which is 1,295 profiles (sum over r of C(4,r)*5^r),
+  # NOT the 624 this comment used to claim (that figure was for weights 1-4).
+  # The load-only scorers
+  # (active-requests, load-balance) were probed and deliberately NOT added: they
+  # reproduce plain least-loaded to within 1%.
+  routing_scorers:
+    enabled_when: "routing_policy == 'weighted' and replicas > 1"
+    flag: "--routing-scorers"
+    format_b:
+      scorers: [precise-prefix-cache, queue-depth, kv-utilization, no-hit-lru]
+      weights: [1, 2, 3, 4, 5]
+
+diversity_safe:
+  routing_policy: [round-robin, least-loaded, weighted]
+
+objectives:
+  - metric: tokens_per_sec
+    direction: maximize
+  - metric: completed_requests
+    direction: maximize
+  - metric: gpus_used
+    direction: minimize
+
+# NOTE: no script in tools/blis-search reads this block — the evaluator returns
+# the whole metrics JSON regardless. It documents what to READ, and what --slo
+# may reference (filter_by_slo accepts any key present in the metrics JSON).
+secondary_metrics:
+  - ttft_p99_ms
+  - e2e_p99_ms
+  - itl_mean_ms
+  - tokens_per_sec
+  - scheduling_delay_p99_ms
+  - preemption_count
+  - completed_requests
+  # cache_hit_rate is the mechanism behind finding A — read it alongside rps.
+  # dropped_unservable and timed_out_requests are the failure modes a too-small
+  # max_model_len, a KV-capped topology, or an oversaturated load point produce;
+  # a config that "wins" while dropping requests has not won.
+  - cache_hit_rate
+  - dropped_unservable
+  - timed_out_requests
+
+hypervolume_reference:
+  # Normalizers, not nadir points: pareto.py DIVIDES by these. There must be an
+  # entry for EVERY metric in `objectives` — search.py:330 falls back to a silent
+  # 100000.0 for a missing one, which would normalize completed_requests to ~0.06
+  # and shrink HV toward the convergence detector's 1e-3 epsilon.
+  #
+  # RE-CALIBRATED 2026-08-27 against the measured sweep below, in the 128k-cap
+  # regime these numbers only describe. Best rps observed across the whole probe
+  # matrix is 0.666 (tp8 x1, conc 64) and best completed_requests is 3,906
+  # (tp4 x2, conc 1); 1.2 and 6000 sit ~1.8x and ~1.5x above those, so a config
+  # better than every probe still normalizes below 1 without clipping.
+  #
+  # Both are regime-specific. Re-calibrate if you change max_model_len (the 128k
+  # cap roughly +57% rps vs 824,580 — see finding E), concurrent_sessions,
+  # total_sessions, shuffle_corpus, or --seed.
+  responses_per_sec: 1.2
+  completed_requests: 6000.0
+  # gpus_used is currently commented OUT of `objectives`, so this entry is inert.
+  # Kept because re-enabling that axis is a one-line change. 9, not 8: at 8 the
+  # 8-GPU point normalizes to 0 and contributes no hypervolume at all. Keep it
+  # above gpu_budget.
+  gpus_used: 9.0

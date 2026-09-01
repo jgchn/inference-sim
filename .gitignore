@@ -137,3 +137,9 @@ docs/plans/
 # Nous campaign orchestration (experiment worktrees + state, not committed)
 .nous-experiments/
 .nous/
+
+# Weka agentic trace dataset (multi-GB raw JSONL + derived TraceV2) — fetch locally, never commit
+tools/blis-search/workloads/weka.csv
+tools/blis-search/workloads/weka.yaml
+tools/blis-search/workloads/weka.yaml.csv
+tools/blis-search/workloads/cc-traces-weka-with-subagents-051926/

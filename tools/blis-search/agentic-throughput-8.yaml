@@ -1,0 +1,264 @@
+# Throughput-maximizing search for a REAL agentic multi-turn trace (weka).
+#   model: qwen/qwen3-14b    hardware: H100    budget: 8 GPUs
+#   workload: TraceV2 replay of semianalysisai/cc-traces-weka-with-subagents-051926
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# HOW TO RUN — this space drives `blis replay`, not `blis run`
+# ─────────────────────────────────────────────────────────────────────────────
+# The workload is a captured trace (header YAML + data CSV), which only
+# `blis replay` accepts. evaluator.py:30 hardcodes `[blis_binary, "run"]`, so
+# point --blis-binary at the shim, which rewrites the subcommand and strips the
+# run-only workload flags. Everything else — including --metrics-path, which is
+# symmetric across run/replay (#1583) — passes through untouched.
+#
+# Run from the repo root (`blis replay` resolves --defaults-filepath from cwd):
+#
+#   python3 tools/blis-search/search.py \
+#     --model qwen/qwen3-14b --hardware H100 \
+#     --workload chatbot --rate 18 --num-requests 4000 \
+#     --search-space tools/blis-search/agentic-throughput-8.yaml \
+#     --objectives "responses_per_sec:maximize,gpus_used:minimize" \
+#     --slo "ttft_p99_ms<15000" \
+#     --budget 600 --workers 8 --eval-timeout 900 \
+#     --blis-binary tools/blis-search/blis-replay-shim.sh \
+#     --output weka-throughput.json --output-all --verbose
+#
+# NOTE on --workload/--rate/--num-requests: still INERT, and now doubly so —
+# search.py requires them for argparse, then the shim deletes them because
+# `blis replay` has no such flags. The trace below governs arrivals entirely.
+# Be aware search.py:343 writes fixed_params into the output's `spec` block, so
+# results will claim `workload=chatbot rate=18`. That is a lie inherited from
+# search.py, and the `spec` block does NOT carry the trace: it is built from
+# fixed_params only (model, hardware, latency-model, seed, workload, rate,
+# num-requests). Real provenance lives per-config instead — read
+# `pareto_front[].config.trace_header` / `.trace_data`, or the same fields under
+# `all_results[]` when run with --output-all (which writes the `all_results`
+# key, not `all_configs`).
+#
+# NOTE on --eval-timeout 900: replay of this trace is ~50x slower than the old
+# synthetic spec. Accumulated contexts reach 824k tokens, so a single eval runs
+# 30s-10min+ depending on topology. tp8 x1 EXCEEDED 10 MINUTES and was killed
+# during calibration. evaluator.py swallows timeouts as `return None`
+# (returncode != 0 -> None, plus a bare `except Exception`), so an
+# under-set timeout silently reports configs as invalid rather than erroring.
+# If valid/total is low, suspect the timeout before the search space.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# TRACE PROPERTIES that make several knobs inert (verified against weka.csv)
+# ─────────────────────────────────────────────────────────────────────────────
+#   session_context_growth: accumulate — per-round input_tokens are DELTAS
+#       (p50 137, p99 150,088, max 824,580), not absolute prompt lengths. Fixed
+#       replay is REJECTED by blis with a fatal error; closed-loop is mandatory.
+#       The shim supplies --concurrent-sessions, which implies closed-loop.
+#   prefix_group / prefix_length: EMPTY in all 37,732 rows. The conversion did
+#       not carry the dataset's per-request KV block hashes into TraceV2, so
+#       there are no declared prefix groups. Cache reuse arises purely from
+#       session context accumulation — it is real (cache_hit_rate 0.18-0.55
+#       measured) but the router cannot see group labels.
+#   slo_class: EMPTY in all rows. Every request lands in the default class, so
+#       tier-aware knobs (--admission-policy tier-shed, gaie-legacy,
+#       --preemption-policy priority) cannot discriminate and are omitted.
+#   streaming: false in all rows. TTFT is still computed by the DES.
+#   output_tokens: p50 317, p99 7,551, max 36,498 — far heavier than the old
+#       synthetic spec, so decode is no longer negligible.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# MEASURED ON THIS TRACE (CONCURRENT=8, TOTAL_SESSIONS=16, seed 42)
+# ─────────────────────────────────────────────────────────────────────────────
+#   tp1 x8   8 GPU   rps 0.1422   ttft_p99 212,529ms   preempt 118   cache 0.178
+#   tp2 x4   8 GPU   rps 0.1970   ttft_p99  15,256ms   preempt   0   cache 0.324
+#   tp4 x2   8 GPU   rps 0.2367   ttft_p99   9,246ms   preempt   0   cache 0.548
+#   tp8 x1   8 GPU   eval exceeded 10 min; not characterized
+#
+# Two findings that INVERT the old synthetic-workload conclusions:
+#
+#   1. FEWER, FATTER INSTANCES WIN. tp4 x2 dominates tp1 x8 and tp2 x4 on rps
+#      AND ttft AND itl AND cache hit rate simultaneously. On the old spec more
+#      replicas won (tp2 x4 was the routing sweet spot). Cause: consolidating
+#      sessions onto fewer instances raises session-affinity cache reuse
+#      (0.178 -> 0.548), and with 100k+ accumulated contexts cache reuse
+#      dominates load balancing. Consequence: at a fixed 8-GPU budget the front
+#      is a single point, so gpus_used as the second objective is doing real
+#      work here — it is what keeps the front populated across GPU tiers.
+#
+#   2. KV NOW BINDS, at low TP only. preemption_count is 118 at tp1 and 0 at
+#      tp2/tp4. The old space dropped --gpu-memory-utilization and the KV
+#      offload knobs as verified no-ops on the grounds that "KV never binds";
+#      that premise is FALSE on this trace at tp1. gpu_memory_utilization is
+#      restored below as a real knob. Read the tp2/tp4 zeros with suspicion:
+#      BLIS's KV auto-sizing is known to overcount by ~TPx, so "more TP makes
+#      KV stop binding" is exactly the artifact that overcount would produce.
+#      Do not conclude from this file that a real H100 at tp4 has KV headroom.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# STALE EVIDENCE — measured on the OLD synthetic spec, NOT revalidated here
+# ─────────────────────────────────────────────────────────────────────────────
+# Everything below was A/B'd against tools/blis-search/workloads/
+# agentic-multiturn.yaml at rates and context lengths ~1000x smaller than this
+# trace. The knobs are retained because they remain plausible levers, but the
+# NUMBERS DO NOT TRANSFER and the rankings are unverified on weka. Treat as
+# hypotheses to re-measure, not as settled results.
+#
+#   OLD: max-num-seqs          48.44 -> 57.61 req/s   (bound below 128)
+#   OLD: max-num-batched-tokens rps-neutral; TTFT p99 133 -> 59 ms
+#   OLD: chunked prefill        small loss on both axes (56.75 vs 57.68 rps)
+#   OLD: routing at fixed topology  30.73 -> 49.89 req/s (+62%, tp2 x4)
+#   OLD: scorer profile best flips with topology — round-robin beat llm-d's
+#        default at tp2 x4, but the default won at tp4 x2. Finding 1 above
+#        makes the tp4 regime the relevant one, so this needs a fresh sweep.
+#   OLD dropped as no-ops, re-test candidates on this trace:
+#     --kv-cpu-blocks / --kv-offload-threshold  dropped because GPU KV never
+#         reached the 0.9 offload threshold. Now that KV binds at tp1 and
+#         sessions idle through think time holding 100k+ contexts, this is the
+#         single most promising omitted knob. Not added here only to keep the
+#         space small enough for budget 600; add it if tp1 configs matter.
+#     --cache-signal-delay / --snapshot-refresh-interval  dropped as
+#         byte-identical with 4 prefix groups. This trace has NO prefix groups
+#         and 219 sessions, so staleness may now matter.
+#     --scheduler sjf vs fcfs  -0.5%, within noise.
+#     --flow-control  SLO protection, not a throughput lever. Also inert here:
+#         slo_class is empty trace-wide, so there is nothing to shed.
+#   P/D disaggregation (explore_pd) lost on every old split (1P1D 39.15 vs
+#       57.61 aggregated) because rounds were output-light with cache-resident
+#       context. On this trace output_tokens p99 is 7,551 and contexts are
+#       enormous, so that reasoning is weaker — but P/D also needs 1p/1d
+#       minimum, which makes routing inert. Left false; flip to re-test.
+# ─────────────────────────────────────────────────────────────────────────────
+
+infrastructure:
+  gpu_budget: 8
+  tp: [1, 2, 4, 8]
+  explore_pd: false     # old-workload result; see header
+
+parameters:
+  # ── Workload injection: the trace itself ────────────────────────────────────
+  # Single-valued on purpose — injection points, not search dimensions. These
+  # replace the old `workload_spec` param, which mapped to --workload-spec and
+  # does not exist on `blis replay` (the shim strips it if present).
+  trace_header:
+    flag: "--trace-header"
+    values: ["tools/blis-search/workloads/weka.yaml"]
+
+  trace_data:
+    flag: "--trace-data"
+    values: ["tools/blis-search/workloads/weka.csv"]
+
+  # Mandatory. qwen3-14b defaults to MaxModelLen 40,960; accumulated contexts
+  # here reach 824,580 tokens. At the default, requests are silently dropped as
+  # unservable and sessions die mid-stream (2 of 3 dropped in a smoke test).
+  max_model_len:
+    flag: "--max-model-len"
+    values: [1048576]
+
+  # The load point. Closed-loop, so responses_per_sec measures real capacity
+  # ("how fast can it clear rounds") rather than the old open-loop "does it keep
+  # up with the offered rate". Single-valued deliberately: making this a
+  # dimension would put different load points on one front and the lightest
+  # load would dominate the throughput axis for reasons unrelated to config.
+  # Raise it to probe a heavier regime, but re-calibrate hypervolume_reference.
+  concurrent_sessions:
+    flag: "--concurrent-sessions"
+    values: [8]
+
+  # 16 sessions x ~105 median rounds ~= 1,700 requests per eval. Raising this
+  # improves metric stability and linearly increases eval wall-clock.
+  total_sessions:
+    flag: "--total-sessions"
+    values: [16]
+
+  # ── Scheduling knobs ────────────────────────────────────────────────────────
+  # Renamed from --max-num-running-reqs, which is a DEPRECATED ALIAS. It still
+  # works on both run and replay but prints a deprecation notice on every one
+  # of 600 evals. Param key kept as max_batch so `constraints` stays valid.
+  max_batch:
+    flag: "--max-num-seqs"
+    values: [32, 64, 128, 256]
+
+  # Renamed from --max-num-scheduled-tokens (also a deprecated alias).
+  # Per-step token budget sets how fast a round's prefill clears. This trace is
+  # far more prefill-heavy than the old spec (p99 delta 150k tokens), so the
+  # high end is more likely to matter here than it was there.
+  max_scheduled_tokens:
+    flag: "--max-num-batched-tokens"
+    values: [2048, 4096, 8192, 16384]
+
+  long_prefill:
+    flag: "--long-prefill-token-threshold"
+    values: [0, 2048, 4096]
+
+  # Prefix-reuse granularity. 64 added because the source dataset hashed KV at
+  # 64-token blocks and contexts here are ~1000x larger than the old spec, so
+  # coarser blocks cut per-block bookkeeping. Note the trace carries no
+  # hash_ids, so this only affects BLIS-side cache accounting.
+  block_size:
+    flag: "--block-size-in-tokens"
+    values: [16, 32, 64]
+
+  # RESTORED. The old space dropped this as a verified no-op because KV never
+  # bound; that premise is false at tp1 on this trace (118 preemptions).
+  gpu_memory_utilization:
+    flag: "--gpu-memory-utilization"
+    values: [0.85, 0.90]
+
+  routing_policy:
+    flag: "--routing-policy"
+    values: [round-robin, least-loaded, weighted]
+
+constraints:
+  - "long_prefill == 0 or long_prefill < max_scheduled_tokens"
+
+conditional_subsystems:
+  # Scorer weights remain the biggest non-topology lever and the least
+  # transferable one. On the old spec the best profile flipped with topology.
+  # Finding 1 in the header (cache reuse dominates load balancing on real
+  # accumulated contexts) predicts the cache-weighted profiles should win here,
+  # which is the opposite of the old tp2 x4 result where round-robin won — so
+  # this is exactly the dimension worth searching rather than assuming.
+  #
+  # 4 scorers x weights 1-3 = 255 profiles. no-hit-lru is retained despite the
+  # absence of prefix groups: precise-prefix-cache queries live instance KV
+  # state rather than group labels, so cold-request spreading still applies.
+  routing_scorers:
+    enabled_when: "routing_policy == 'weighted' and replicas > 1"
+    flag: "--routing-scorers"
+    format_b:
+      scorers: [precise-prefix-cache, queue-depth, kv-utilization, no-hit-lru]
+      weights: [1, 2, 3]
+
+diversity_safe:
+  routing_policy: [round-robin, least-loaded, weighted]
+
+objectives:
+  - metric: responses_per_sec
+    direction: maximize
+  - metric: gpus_used
+    direction: minimize
+
+secondary_metrics:
+  - ttft_p99_ms
+  - e2e_p99_ms
+  - itl_mean_ms
+  - tokens_per_sec
+  - scheduling_delay_p99_ms
+  - preemption_count
+  - completed_requests
+  # Added for this trace: cache reuse is the dominant mechanism (Finding 1),
+  # and drops/timeouts are the failure modes that a too-small max_model_len or
+  # an oversaturated load point produce.
+  - cache_hit_rate
+  - timed_out_requests
+  - dropped_unservable
+
+hypervolume_reference:
+  # Normalizers, not nadir points: HV divides by these (pareto.py:60-68).
+  #
+  # RESCALED for closed-loop replay. The old value of 100.0 was set for the
+  # synthetic spec's ~63 rps; this trace runs at 0.14-0.24 rps, which under a
+  # reference of 100 normalizes every point to ~0.002 and collapses HV to
+  # ~0.0009 (measured). That silently starves the convergence detector, whose
+  # default epsilon is 0.001 — it would fire almost immediately regardless of
+  # the real front. 0.5 sits above the 0.2367 best measured so nothing clips.
+  # RE-CALIBRATE THIS if you change concurrent_sessions.
+  responses_per_sec: 0.5
+  gpus_used: 9.0            # 9 not 8: with ref 8 the 8-GPU point normalizes to
+                            # 0 and would contribute no hypervolume at all.
